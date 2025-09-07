@@ -17,6 +17,7 @@ export const zh = {
   // Input Screen
   'input.title': '创作一个神奇的故事',
   'input.prompt.placeholder': '一只想飞的勇敢小松鼠...',
+  'input.samples.refresh': '刷新示例提示',
   'input.visualInspiration.label': '视觉灵感（可选）',
   'input.visualInspiration.uploadDescription': '上传一幅画或一张照片！',
   'input.visualInspiration.drawDescription': '画出你的角色！',

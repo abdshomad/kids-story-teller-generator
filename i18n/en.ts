@@ -16,6 +16,7 @@ export const en = {
   // Input Screen
   'input.title': 'Create a Magical Story',
   'input.prompt.placeholder': 'A brave little squirrel who wants to fly...',
+  'input.samples.refresh': 'Refresh sample prompts',
   'input.visualInspiration.label': 'Visual Inspiration (Optional)',
   'input.visualInspiration.uploadDescription': 'Upload a drawing or photo!',
   'input.visualInspiration.drawDescription': 'Draw your character!',

@@ -1,11 +1,12 @@
 
 
+
 import React, { useState, useEffect, useCallback, useRef, FC } from 'react';
 import { StoryOptions } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, LANGUAGES } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
-import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, PenSquare, Loader2, ChevronDown } from 'lucide-react';
+import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, PenSquare, Loader2, ChevronDown, RefreshCw } from 'lucide-react';
 import FullscreenCanvas from './FullscreenCanvas';
 import { extractCharacterDetails, generateSamplePrompts } from '../services/geminiService';
 
@@ -100,16 +101,16 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     }
   }, [transcript, setTranscript]);
 
-  useEffect(() => {
-    const fetchPrompts = async () => {
-      setIsLoadingSamples(true);
-      setSamplePrompts([]);
-      const prompts = await generateSamplePrompts(language);
-      setSamplePrompts(prompts);
-      setIsLoadingSamples(false);
-    };
-    fetchPrompts();
+  const fetchPrompts = useCallback(async () => {
+    setIsLoadingSamples(true);
+    const prompts = await generateSamplePrompts(language);
+    setSamplePrompts(prompts);
+    setIsLoadingSamples(false);
   }, [language]);
+
+  useEffect(() => {
+    fetchPrompts();
+  }, [fetchPrompts]);
 
 
   useEffect(() => {
@@ -274,25 +275,36 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
               )}
             </div>
              {error && <p className="text-red-600 text-sm mt-2 text-center" role="alert">{t(error)}</p>}
-             <div className="flex flex-wrap justify-center gap-8 my-6">
-              {isLoadingSamples ? (
+             <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 my-6">
+              {(isLoadingSamples && samplePrompts.length === 0) ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className={`h-10 w-56 rounded-full animate-pulse ${sampleButtonColors[i % sampleButtonColors.length]}`} />
+                    <div key={i} className={`h-12 w-56 rounded-full animate-pulse ${sampleButtonColors[i % sampleButtonColors.length]}`} />
                 ))
               ) : (
-                samplePrompts.map((sample, i) => {
-                    const isActive = i === activeSampleIndex && !options.prompt;
-                    return (
-                        <button
-                            type="button"
-                            key={i}
-                            onClick={() => handleInputChange('prompt', sample.prompt)}
-                            className={`px-5 py-3 text-white font-semibold rounded-full text-sm shadow-md transition-all duration-300 hover:scale-105 whitespace-nowrap ${sampleButtonColors[i % sampleButtonColors.length]} ${isActive ? 'ring-4 ring-offset-2 ring-violet-400 scale-110' : ''}`}
-                        >
-                            {sample.title}
-                        </button>
-                    );
-                })
+                <>
+                  {samplePrompts.map((sample, i) => {
+                      const isActive = i === activeSampleIndex && !options.prompt;
+                      return (
+                          <button
+                              type="button"
+                              key={i}
+                              onClick={() => handleInputChange('prompt', sample.prompt)}
+                              className={`px-5 py-3 text-white font-semibold rounded-full text-sm shadow-md transition-all duration-300 hover:scale-105 whitespace-nowrap ${sampleButtonColors[i % sampleButtonColors.length]} ${isActive ? 'ring-4 ring-offset-2 ring-violet-400 scale-110' : ''}`}
+                          >
+                              {sample.title}
+                          </button>
+                      );
+                  })}
+                  <button
+                    type="button"
+                    onClick={fetchPrompts}
+                    disabled={isLoadingSamples}
+                    aria-label={t('input.samples.refresh')}
+                    className="p-3 bg-white/80 text-slate-600 rounded-full hover:bg-white shadow-md transition-all disabled:opacity-50 disabled:cursor-wait"
+                  >
+                    <RefreshCw className={`w-5 h-5 ${isLoadingSamples ? 'animate-spin' : ''}`} />
+                  </button>
+                </>
               )}
             </div>
           </section>

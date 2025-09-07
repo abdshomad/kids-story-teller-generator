@@ -128,10 +128,13 @@ const getLanguageName = (lang: Language): string => {
 export const generateSamplePrompts = async (language: Language): Promise<{ title: string; prompt: string; }[]> => {
     const prompt = `
 Generate 4 unique, creative, and imaginative story prompts suitable for children aged 3-8.
+The prompts should be very different from each other. For instance, if one is about a magical animal, another could be about a child's everyday adventure, another about a friendly robot, and another about exploring nature. Be surprising and avoid clichés.
+
 For each prompt, provide a very short, catchy title (max 5 words) and a longer prompt (2-3 sentences).
-Examples:
+Examples of the desired format (do not copy these ideas):
 - Title: "The Magical Hat", Prompt: "A curious but shy cat finds a magical hat in an old attic. When he puts it on, something amazing happens! What new adventures await?"
 - Title: "The Robot's Garden", Prompt: "A happy robot loves to plant flowers for his friends. One day, he finds a mysterious seed that grows into something unexpected. What could it be?"
+
 The prompts must be written in ${getLanguageName(language)}.
 `;
     try {
@@ -263,7 +266,7 @@ const generateSoundEffect = async (prompt: string): Promise<string | undefined> 
         return undefined;
     }
     try {
-        const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM`; // Rachel
+        const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM`; // Rachel - A calm and gentle American voice.
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_API_KEY },
@@ -293,14 +296,14 @@ const generateAudio = async (text: string): Promise<string | undefined> => {
             return undefined;
         }
 
-        const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM`; // Rachel
+        const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb`; // Fin - An old, wise, and expressive storyteller.
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_API_KEY },
             body: JSON.stringify({
                 text: textToSpeak,
                 model_id: 'eleven_multilingual_v2',
-                voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+                voice_settings: { stability: 0.7, similarity_boost: 0.2 },
             }),
         });
         if (!response.ok) throw new Error(`ElevenLabs API error: ${response.status}`);

@@ -17,6 +17,7 @@ export const ja = {
   // Input Screen
   'input.title': '魔法の物語を作成',
   'input.prompt.placeholder': '空を飛びたい勇敢な小さなリス...',
+  'input.samples.refresh': 'サンプルプロンプトを更新',
   'input.visualInspiration.label': 'ビジュアルインスピレーション（任意）',
   'input.visualInspiration.uploadDescription': '絵や写真をアップロード！',
   'input.visualInspiration.drawDescription': 'キャラクターを描こう！',

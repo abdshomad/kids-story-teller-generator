@@ -17,6 +17,7 @@ export const ar = {
   // Input Screen
   'input.title': 'أنشئ قصة ساحرة',
   'input.prompt.placeholder': 'سنجاب صغير شجاع يريد أن يطير...',
+  'input.samples.refresh': 'تحديث المطالبات النموذجية',
   'input.visualInspiration.label': 'إلهام بصري (اختياري)',
   'input.visualInspiration.uploadDescription': 'حمّل رسمًا أو صورة!',
   'input.visualInspiration.drawDescription': 'ارسم شخصيتك!',
