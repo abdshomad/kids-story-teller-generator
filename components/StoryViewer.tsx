@@ -1,12 +1,8 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryData } from '../types';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
 import { useAppContext } from '../App';
-import VolumeUpIcon from './icons/VolumeUpIcon';
-import VolumeOffIcon from './icons/VolumeOffIcon';
-import ArrowLeftIcon from './icons/ArrowLeftIcon';
-import ArrowRightIcon from './icons/ArrowRightIcon';
+import { Volume2, VolumeX, ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface StoryViewerProps {
   story: StoryData;
@@ -73,7 +69,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory }) => {
         <div className="flex items-center gap-4">
           {isSupported && (
             <button onClick={handleReadAloud} title={t('story.readAloud')} className="p-2 rounded-full hover:bg-slate-700 transition-colors">
-              {isSpeaking ? <VolumeUpIcon className="w-6 h-6 text-yellow-400" /> : <VolumeOffIcon className="w-6 h-6" />}
+              {isSpeaking ? <Volume2 className="w-6 h-6 text-yellow-400" /> : <VolumeX className="w-6 h-6" />}
             </button>
           )}
           <button onClick={onNewStory} className="px-4 py-2 bg-blue-500 font-bold rounded-full hover:bg-blue-600 transition-colors">
@@ -102,10 +98,10 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory }) => {
         
         {/* Navigation Buttons */}
         <button onClick={goToPrevPage} disabled={isTitlePage} className="absolute left-0 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 p-3 bg-white/50 rounded-full text-slate-800 hover:bg-white disabled:opacity-0 disabled:cursor-not-allowed transition-all">
-          <ArrowLeftIcon className="w-8 h-8"/>
+          <ArrowLeft className="w-8 h-8"/>
         </button>
         <button onClick={goToNextPage} disabled={currentPage === totalPages - 1} className="absolute right-0 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 p-3 bg-white/50 rounded-full text-slate-800 hover:bg-white disabled:opacity-0 disabled:cursor-not-allowed transition-all">
-          <ArrowRightIcon className="w-8 h-8"/>
+          <ArrowRight className="w-8 h-8"/>
         </button>
       </div>
 

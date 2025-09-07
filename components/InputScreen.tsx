@@ -1,12 +1,9 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryOptions } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, SAMPLE_PROMPTS } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
-import MicIcon from './icons/MicIcon';
-import SparklesIcon from './icons/SparklesIcon';
-import UploadIcon from './icons/UploadIcon';
+import { Mic, Sparkles, Upload } from 'lucide-react';
 
 interface InputScreenProps {
   onCreateStory: (options: StoryOptions) => void;
@@ -82,7 +79,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-800 flex items-center gap-3">
-                <SparklesIcon className="w-8 h-8 text-yellow-500" />
+                <Sparkles className="w-8 h-8 text-yellow-500" />
                 {t('input.title')}
             </h1>
             <div className="flex gap-1 bg-white rounded-full p-1 shadow-md">
@@ -107,7 +104,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                     onClick={isListening ? stopListening : startListening}
                     className={`absolute top-4 right-4 p-2 rounded-full transition-colors ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                 >
-                    <MicIcon className="w-6 h-6" />
+                    <Mic className="w-6 h-6" />
                 </button>
               )}
             </div>
@@ -135,7 +132,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
               <h2 className="text-xl font-bold text-slate-700">{t('input.visualInspiration.label')}</h2>
               <p className="text-sm text-slate-500">{t('input.visualInspiration.description')}</p>
               <label className="w-full cursor-pointer flex items-center justify-center gap-3 p-4 border-2 border-dashed border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 hover:border-blue-500 hover:text-blue-600 transition-colors">
-                 <UploadIcon className="w-6 h-6" />
+                 <Upload className="w-6 h-6" />
                  <span>{visualInspirationPreview ? t('input.visualInspiration.change') : t('input.visualInspiration.button')}</span>
                  <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
               </label>
