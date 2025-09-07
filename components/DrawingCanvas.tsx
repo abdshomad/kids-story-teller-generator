@@ -1,8 +1,7 @@
+
 import React, { useRef, useEffect, useImperativeHandle, forwardRef, useState, useCallback } from 'react';
 
 interface DrawingCanvasProps {
-  width?: number;
-  height?: number;
   strokeColor?: string;
   strokeWidth?: number;
   onDrawStart?: () => void;
@@ -15,8 +14,9 @@ export interface DrawingCanvasRef {
 }
 
 const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
-  ({ width = 300, height = 200, strokeColor = '#334155', strokeWidth = 3, onDrawStart }, ref) => {
+  ({ strokeColor = '#334155', strokeWidth = 3, onDrawStart }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [isEmpty, setIsEmpty] = useState(true);
 
@@ -35,10 +35,13 @@ const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
       } else {
           return null;
       }
+      
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
 
       return {
-          x: clientX - rect.left,
-          y: clientY - rect.top
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY,
       };
     }, []);
 
@@ -112,6 +115,31 @@ const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
             canvas.removeEventListener('touchend', stopDrawing);
         };
     }, [draw, startDrawing, stopDrawing]);
+    
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const container = containerRef.current;
+        if (!canvas || !container) return;
+
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const { width, height } = entry.contentRect;
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.strokeStyle = strokeColor;
+                    ctx.lineWidth = strokeWidth;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                }
+            }
+        });
+
+        resizeObserver.observe(container);
+        return () => resizeObserver.disconnect();
+    }, [strokeColor, strokeWidth]);
+
 
     useImperativeHandle(ref, () => ({
       clear: () => {
@@ -124,19 +152,19 @@ const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
       },
       toDataURL: (type = 'image/png', quality = 1.0) => {
         const canvas = canvasRef.current;
-        if (!canvas) return '';
+        if (!canvas || isEmpty) return '';
         return canvas.toDataURL(type, quality);
       },
       isEmpty: () => isEmpty,
     }));
 
     return (
-      <canvas
-        ref={canvasRef}
-        width={width}
-        height={height}
-        className="bg-white rounded-lg cursor-crosshair touch-none w-full h-auto"
-      />
+      <div ref={containerRef} className="w-full h-full">
+          <canvas
+            ref={canvasRef}
+            className="bg-white rounded-lg cursor-crosshair touch-none w-full h-full"
+          />
+      </div>
     );
   }
 );

@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryData } from '../types';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
 import { useAppContext } from '../App';
-import { Volume2, VolumeX, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Volume2, VolumeX, ArrowLeft, ArrowRight, ImageOff } from 'lucide-react';
 
 interface StoryViewerProps {
   story: StoryData;
@@ -80,12 +81,27 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory }) => {
 
       <div className="flex-grow flex items-center justify-center relative">
         <div className="w-full max-w-5xl aspect-[4/3] bg-white rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
-            <div className="w-full md:w-1/2 h-1/2 md:h-full bg-slate-100 flex items-center justify-center">
-                {currentContent.imageUrl ? (
-                    <img src={currentContent.imageUrl} alt={isTitlePage ? 'Story cover' : `Illustration for page ${currentPage + 1}`} className="w-full h-full object-cover"/>
-                ) : (
-                    <div className="text-slate-400">Image not available</div>
-                )}
+            <div className="w-full md:w-1/2 h-1/2 md:h-full bg-slate-100 flex items-center justify-center p-4">
+                {(() => {
+                    if (currentContent.imageUrl && currentContent.imageUrl !== 'GENERATION_FAILED') {
+                        return <img src={currentContent.imageUrl} alt={isTitlePage ? 'Story cover' : `Illustration for page ${currentPage + 1}`} className="w-full h-full object-cover rounded-lg"/>;
+                    }
+                    if (currentContent.imageUrl === 'GENERATION_FAILED') {
+                        return (
+                            <div className="flex flex-col items-center justify-center text-red-500 gap-2 p-4">
+                                <ImageOff className="w-16 h-16" />
+                                <span className="font-bold text-lg text-center">{t('story.imageError')}</span>
+                            </div>
+                        );
+                    }
+                    // Default case: imageUrl is undefined (still loading)
+                    return (
+                        <div className="flex flex-col items-center justify-center text-slate-500 gap-4">
+                            <div className="w-16 h-16 border-4 border-slate-300 border-t-purple-400 rounded-full animate-spin"></div>
+                            <span className="font-bold text-lg">{t('story.illustrating')}</span>
+                        </div>
+                    );
+                })()}
             </div>
             <div className="w-full md:w-1/2 h-1/2 md:h-full p-6 sm:p-8 flex flex-col justify-center">
                  <div className="overflow-y-auto flex-grow">

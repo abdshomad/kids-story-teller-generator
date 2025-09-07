@@ -1,11 +1,11 @@
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StoryOptions } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, SAMPLE_PROMPTS } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
-import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, ChevronDown } from 'lucide-react';
-import DrawingCanvas, { DrawingCanvasRef } from './DrawingCanvas';
+import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, ChevronDown, PenSquare } from 'lucide-react';
+import FullscreenCanvas from './FullscreenCanvas';
 
 interface InputScreenProps {
   onCreateStory: (options: StoryOptions) => void;
@@ -38,8 +38,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     characterPersonality: '',
   });
   const [visualInspirationPreview, setVisualInspirationPreview] = useState<string | null>(null);
-  const [inspirationSource, setInspirationSource] = useState<'upload' | 'draw' | null>(null);
-  const canvasRef = useRef<DrawingCanvasRef>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
 
   const { isListening, transcript, startListening, stopListening, setTranscript, browserSupportsSpeechRecognition } = useSpeechToText(language);
 
@@ -61,43 +60,27 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
         const { mimeType, data } = await fileToBase64(file);
         handleInputChange('visualInspiration', { mimeType, data });
         setVisualInspirationPreview(URL.createObjectURL(file));
-        setInspirationSource('upload');
-        canvasRef.current?.clear();
       } catch (error) {
         console.error("Error converting file to base64", error);
       }
     }
   };
-
-  const handleDrawStart = useCallback(() => {
-    if (inspirationSource !== 'draw') {
-        setInspirationSource('draw');
-        setVisualInspirationPreview(null);
-        handleInputChange('visualInspiration', undefined);
+  
+  const handleDrawingDone = (dataUrl: string) => {
+    const [mimePart, base64Part] = dataUrl.split(',');
+    if (mimePart && base64Part) {
+      const mimeType = mimePart.split(':')[1].split(';')[0];
+      handleInputChange('visualInspiration', { mimeType, data: base64Part });
+      setVisualInspirationPreview(dataUrl);
     }
-  }, [inspirationSource, handleInputChange]);
+    setIsDrawing(false);
+  };
 
-  const handleClearCanvas = useCallback(() => {
-      canvasRef.current?.clear();
-      if(inspirationSource === 'draw') {
-          setInspirationSource(null);
-      }
-  }, [inspirationSource]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    let finalOptions = { ...options };
-
-    if (inspirationSource === 'draw' && canvasRef.current && !canvasRef.current.isEmpty()) {
-      const dataUrl = canvasRef.current.toDataURL('image/png');
-      const base64Part = dataUrl.split(',')[1];
-      if (base64Part) {
-          finalOptions.visualInspiration = { mimeType: 'image/png', data: base64Part };
-      }
-    }
-
-    if (finalOptions.prompt.trim()) {
-      onCreateStory(finalOptions);
+    if (options.prompt.trim()) {
+      onCreateStory(options);
     }
   };
 
@@ -105,9 +88,13 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     handleInputChange('prompt', t(promptKey));
   };
 
+  if (isDrawing) {
+      return <FullscreenCanvas onDone={handleDrawingDone} onClose={() => setIsDrawing(false)} />;
+  }
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-pink-100 via-purple-100 to-blue-200 p-4 sm:p-8 flex items-center justify-center">
-      <main className="bg-white/70 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl max-w-4xl w-full p-6 sm:p-8">
+      <main className="bg-white/70 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl max-w-6xl w-full p-8 sm:p-12">
         <header className="flex flex-col sm:flex-row justify-between items-center mb-8">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-800 flex items-center gap-3 mb-4 sm:mb-0">
             <Sparkles className="w-8 h-8 text-fuchsia-500" />
@@ -140,9 +127,9 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                 </button>
               )}
             </div>
-             <div className="mt-4">
+             <div className="mt-4 flex flex-col items-center">
                 <h3 className="text-sm font-bold text-slate-500 mb-2">{t('input.inspiration')}</h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 justify-center">
                     {SAMPLE_PROMPTS.map(key => (
                         <button type="button" key={key} onClick={() => handleSamplePrompt(key)} className="px-3 py-1 bg-sky-100/70 text-sky-800 text-sm rounded-full hover:bg-sky-200/80 transition-colors">
                             {t(key)}
@@ -167,7 +154,25 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Select id="ageGroup" label={t('input.options.age')} value={options.ageGroup} onChange={(e) => handleInputChange('ageGroup', e.target.value)} options={AGE_GROUPS.map(o => ({...o, label: t(o.labelKey)}))} />
                 <Select id="theme" label={t('input.options.theme')} value={options.theme} onChange={(e) => handleInputChange('theme', e.target.value)} options={THEMES.map(o => ({...o, label: t(o.labelKey)}))} />
-                <Select id="length" label={t('input.options.length')} value={options.length} onChange={(e) => handleInputChange('length', e.target.value as StoryOptions['length'])} options={STORY_LENGTHS.map(o => ({...o, label: t(o.labelKey)}))} />
+                <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-1">{t('input.options.length')}</label>
+                    <div className="flex gap-2">
+                        {STORY_LENGTHS.map(lengthOption => (
+                            <button
+                                type="button"
+                                key={lengthOption.value}
+                                onClick={() => handleInputChange('length', lengthOption.value as StoryOptions['length'])}
+                                className={`flex-1 p-3 rounded-lg text-xs font-bold transition-all text-center border ${
+                                    options.length === lengthOption.value
+                                        ? 'bg-purple-500 text-white shadow-md border-purple-500'
+                                        : 'bg-white/60 text-slate-700 hover:bg-white/90 border-slate-300/80'
+                                }`}
+                            >
+                                {t(lengthOption.labelKey)}
+                            </button>
+                        ))}
+                    </div>
+                </div>
                 <Select id="illustrationStyle" label={t('input.options.style')} value={options.illustrationStyle} onChange={(e) => handleInputChange('illustrationStyle', e.target.value)} options={ILLUSTRATION_STYLES.map(o => ({...o, label: t(o.labelKey)}))} />
               </div>
             </section>
@@ -175,23 +180,25 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
           
           <section>
             <h2 className="text-xl font-bold text-slate-700 mb-3 flex items-center gap-2"><Image className="w-6 h-6 text-sky-500" />{t('input.visualInspiration.label')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start bg-slate-100/40 p-4 rounded-xl">
-              <div className="flex flex-col items-center gap-3 text-center">
-                <p className="text-sm text-slate-600 font-semibold">{t('input.visualInspiration.uploadDescription')}</p>
-                <label className="w-full max-w-xs cursor-pointer flex items-center justify-center gap-3 p-3 border-2 border-dashed border-slate-300/80 rounded-lg text-slate-600 hover:bg-white/80 hover:border-sky-500 hover:text-sky-600 transition-colors">
+            <div className="bg-slate-100/40 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+                <label className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 p-4 border-2 border-dashed border-slate-300/80 rounded-lg text-slate-600 hover:bg-white/80 hover:border-sky-500 hover:text-sky-600 transition-colors">
                    <Upload className="w-5 h-5" />
-                   <span className="font-semibold">{visualInspirationPreview && inspirationSource === 'upload' ? t('input.visualInspiration.change') : t('input.visualInspiration.button')}</span>
+                   <span className="font-semibold">{t('input.visualInspiration.uploadDescription')}</span>
                    <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                 </label>
-                {visualInspirationPreview && inspirationSource === 'upload' && <img src={visualInspirationPreview} alt="Preview" className="mt-2 rounded-lg object-cover h-24 w-24 mx-auto shadow-md"/>}
-              </div>
-              <div className="flex flex-col items-center gap-2 text-center">
-                 <p className="text-sm text-slate-600 font-semibold">{t('input.visualInspiration.drawDescription')}</p>
-                 <div className="w-full aspect-[4/3] rounded-lg overflow-hidden border border-slate-300/80 shadow-inner">
-                    <DrawingCanvas ref={canvasRef} onDrawStart={handleDrawStart} width={300} height={225} />
-                 </div>
-                 <button type="button" onClick={handleClearCanvas} className="text-sm text-slate-500 hover:text-red-500 transition-colors -mt-1">{t('input.visualInspiration.clearDrawing')}</button>
-              </div>
+                
+                <span className="font-semibold text-slate-500">or</span>
+
+                <button type="button" onClick={() => setIsDrawing(true)} className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 p-4 border-2 border-dashed border-slate-300/80 rounded-lg text-slate-600 hover:bg-white/80 hover:border-purple-500 hover:text-purple-600 transition-colors">
+                   <PenSquare className="w-5 h-5" />
+                   <span className="font-semibold">{t('input.visualInspiration.drawDescription')}</span>
+                </button>
+                
+                {visualInspirationPreview && (
+                  <div className="w-full sm:w-auto sm:ml-4 pt-4 sm:pt-0">
+                    <img src={visualInspirationPreview} alt="Preview" className="rounded-lg object-cover h-24 w-24 mx-auto shadow-md"/>
+                  </div>
+                )}
             </div>
           </section>
 

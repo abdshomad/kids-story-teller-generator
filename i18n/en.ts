@@ -1,3 +1,4 @@
+
 export const en = {
   // Welcome
   'welcome.title': 'A Magical Welcome to Story Time!',
@@ -18,7 +19,7 @@ export const en = {
   'input.inspiration': 'Need inspiration?',
   'input.visualInspiration.label': 'Visual Inspiration (Optional)',
   'input.visualInspiration.uploadDescription': 'Upload a drawing or photo!',
-  'input.visualInspiration.drawDescription': '...or draw your character!',
+  'input.visualInspiration.drawDescription': 'Draw your character!',
   'input.visualInspiration.button': 'Upload Image',
   'input.visualInspiration.change': 'Change Image',
   'input.visualInspiration.clearDrawing': 'Clear Drawing',
@@ -32,9 +33,12 @@ export const en = {
   'input.options.length': 'Length',
   'input.options.style': 'Illustration Style',
   'input.button.create': 'Create My Story!',
+  'input.draw.done': 'Done',
+  'input.draw.clear': 'Clear',
+  'input.draw.close': 'Close',
 
   // Loading Screen
-  'loading.dreaming': 'Dreaming up characters...',
+  'loading.dreaming': 'Dreaming up your story...',
   'loading.building': 'Building a magical world...',
   'loading.painting': 'Painting the pictures...',
   'loading.finishing': 'Adding the final sparkles...',
@@ -44,6 +48,8 @@ export const en = {
   // Story Viewer
   'story.readAloud': 'Read Aloud',
   'story.newStory': 'Create New Story',
+  'story.illustrating': 'Illustrating...',
+  'story.imageError': 'Image could not be generated.',
 
   // Error
   'error.title': 'Oh no, a hiccup in the magic!',
@@ -59,9 +65,9 @@ export const en = {
   'theme.courage': 'Courage',
   'theme.kindness': 'Being Kind',
   'theme.adventure': 'Adventure',
-  'length.short': 'Short (3-4 pages)',
-  'length.medium': 'Medium (5-6 pages)',
-  'length.long': 'Long (7-8 pages)',
+  'length.short': 'Short (7 pages)',
+  'length.medium': 'Medium (19 pages)',
+  'length.long': 'Long (25 pages)',
   'style.watercolor': 'Watercolor',
   'style.cartoon': 'Cartoon',
   'style.pixel': 'Pixel Art',

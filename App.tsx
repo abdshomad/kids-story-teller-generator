@@ -4,7 +4,7 @@ import WelcomeModal from './components/WelcomeModal';
 import InputScreen from './components/InputScreen';
 import LoadingScreen from './components/LoadingScreen';
 import StoryViewer from './components/StoryViewer';
-import { StoryData, StoryOptions, Language, AppState, AppStatus } from './types';
+import { StoryData, StoryOptions, Language, AppState, AppStatus, StoryPage } from './types';
 import { generateStoryAndImages } from './services/geminiService';
 import { locales } from './i18n/locales';
 
@@ -41,10 +41,29 @@ const App: React.FC = () => {
   const handleStoryCreate = async (options: StoryOptions) => {
     setAppState({ status: AppStatus.LOADING, progressMessage: t('loading.dreaming') });
     try {
-      const storyData = await generateStoryAndImages(options, (progressMessage) => {
-        setAppState({ status: AppStatus.LOADING, progressMessage });
-      }, t);
-      setAppState({ status: AppStatus.STORY, storyData });
+      await generateStoryAndImages(
+        options,
+        t,
+        (initialStory) => {
+          setAppState({ status: AppStatus.STORY, storyData: initialStory });
+        },
+        (illustratedPage, index) => {
+          setAppState(currentState => {
+            if (currentState.status !== AppStatus.STORY) return currentState;
+            
+            const newPages = [...currentState.storyData.pages];
+            newPages[index] = illustratedPage;
+
+            return {
+              ...currentState,
+              storyData: {
+                ...currentState.storyData,
+                pages: newPages,
+              },
+            };
+          });
+        }
+      );
     } catch (error) {
       console.error("Failed to generate story:", error);
       const errorMessage = error instanceof Error ? error.message : t('error.generic');

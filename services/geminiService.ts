@@ -8,6 +8,9 @@ if (!process.env.API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
+// FAL.ai configuration
+const FAL_API_URL = 'https://fal.run/fal-ai/nano-banana';
+
 const storySchema = {
   type: Type.OBJECT,
   properties: {
@@ -39,9 +42,9 @@ const storySchema = {
 
 const getPageCount = (length: 'short' | 'medium' | 'long') => {
     switch(length) {
-        case 'short': return '3 to 4';
-        case 'medium': return '5 to 6';
-        case 'long': return '7 to 8';
+        case 'short': return '7';
+        case 'medium': return '19';
+        case 'long': return '25';
     }
 }
 
@@ -84,16 +87,27 @@ Please generate the complete story based on these instructions.
   return parts;
 };
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+const blobToBase64 = (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+};
+
+
 export const generateStoryAndImages = async (
   options: StoryOptions, 
-  onProgress: (message: string) => void,
-  t: (key: string, params?: Record<string, string | number>) => string
-): Promise<StoryData> => {
+  t: (key: string, params?: Record<string, string | number>) => string,
+  onTextComplete: (story: StoryData) => void,
+  onPageIllustrated: (page: StoryPage, index: number) => void
+): Promise<void> => {
     
-  onProgress(t('loading.dreaming'));
-  
+  // 1. Generate story text
   const storyPromptParts = buildStoryPrompt(options);
-
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
     contents: { parts: storyPromptParts },
@@ -110,40 +124,88 @@ export const generateStoryAndImages = async (
     throw new Error("AI failed to generate a valid story structure.");
   }
   
-  onProgress(t('loading.painting'));
+  const initialStoryData: StoryData = {
+    title: storyContent.title,
+    pages: storyContent.pages.map(page => ({ ...page, imageUrl: undefined })),
+  };
 
-  const illustratedPages: StoryPage[] = [];
-  const totalPages = storyContent.pages.length;
+  onTextComplete(initialStoryData);
 
-  for (let i = 0; i < totalPages; i++) {
-    const page = storyContent.pages[i];
-    onProgress(t('loading.illustratingPage', { currentPage: i + 1, totalPages }));
-    
-    try {
-      const imageResponse = await ai.models.generateImages({
-        model: 'imagen-4.0-generate-001',
-        prompt: `${page.imagePrompt}, in a beautiful ${options.illustrationStyle} style, G-rated, for a children's book`,
-        config: {
-          numberOfImages: 1,
-          outputMimeType: 'image/jpeg',
-          aspectRatio: '1:1',
-        },
-      });
-
-      const base64ImageBytes = imageResponse.generatedImages[0].image.imageBytes;
-      const imageUrl = `data:image/jpeg;base64,${base64ImageBytes}`;
-      illustratedPages.push({ ...page, imageUrl });
-
-    } catch (imageError) {
-      console.error(`Failed to generate image for page ${i + 1}:`, imageError);
-      // Push page without image URL so the story can still be viewed
-      illustratedPages.push({ ...page, imageUrl: undefined });
+  // 2. Generate images for each page.
+  if (!process.env.FAL_API_KEY) {
+    console.warn("FAL_API_KEY environment variable not set. Skipping image generation.");
+    for (let i = 0; i < initialStoryData.pages.length; i++) {
+        onPageIllustrated({ ...initialStoryData.pages[i], imageUrl: 'GENERATION_FAILED' }, i);
     }
+    return;
   }
 
-  onProgress(t('loading.finishing'));
-  return {
-    title: storyContent.title,
-    pages: illustratedPages,
-  };
+  for (let i = 0; i < initialStoryData.pages.length; i++) {
+    const page = initialStoryData.pages[i];
+    
+    let success = false;
+    let retries = 3;
+    let attemptDelay = 2000; // Start with 2 seconds for retry attempts
+
+    while (!success && retries > 0) {
+        try {
+            const falResponse = await fetch(FAL_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Key ${process.env.FAL_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    prompt: `${page.imagePrompt}, in a beautiful ${options.illustrationStyle} style, G-rated, for a children's book`,
+                })
+            });
+
+            if (!falResponse.ok) {
+                const errorBody = await falResponse.text();
+                throw new Error(`FAL API error: ${falResponse.status} ${falResponse.statusText} - ${errorBody}`);
+            }
+
+            const falResult = await falResponse.json();
+            
+            if (!falResult.images || falResult.images.length === 0 || !falResult.images[0].url) {
+                throw new Error('FAL API did not return a valid image URL.');
+            }
+            
+            const imageUrlFromFal = falResult.images[0].url;
+
+            const imageDownloadResponse = await fetch(imageUrlFromFal);
+            if (!imageDownloadResponse.ok) {
+                throw new Error(`Failed to download image from FAL URL: ${imageDownloadResponse.statusText}`);
+            }
+
+            const imageBlob = await imageDownloadResponse.blob();
+            const imageUrl = await blobToBase64(imageBlob);
+            
+            onPageIllustrated({ ...page, imageUrl }, i);
+            success = true;
+
+        } catch (imageError) {
+            console.error(`Failed to generate image for page ${i + 1}:`, imageError);
+            
+            const errorMessage = imageError instanceof Error ? imageError.message : String(imageError);
+            const isRateLimitError = errorMessage.includes('429') || errorMessage.toUpperCase().includes('RESOURCE_EXHAUSTED');
+
+            if (isRateLimitError && retries > 0) {
+                retries--;
+                console.warn(`Rate limit hit for page ${i + 1}. Retrying in ${attemptDelay / 1000}s... (${retries} retries left)`);
+                await delay(attemptDelay);
+                attemptDelay *= 2; // Exponential backoff
+            } else {
+                console.error(`Could not generate image for page ${i + 1}. Skipping.`);
+                onPageIllustrated({ ...page, imageUrl: 'GENERATION_FAILED' }, i);
+                success = true; // Mark as "handled" to exit the while loop
+            }
+        }
+    }
+
+    // Proactively add a delay between requests to avoid hitting rate limits.
+    if (i < initialStoryData.pages.length - 1) {
+      await delay(1000); // 1-second delay between each page's image generation request
+    }
+  }
 };

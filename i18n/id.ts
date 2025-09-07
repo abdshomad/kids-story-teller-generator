@@ -1,3 +1,4 @@
+
 export const id = {
   // Welcome
   'welcome.title': 'Selamat Datang di Waktu Cerita Ajaib!',
@@ -18,7 +19,7 @@ export const id = {
   'input.inspiration': 'Butuh inspirasi?',
   'input.visualInspiration.label': 'Inspirasi Visual (Opsional)',
   'input.visualInspiration.uploadDescription': 'Unggah gambar atau foto!',
-  'input.visualInspiration.drawDescription': '...atau gambar karaktermu!',
+  'input.visualInspiration.drawDescription': 'Gambar karaktermu!',
   'input.visualInspiration.button': 'Unggah Gambar',
   'input.visualInspiration.change': 'Ganti Gambar',
   'input.visualInspiration.clearDrawing': 'Bersihkan Gambar',
@@ -32,9 +33,12 @@ export const id = {
   'input.options.length': 'Panjang',
   'input.options.style': 'Gaya Ilustrasi',
   'input.button.create': 'Buat Ceritaku!',
+  'input.draw.done': 'Selesai',
+  'input.draw.clear': 'Bersihkan',
+  'input.draw.close': 'Tutup',
 
   // Loading Screen
-  'loading.dreaming': 'Memimpikan karakter...',
+  'loading.dreaming': 'Memimpikan ceritamu...',
   'loading.building': 'Membangun dunia magis...',
   'loading.painting': 'Melukis gambar...',
   'loading.finishing': 'Menambahkan kilauan terakhir...',
@@ -44,6 +48,8 @@ export const id = {
   // Story Viewer
   'story.readAloud': 'Bacakan',
   'story.newStory': 'Buat Cerita Baru',
+  'story.illustrating': 'Mengilustrasikan...',
+  'story.imageError': 'Gambar tidak dapat dibuat.',
 
   // Error
   'error.title': 'Oh tidak, ada gangguan dalam sihir!',
@@ -59,9 +65,9 @@ export const id = {
   'theme.courage': 'Keberanian',
   'theme.kindness': 'Kebaikan',
   'theme.adventure': 'Petualangan',
-  'length.short': 'Pendek (3-4 halaman)',
-  'length.medium': 'Sedang (5-6 halaman)',
-  'length.long': 'Panjang (7-8 halaman)',
+  'length.short': 'Pendek (7 halaman)',
+  'length.medium': 'Sedang (19 halaman)',
+  'length.long': 'Panjang (25 halaman)',
   'style.watercolor': 'Cat Air',
   'style.cartoon': 'Kartun',
   'style.pixel': 'Pixel Art',

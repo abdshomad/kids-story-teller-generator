@@ -19,7 +19,7 @@ export interface StoryOptions {
 export interface StoryPage {
   text: string;
   imagePrompt: string;
-  imageUrl?: string;
+  imageUrl?: string | 'GENERATION_FAILED';
 }
 
 export interface StoryData {
@@ -41,4 +41,3 @@ export type AppState =
   | { status: AppStatus.LOADING, progressMessage: string }
   | { status: AppStatus.STORY, storyData: StoryData }
   | { status: AppStatus.ERROR, message: string };
-
