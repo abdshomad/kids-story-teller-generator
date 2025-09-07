@@ -76,6 +76,7 @@ export const su = {
   // Common
   'common.tryAgain': 'Coba Deui',
   'common.loading': 'Nuju didamel...',
+  'common.search': 'Pilari...',
 
   // Options
   'age.3-5': '3-5 taun',

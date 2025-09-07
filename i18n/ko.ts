@@ -76,6 +76,7 @@ export const ko = {
   // Common
   'common.tryAgain': '다시 시도',
   'common.loading': '만드는 중...',
+  'common.search': '검색...',
 
   // Options
   'age.3-5': '3-5세',

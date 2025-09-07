@@ -76,6 +76,7 @@ export const zh = {
   // Common
   'common.tryAgain': '再试一次',
   'common.loading': '正在创作...',
+  'common.search': '搜索...',
 
   // Options
   'age.3-5': '3-5岁',

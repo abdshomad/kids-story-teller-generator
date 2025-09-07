@@ -77,6 +77,7 @@ export const id = {
   // Common
   'common.tryAgain': 'Coba Lagi',
   'common.loading': 'Membuat...',
+  'common.search': 'Cari...',
 
   // Options
   'age.3-5': '3-5 tahun',

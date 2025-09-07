@@ -76,6 +76,7 @@ export const tr = {
   // Common
   'common.tryAgain': 'Tekrar Dene',
   'common.loading': 'Oluşturuluyor...',
+  'common.search': 'Ara...',
 
   // Options
   'age.3-5': '3-5 yaş',

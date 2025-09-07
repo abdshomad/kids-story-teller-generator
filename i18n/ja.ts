@@ -76,6 +76,7 @@ export const ja = {
   // Common
   'common.tryAgain': '再試行',
   'common.loading': '作成中...',
+  'common.search': '検索...',
 
   // Options
   'age.3-5': '3～5歳',

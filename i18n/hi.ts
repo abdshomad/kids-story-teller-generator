@@ -76,6 +76,7 @@ export const hi = {
   // Common
   'common.tryAgain': 'पुनः प्रयास करें',
   'common.loading': 'बनाया जा रहा है...',
+  'common.search': 'खोजें...',
 
   // Options
   'age.3-5': '3-5 साल',

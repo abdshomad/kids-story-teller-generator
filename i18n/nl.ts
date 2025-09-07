@@ -76,6 +76,7 @@ export const nl = {
   // Common
   'common.tryAgain': 'Opnieuw proberen',
   'common.loading': 'Bezig met maken...',
+  'common.search': 'Zoeken...',
 
   // Options
   'age.3-5': '3-5 jaar',

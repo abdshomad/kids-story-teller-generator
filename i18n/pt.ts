@@ -76,6 +76,7 @@ export const pt = {
   // Common
   'common.tryAgain': 'Tentar Novamente',
   'common.loading': 'Criando...',
+  'common.search': 'Pesquisar...',
 
   // Options
   'age.3-5': '3-5 anos',

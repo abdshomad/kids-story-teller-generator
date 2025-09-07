@@ -76,6 +76,7 @@ export const jv = {
   // Common
   'common.tryAgain': 'Coba Maneh',
   'common.loading': 'Nggawe...',
+  'common.search': 'Golek...',
 
   // Options
   'age.3-5': '3-5 taun',

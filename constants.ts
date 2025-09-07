@@ -2,25 +2,25 @@
 import { Heart, Shield, HandHeart, Compass, Paintbrush, Pencil, Grid, Castle, Box, Drama, PenLine } from 'lucide-react';
 import { Language } from './types';
 
-export const LANGUAGES: { code: Language; label: string }[] = [
-  { code: 'en', label: 'EN' },
-  { code: 'id', label: 'ID' },
-  { code: 'jv', label: 'JV' },
-  { code: 'su', label: 'SU' },
-  { code: 'ar', label: 'AR' },
-  { code: 'hi', label: 'HI' },
-  { code: 'es', label: 'ES' },
-  { code: 'fr', label: 'FR' },
-  { code: 'de', label: 'DE' },
-  { code: 'zh', label: 'ZH' },
-  { code: 'ja', label: 'JA' },
-  { code: 'pt', label: 'PT' },
-  { code: 'ru', label: 'RU' },
-  { code: 'it', label: 'IT' },
-  { code: 'ko', label: 'KO' },
-  { code: 'tr', label: 'TR' },
-  { code: 'nl', label: 'NL' },
-  { code: 'pl', label: 'PL' },
+export const LANGUAGES: { code: Language; label: string; flag: string; primary: boolean; }[] = [
+  { code: 'en', label: 'EN', flag: '🇺🇸', primary: true },
+  { code: 'id', label: 'ID', flag: '🇮🇩', primary: true },
+  { code: 'jv', label: 'Javanese', flag: '🇮🇩', primary: false },
+  { code: 'su', label: 'Sundanese', flag: '🇮🇩', primary: false },
+  { code: 'ar', label: 'Arabic', flag: '🇸🇦', primary: false },
+  { code: 'hi', label: 'Hindi', flag: '🇮🇳', primary: false },
+  { code: 'es', label: 'Español', flag: '🇪🇸', primary: false },
+  { code: 'fr', label: 'Français', flag: '🇫🇷', primary: false },
+  { code: 'de', label: 'Deutsch', flag: '🇩🇪', primary: false },
+  { code: 'zh', label: '中文', flag: '🇨🇳', primary: false },
+  { code: 'ja', label: '日本語', flag: '🇯🇵', primary: false },
+  { code: 'pt', label: 'Português', flag: '🇧🇷', primary: false },
+  { code: 'ru', label: 'Русский', flag: '🇷🇺', primary: false },
+  { code: 'it', label: 'Italiano', flag: '🇮🇹', primary: false },
+  { code: 'ko', label: '한국어', flag: '🇰🇷', primary: false },
+  { code: 'tr', label: 'Türkçe', flag: '🇹🇷', primary: false },
+  { code: 'nl', label: 'Nederlands', flag: '🇳🇱', primary: false },
+  { code: 'pl', label: 'Polski', flag: '🇵🇱', primary: false },
 ];
 
 export const AGE_GROUPS = [
