@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryOptions } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, SAMPLE_PROMPTS } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
-import { Mic, Sparkles, Upload } from 'lucide-react';
+import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, ChevronDown } from 'lucide-react';
 
 interface InputScreenProps {
   onCreateStory: (options: StoryOptions) => void;
@@ -75,36 +76,37 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 p-4 sm:p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-800 flex items-center gap-3">
-                <Sparkles className="w-8 h-8 text-yellow-500" />
-                {t('input.title')}
-            </h1>
-            <div className="flex gap-1 bg-white rounded-full p-1 shadow-md">
-                <button onClick={() => setLanguage('en')} className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === 'en' ? 'bg-blue-500 text-white' : 'text-slate-600'}`}>EN</button>
-                <button onClick={() => setLanguage('id')} className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === 'id' ? 'bg-blue-500 text-white' : 'text-slate-600'}`}>ID</button>
-            </div>
-        </div>
+    <div className="min-h-screen w-full bg-gradient-to-br from-pink-100 via-purple-100 to-blue-200 p-4 sm:p-8 flex items-center justify-center">
+      <main className="bg-white/70 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl max-w-4xl w-full p-6 sm:p-8">
+        <header className="flex flex-col sm:flex-row justify-between items-center mb-8">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-800 flex items-center gap-3 mb-4 sm:mb-0">
+            <Sparkles className="w-8 h-8 text-fuchsia-500" />
+            {t('input.title')}
+          </h1>
+          <div className="flex gap-1 bg-gray-200/50 rounded-full p-1 shadow-inner">
+            <button onClick={() => setLanguage('en')} className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === 'en' ? 'bg-white shadow-md text-slate-800' : 'text-slate-500'}`}>EN</button>
+            <button onClick={() => setLanguage('id')} className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === 'id' ? 'bg-white shadow-md text-slate-800' : 'text-slate-500'}`}>ID</button>
+          </div>
+        </header>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="bg-white p-6 rounded-2xl shadow-lg">
+          <section>
             <div className="relative">
               <textarea
                 value={options.prompt}
                 onChange={(e) => handleInputChange('prompt', e.target.value)}
                 placeholder={t('input.prompt.placeholder')}
-                className="w-full h-32 p-4 pr-16 text-lg border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all"
+                className="w-full h-32 p-4 pr-16 text-lg bg-white/60 border-2 border-transparent rounded-xl focus:ring-4 focus:ring-fuchsia-300/50 focus:border-fuchsia-300 transition-all placeholder:text-slate-500"
                 required
               />
               {browserSupportsSpeechRecognition && (
                 <button 
                     type="button" 
                     onClick={isListening ? stopListening : startListening}
-                    className={`absolute top-4 right-4 p-2 rounded-full transition-colors ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                    aria-label={isListening ? 'Stop recording' : 'Start recording'}
+                    className={`absolute top-4 right-4 p-3 rounded-full transition-all duration-300 ${isListening ? 'bg-red-500 text-white animate-pulse shadow-lg' : 'bg-white/80 text-slate-600 hover:bg-white'}`}
                 >
-                    <Mic className="w-6 h-6" />
+                    <Mic className="w-5 h-5" />
                 </button>
               )}
             </div>
@@ -112,51 +114,55 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                 <h3 className="text-sm font-bold text-slate-500 mb-2">{t('input.inspiration')}</h3>
                 <div className="flex flex-wrap gap-2">
                     {SAMPLE_PROMPTS.map(key => (
-                        <button type="button" key={key} onClick={() => handleSamplePrompt(key)} className="px-3 py-1 bg-sky-100 text-sky-800 text-sm rounded-full hover:bg-sky-200 transition-colors">
+                        <button type="button" key={key} onClick={() => handleSamplePrompt(key)} className="px-3 py-1 bg-sky-100/70 text-sky-800 text-sm rounded-full hover:bg-sky-200/80 transition-colors">
                             {t(key)}
                         </button>
                     ))}
                 </div>
             </div>
-          </div>
+          </section>
           
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 rounded-2xl shadow-lg space-y-4">
-              <h2 className="text-xl font-bold text-slate-700">{t('input.character.title')}</h2>
-              <input type="text" value={options.characterName} onChange={(e) => handleInputChange('characterName', e.target.value)} placeholder={t('input.character.name')} className="w-full p-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-300"/>
-              <input type="text" value={options.characterType} onChange={(e) => handleInputChange('characterType', e.target.value)} placeholder={t('input.character.type')} className="w-full p-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-300"/>
-              <input type="text" value={options.characterPersonality} onChange={(e) => handleInputChange('characterPersonality', e.target.value)} placeholder={t('input.character.personality')} className="w-full p-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-300"/>
+          <div className="grid lg:grid-cols-2 gap-8">
+            <div className="space-y-8">
+              <section>
+                <h2 className="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2"><UserRound className="w-6 h-6 text-purple-500" />{t('input.character.title')}</h2>
+                <div className="space-y-3">
+                  <input type="text" value={options.characterName} onChange={(e) => handleInputChange('characterName', e.target.value)} placeholder={t('input.character.name')} className="w-full p-3 bg-white/60 border-2 border-transparent rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
+                  <input type="text" value={options.characterType} onChange={(e) => handleInputChange('characterType', e.target.value)} placeholder={t('input.character.type')} className="w-full p-3 bg-white/60 border-2 border-transparent rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
+                  <input type="text" value={options.characterPersonality} onChange={(e) => handleInputChange('characterPersonality', e.target.value)} placeholder={t('input.character.personality')} className="w-full p-3 bg-white/60 border-2 border-transparent rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-bold text-slate-700 mb-3 flex items-center gap-2"><Image className="w-6 h-6 text-sky-500" />{t('input.visualInspiration.label')}</h2>
+                <p className="text-sm text-slate-600 mb-3">{t('input.visualInspiration.description')}</p>
+                <label className="w-full cursor-pointer flex items-center justify-center gap-3 p-4 border-2 border-dashed border-slate-300/80 rounded-lg text-slate-600 hover:bg-white/80 hover:border-sky-500 hover:text-sky-600 transition-colors">
+                   <Upload className="w-5 h-5" />
+                   <span className="font-semibold">{visualInspirationPreview ? t('input.visualInspiration.change') : t('input.visualInspiration.button')}</span>
+                   <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                </label>
+                {visualInspirationPreview && <img src={visualInspirationPreview} alt="Preview" className="mt-3 rounded-lg object-cover h-24 w-24 mx-auto shadow-md"/>}
+              </section>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-lg space-y-3">
-              <h2 className="text-xl font-bold text-slate-700">{t('input.visualInspiration.label')}</h2>
-              <p className="text-sm text-slate-500">{t('input.visualInspiration.description')}</p>
-              <label className="w-full cursor-pointer flex items-center justify-center gap-3 p-4 border-2 border-dashed border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 hover:border-blue-500 hover:text-blue-600 transition-colors">
-                 <Upload className="w-6 h-6" />
-                 <span>{visualInspirationPreview ? t('input.visualInspiration.change') : t('input.visualInspiration.button')}</span>
-                 <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-              </label>
-              {visualInspirationPreview && <img src={visualInspirationPreview} alt="Preview" className="mt-2 rounded-lg object-cover h-24 w-24 mx-auto"/>}
-            </div>
+            <section>
+              <h2 className="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2"><SlidersHorizontal className="w-6 h-6 text-emerald-500" />{t('input.options.title')}</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Select id="ageGroup" label={t('input.options.age')} value={options.ageGroup} onChange={(e) => handleInputChange('ageGroup', e.target.value)} options={AGE_GROUPS.map(o => ({...o, label: t(o.labelKey)}))} />
+                <Select id="theme" label={t('input.options.theme')} value={options.theme} onChange={(e) => handleInputChange('theme', e.target.value)} options={THEMES.map(o => ({...o, label: t(o.labelKey)}))} />
+                <Select id="length" label={t('input.options.length')} value={options.length} onChange={(e) => handleInputChange('length', e.target.value as StoryOptions['length'])} options={STORY_LENGTHS.map(o => ({...o, label: t(o.labelKey)}))} />
+                <Select id="illustrationStyle" label={t('input.options.style')} value={options.illustrationStyle} onChange={(e) => handleInputChange('illustrationStyle', e.target.value)} options={ILLUSTRATION_STYLES.map(o => ({...o, label: t(o.labelKey)}))} />
+              </div>
+            </section>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-lg">
-            <h2 className="text-xl font-bold text-slate-700 mb-4">{t('input.options.title')}</h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Select id="ageGroup" label={t('input.options.age')} value={options.ageGroup} onChange={(e) => handleInputChange('ageGroup', e.target.value)} options={AGE_GROUPS.map(o => ({...o, label: t(o.labelKey)}))} />
-              <Select id="theme" label={t('input.options.theme')} value={options.theme} onChange={(e) => handleInputChange('theme', e.target.value)} options={THEMES.map(o => ({...o, label: t(o.labelKey)}))} />
-              <Select id="length" label={t('input.options.length')} value={options.length} onChange={(e) => handleInputChange('length', e.target.value as StoryOptions['length'])} options={STORY_LENGTHS.map(o => ({...o, label: t(o.labelKey)}))} />
-              <Select id="illustrationStyle" label={t('input.options.style')} value={options.illustrationStyle} onChange={(e) => handleInputChange('illustrationStyle', e.target.value)} options={ILLUSTRATION_STYLES.map(o => ({...o, label: t(o.labelKey)}))} />
-            </div>
-          </div>
-
-          <div className="text-center">
-            <button type="submit" className="px-12 py-4 bg-yellow-400 text-slate-900 font-extrabold text-xl rounded-full shadow-lg hover:bg-yellow-500 hover:scale-105 transform transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-yellow-300">
+          <div className="text-center pt-4">
+            <button type="submit" className="w-full sm:w-auto bg-fuchsia-600 text-white font-bold tracking-wider py-4 px-10 rounded-full hover:bg-fuchsia-700 focus:outline-none focus:ring-4 focus:ring-fuchsia-300 transition-all duration-300 shadow-lg text-lg">
               {t('input.button.create')}
             </button>
           </div>
         </form>
-      </div>
+      </main>
     </div>
   );
 };
@@ -170,11 +176,19 @@ interface SelectProps {
 }
 
 const Select: React.FC<SelectProps> = ({ id, label, value, onChange, options }) => (
-    <div>
+    <div className="relative">
         <label htmlFor={id} className="block text-sm font-bold text-slate-600 mb-1">{label}</label>
-        <select id={id} value={value} onChange={onChange} className="w-full p-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-300">
+        <select 
+            id={id} 
+            value={value} 
+            onChange={onChange} 
+            className="w-full p-3 bg-white/60 border-2 border-transparent appearance-none rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all"
+        >
             {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
         </select>
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 pt-6 text-slate-700">
+            <ChevronDown className="h-5 w-5" />
+        </div>
     </div>
 );
 
