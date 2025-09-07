@@ -1,108 +1,92 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { transcribeAudio } from '../services/geminiService';
+import { Language } from '../types';
 
-// Fix: Add type definitions for the Web Speech API to resolve TypeScript errors.
-interface SpeechRecognitionAlternative {
-  transcript: string;
-}
-interface SpeechRecognitionResult {
-  isFinal: boolean;
-  [index: number]: SpeechRecognitionAlternative;
-  length: number;
-}
-interface SpeechRecognitionResultList {
-  [index: number]: SpeechRecognitionResult;
-  length: number;
-}
-interface SpeechRecognitionEvent extends Event {
-  resultIndex: number;
-  results: SpeechRecognitionResultList;
-}
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string;
-}
-interface SpeechRecognition extends EventTarget {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start(): void;
-  stop(): void;
-  onresult: (event: SpeechRecognitionEvent) => void;
-  onerror: (event: SpeechRecognitionErrorEvent) => void;
-  onend: () => void;
-}
-interface SpeechRecognitionStatic {
-  new(): SpeechRecognition;
-}
-declare global {
-  interface Window {
-    SpeechRecognition: SpeechRecognitionStatic;
-    webkitSpeechRecognition: SpeechRecognitionStatic;
-  }
-}
-
-
-// Polyfill for browsers that might not have SpeechRecognition in the window object yet.
-// Fix: Renamed constant to avoid conflict with the 'SpeechRecognition' type interface.
-const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-export const useSpeechToText = (language: string) => {
-  const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
-
-  useEffect(() => {
-    if (!SpeechRecognitionAPI) {
-      console.warn('Speech Recognition is not supported in this browser.');
-      return;
-    }
-    
-    const recognition = new SpeechRecognitionAPI();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = language === 'id' ? 'id-ID' : 'en-US';
-
-    recognition.onresult = (event) => {
-      let finalTranscript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        }
+const blobToBase64 = (blob: Blob): Promise<{ mimeType: string; data: string }> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      const [mimePart, base64Part] = result.split(',');
+      if (!mimePart || !base64Part) {
+        reject(new Error("Invalid data URL format"));
+        return;
       }
-      setTranscript(prev => prev + finalTranscript);
+      const mimeType = mimePart.split(':')[1].split(';')[0];
+      resolve({ mimeType, data: base64Part });
     };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
 
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error', event.error);
-      setIsListening(false);
-    };
+export const useSpeechToText = (language: Language) => {
+  const [isListening, setIsListening] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
-    recognition.onend = () => {
-      setIsListening(false);
-    };
+  const browserSupportsSpeechRecognition = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 
-    recognitionRef.current = recognition;
+  const stopListening = useCallback(async () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+  }, []);
 
-    return () => {
-      recognition.stop();
-    };
-  }, [language]);
+  const startListening = useCallback(async () => {
+    if (isListening || isTranscribing || !browserSupportsSpeechRecognition) return;
 
-  const startListening = () => {
-    if (recognitionRef.current && !isListening) {
-      setTranscript('');
-      recognitionRef.current.start();
+    setTranscript('');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const options = { mimeType: 'audio/webm' };
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        console.warn(`${options.mimeType} is not supported. Trying default.`);
+      }
+      const mediaRecorder = new MediaRecorder(stream, options);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: options.mimeType });
+        
+        stream.getTracks().forEach(track => track.stop());
+
+        setIsListening(false);
+        setIsTranscribing(true);
+        try {
+          const audioData = await blobToBase64(audioBlob);
+          const result = await transcribeAudio(audioData, language);
+          setTranscript(result);
+        } catch (error) {
+          console.error('Error transcribing audio:', error);
+        } finally {
+          setIsTranscribing(false);
+        }
+      };
+
+      mediaRecorder.start();
       setIsListening(true);
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
     }
-  };
+  }, [isListening, isTranscribing, browserSupportsSpeechRecognition, language]);
 
-  const stopListening = () => {
-    if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    }
+  return {
+    isListening,
+    isTranscribing,
+    transcript,
+    startListening,
+    stopListening,
+    setTranscript,
+    browserSupportsSpeechRecognition,
   };
-  
-  const browserSupportsSpeechRecognition = !!SpeechRecognitionAPI;
-
-  return { isListening, transcript, startListening, stopListening, setTranscript, browserSupportsSpeechRecognition };
 };

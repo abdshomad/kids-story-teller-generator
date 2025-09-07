@@ -1,6 +1,5 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
-import { StoryOptions, StoryData, StoryPage } from '../types';
+import { StoryOptions, StoryData, StoryPage, Language } from '../types';
 
 if (!process.env.API_KEY) {
   throw new Error("API_KEY environment variable not set");
@@ -208,4 +207,28 @@ export const generateStoryAndImages = async (
       await delay(1000); // 1-second delay between each page's image generation request
     }
   }
+};
+
+export const transcribeAudio = async (audio: { mimeType: string, data: string }, language: Language): Promise<string> => {
+  const langName = language === 'id' ? 'Indonesian' : 'English';
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: {
+      parts: [
+        { text: `Transcribe the following audio recording precisely. The language is ${langName}.` },
+        {
+          inlineData: {
+            mimeType: audio.mimeType,
+            data: audio.data,
+          },
+        },
+      ],
+    },
+  });
+  
+  if (!response.text) {
+    console.warn("Gemini audio transcription returned no text.");
+    return "";
+  }
+  return response.text.trim();
 };

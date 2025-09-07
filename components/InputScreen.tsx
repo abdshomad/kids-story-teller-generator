@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryOptions } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, SAMPLE_PROMPTS } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
-import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, ChevronDown, PenSquare } from 'lucide-react';
+import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, ChevronDown, PenSquare, Loader2 } from 'lucide-react';
 import FullscreenCanvas from './FullscreenCanvas';
 
 interface InputScreenProps {
@@ -40,11 +39,11 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   const [visualInspirationPreview, setVisualInspirationPreview] = useState<string | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
-  const { isListening, transcript, startListening, stopListening, setTranscript, browserSupportsSpeechRecognition } = useSpeechToText(language);
+  const { isListening, isTranscribing, transcript, startListening, stopListening, setTranscript, browserSupportsSpeechRecognition } = useSpeechToText(language);
 
   useEffect(() => {
     if (transcript) {
-      setOptions(prev => ({ ...prev, prompt: prev.prompt + transcript }));
+      setOptions(prev => ({ ...prev, prompt: prev.prompt ? `${prev.prompt} ${transcript}` : transcript }));
       setTranscript('');
     }
   }, [transcript, setTranscript]);
@@ -76,7 +75,6 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     setIsDrawing(false);
   };
 
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (options.prompt.trim()) {
@@ -87,6 +85,14 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   const handleSamplePrompt = (promptKey: string) => {
     handleInputChange('prompt', t(promptKey));
   };
+
+  const handleMicClick = useCallback(() => {
+    if (isListening) {
+      stopListening();
+    } else if (!isTranscribing) {
+      startListening();
+    }
+  }, [isListening, isTranscribing, startListening, stopListening]);
 
   if (isDrawing) {
       return <FullscreenCanvas onDone={handleDrawingDone} onClose={() => setIsDrawing(false)} />;
@@ -117,13 +123,18 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                 required
               />
               {browserSupportsSpeechRecognition && (
-                <button 
-                    type="button" 
-                    onClick={isListening ? stopListening : startListening}
-                    aria-label={isListening ? 'Stop recording' : 'Start recording'}
-                    className={`absolute top-4 right-4 p-3 rounded-full transition-all duration-300 ${isListening ? 'bg-red-500 text-white animate-pulse shadow-lg' : 'bg-white/80 text-slate-600 hover:bg-white'}`}
+                <button
+                  type="button"
+                  onClick={handleMicClick}
+                  disabled={isTranscribing}
+                  aria-label={isListening ? 'Stop recording' : (isTranscribing ? 'Processing audio' : 'Start recording')}
+                  className={`absolute top-4 right-4 p-3 rounded-full transition-all duration-300 ${
+                      isListening
+                          ? 'bg-red-500 text-white animate-pulse shadow-lg'
+                          : 'bg-white/80 text-slate-600 hover:bg-white'
+                  } disabled:bg-slate-200 disabled:cursor-not-allowed`}
                 >
-                    <Mic className="w-5 h-5" />
+                  {isTranscribing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Mic className="w-5 h-5" />}
                 </button>
               )}
             </div>
