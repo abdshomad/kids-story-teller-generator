@@ -462,23 +462,27 @@ Please generate the complete story now.
 
     onUpdate({ stage: LoadingStage.FINAL_TOUCHES, storyData, progress: { current: 0, total: totalPages } });
 
-    // Generate audio and SFX sequentially per page to avoid rate-limiting and show progress
-    for (let i = 0; i < totalPages; i++) {
-        const page = storyData.pages[i];
-        
-        const narrationPromise = generateAudio(page.text);
-        
-        const sfxPromises = page.soundEffects?.map(sfx =>
+    // Generate audio and SFX for all pages in parallel to speed up the process.
+    // Progress is still reported page-by-page as audio assets for each page are completed.
+    const allPageAudioPromises = storyData.pages.map((page, i) => {
+        const narrationPromise = generateAudio(page.text).then(url => {
+            // This direct mutation is safe as we're managing the state within this function
+            // and passing a new object wrapper in onUpdate.
+            storyData.pages[i].audioUrl = url;
+        });
+
+        const sfxPromises = page.soundEffects?.map(sfx => 
             generateSoundEffect(sfx.sfx_prompt).then(audioUrl => {
                 sfx.audioUrl = audioUrl;
-                return sfx;
             })
         ) || [];
 
-        const [narrationUrl] = await Promise.all([narrationPromise, ...sfxPromises]);
-        
-        storyData.pages[i].audioUrl = narrationUrl;
+        return Promise.all([narrationPromise, ...sfxPromises]);
+    });
 
+    // Await each page's promises sequentially to update progress bar correctly
+    for (let i = 0; i < allPageAudioPromises.length; i++) {
+        await allPageAudioPromises[i];
         onUpdate({
             stage: LoadingStage.FINAL_TOUCHES,
             storyData: { ...storyData, pages: [...storyData.pages] },
