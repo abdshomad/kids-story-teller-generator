@@ -1,3 +1,4 @@
+
 // NOTE: This is a machine-generated translation
 export const su = {
   // Welcome
@@ -23,6 +24,7 @@ export const su = {
   'input.visualInspiration.change': 'Ganti Gambar',
   'input.visualInspiration.clearDrawing': 'Hapus Gambar',
   'input.character.title': 'Jieun Karakter (Opsional)',
+  'input.character.subtitle': "Urang bakal nyarankeun karakter dumasar kana carita anjeun, tapi anjeun tiasa ngarobihna!",
   'input.character.name': 'Nami',
   'input.character.type': 'Jinis (contona, singa anu gagah)',
   'input.character.personality': 'Kapribadian (contona, panasaran sareng bageur)',

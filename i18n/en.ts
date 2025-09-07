@@ -1,5 +1,4 @@
 
-
 export const en = {
   // Welcome
   'welcome.title': 'A Magical Welcome to Story Time!',
@@ -24,6 +23,7 @@ export const en = {
   'input.visualInspiration.change': 'Change Image',
   'input.visualInspiration.clearDrawing': 'Clear Drawing',
   'input.character.title': 'Create a Character (Optional)',
+  'input.character.subtitle': "We'll suggest a character based on your story, but feel free to change it!",
   'input.character.name': 'Name',
   'input.character.type': 'Type (e.g., a brave lion)',
   'input.character.personality': 'Personality (e.g., curious and kind)',

@@ -1,3 +1,4 @@
+
 // NOTE: This is a machine-generated translation
 export const tr = {
   // Welcome
@@ -23,6 +24,7 @@ export const tr = {
   'input.visualInspiration.change': 'Resmi Değiştir',
   'input.visualInspiration.clearDrawing': 'Çizimi Temizle',
   'input.character.title': 'Bir Karakter Yarat (İsteğe Bağlı)',
+  'input.character.subtitle': "Hikayenize göre bir karakter önereceğiz, ancak değiştirmekten çekinmeyin!",
   'input.character.name': 'İsim',
   'input.character.type': 'Tür (ör: cesur bir aslan)',
   'input.character.personality': 'Kişilik (ör: meraklı ve nazik)',

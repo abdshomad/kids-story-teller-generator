@@ -1,5 +1,4 @@
 
-
 export const id = {
   // Welcome
   'welcome.title': 'Selamat Datang di Waktu Cerita Ajaib!',
@@ -24,6 +23,7 @@ export const id = {
   'input.visualInspiration.change': 'Ganti Gambar',
   'input.visualInspiration.clearDrawing': 'Bersihkan Gambar',
   'input.character.title': 'Buat Karakter (Opsional)',
+  'input.character.subtitle': "Kami akan menyarankan karakter berdasarkan ceritamu, tapi jangan ragu untuk mengubahnya!",
   'input.character.name': 'Nama',
   'input.character.type': 'Jenis (misalnya, singa pemberani)',
   'input.character.personality': 'Kepribadian (misalnya, ingin tahu dan baik hati)',

@@ -1,3 +1,4 @@
+
 // NOTE: This is a machine-generated translation
 export const ja = {
   // Welcome
@@ -23,6 +24,7 @@ export const ja = {
   'input.visualInspiration.change': '画像を変更',
   'input.visualInspiration.clearDrawing': '描画をクリア',
   'input.character.title': 'キャラクターを作成（任意）',
+  'input.character.subtitle': "あなたの物語に基づいてキャラクターを提案しますが、自由に変更してください！",
   'input.character.name': '名前',
   'input.character.type': 'タイプ（例：勇敢なライオン）',
   'input.character.personality': '性格（例：好奇心旺盛で親切）',

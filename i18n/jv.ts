@@ -1,3 +1,4 @@
+
 // NOTE: This is a machine-generated translation
 export const jv = {
   // Welcome
@@ -23,6 +24,7 @@ export const jv = {
   'input.visualInspiration.change': 'Ganti Gambar',
   'input.visualInspiration.clearDrawing': 'Busak Gambar',
   'input.character.title': 'Gawe Karakter (Opsional)',
+  'input.character.subtitle': "Kita bakal menehi saran karakter adhedhasar crita sampeyan, nanging bebas kanggo ngganti!",
   'input.character.name': 'Jeneng',
   'input.character.type': 'Jinis (umpamane, singa sing wani)',
   'input.character.personality': 'Watak (umpamane, penasaran lan apikan)',

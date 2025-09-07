@@ -1,3 +1,4 @@
+
 // NOTE: This is a machine-generated translation
 export const ko = {
   // Welcome
@@ -23,6 +24,7 @@ export const ko = {
   'input.visualInspiration.change': '이미지 변경',
   'input.visualInspiration.clearDrawing': '그림 지우기',
   'input.character.title': '캐릭터 만들기 (선택 사항)',
+  'input.character.subtitle': "이야기에 따라 캐릭터를 제안해 드리지만, 자유롭게 변경하셔도 됩니다!",
   'input.character.name': '이름',
   'input.character.type': '유형 (예: 용감한 사자)',
   'input.character.personality': '성격 (예: 호기심 많고 친절함)',

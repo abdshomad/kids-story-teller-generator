@@ -1,3 +1,4 @@
+
 // NOTE: This is a machine-generated translation
 export const zh = {
   // Welcome
@@ -23,6 +24,7 @@ export const zh = {
   'input.visualInspiration.change': '更换图片',
   'input.visualInspiration.clearDrawing': '清除绘画',
   'input.character.title': '创建一个角色（可选）',
+  'input.character.subtitle': "我们会根据您的故事建议一个角色，但您可以随时更改！",
   'input.character.name': '名字',
   'input.character.type': '类型（例如，一只勇敢的狮子）',
   'input.character.personality': '性格（例如，好奇又善良）',

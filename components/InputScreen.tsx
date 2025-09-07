@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef, FC } from 'react';
 import { StoryOptions } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, SAMPLE_PROMPTS, LANGUAGES } from '../constants';
@@ -5,6 +6,7 @@ import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
 import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, PenSquare, Loader2, Globe, Search } from 'lucide-react';
 import FullscreenCanvas from './FullscreenCanvas';
+import { extractCharacterDetails } from '../services/geminiService';
 
 interface InputScreenProps {
   onCreateStory: (options: StoryOptions) => void;
@@ -54,6 +56,10 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   
+  const [characterFieldsEditedByUser, setCharacterFieldsEditedByUser] = useState(false);
+  const [isExtractingCharacter, setIsExtractingCharacter] = useState(false);
+  const lastExtractedPrompt = useRef('');
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -82,6 +88,13 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     }
     setOptions(prev => ({ ...prev, [field]: value }));
   }, [error, clearError]);
+  
+  const handleCharacterInputChange = useCallback((field: 'characterName' | 'characterType' | 'characterPersonality', value: string) => {
+    if (!characterFieldsEditedByUser) {
+      setCharacterFieldsEditedByUser(true);
+    }
+    handleInputChange(field, value);
+  }, [characterFieldsEditedByUser, handleInputChange]);
 
   useEffect(() => {
     handleInputChange('language', language);
@@ -109,6 +122,49 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     return () => clearInterval(intervalId);
   }, [options.prompt]);
   
+  useEffect(() => {
+    // This effect handles auto-filling character details from the prompt.
+    // It only runs if the prompt is not empty and the user has not manually edited the character fields.
+    if (options.prompt && !characterFieldsEditedByUser && options.prompt !== lastExtractedPrompt.current) {
+        const handler = setTimeout(async () => {
+            // Re-check in case the user started editing during the debounce timeout
+            if (characterFieldsEditedByUser) return;
+            
+            const currentPrompt = options.prompt;
+            lastExtractedPrompt.current = currentPrompt;
+            setIsExtractingCharacter(true);
+
+            try {
+                const details = await extractCharacterDetails(currentPrompt, language);
+                
+                // Final check before setting state to prevent race conditions
+                setOptions(prev => {
+                    if (prev.prompt === currentPrompt && !characterFieldsEditedByUser) {
+                        return {
+                            ...prev,
+                            characterName: details.characterName || '',
+                            characterType: details.characterType || '',
+                            characterPersonality: details.characterPersonality || '',
+                        };
+                    }
+                    return prev;
+                });
+            } catch (error) {
+                console.error("Failed to extract character details:", error);
+            } finally {
+                // Only stop the spinner if this was the last request sent
+                if (lastExtractedPrompt.current === currentPrompt) {
+                   setIsExtractingCharacter(false);
+                }
+            }
+        }, 1500); // 1.5 second debounce after user stops typing
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }
+  }, [options.prompt, language, characterFieldsEditedByUser]);
+
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -265,11 +321,16 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
           <div className="grid lg:grid-cols-2 gap-12">
             <div className="space-y-8">
                 <section>
-                  <h2 className="text-xl font-bold text-slate-700 mb-3 flex items-center gap-2"><UserRound className="w-6 h-6 text-purple-500" />{t('input.character.title')}</h2>
+                  <h2 className="text-xl font-bold text-slate-700 mb-3 flex items-center gap-2">
+                    <UserRound className="w-6 h-6 text-purple-500" />
+                    {t('input.character.title')}
+                    {isExtractingCharacter && <Loader2 className="w-5 h-5 text-purple-500 animate-spin" />}
+                  </h2>
+                   <p className="text-sm text-slate-500 -mt-2 mb-3">{t('input.character.subtitle')}</p>
                   <div className="space-y-1">
-                    <input type="text" value={options.characterName} onChange={(e) => handleInputChange('characterName', e.target.value)} placeholder={t('input.character.name')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
-                    <input type="text" value={options.characterType} onChange={(e) => handleInputChange('characterType', e.target.value)} placeholder={t('input.character.type')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
-                    <input type="text" value={options.characterPersonality} onChange={(e) => handleInputChange('characterPersonality', e.target.value)} placeholder={t('input.character.personality')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
+                    <input type="text" value={options.characterName} onChange={(e) => handleCharacterInputChange('characterName', e.target.value)} placeholder={t('input.character.name')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
+                    <input type="text" value={options.characterType} onChange={(e) => handleCharacterInputChange('characterType', e.target.value)} placeholder={t('input.character.type')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
+                    <input type="text" value={options.characterPersonality} onChange={(e) => handleCharacterInputChange('characterPersonality', e.target.value)} placeholder={t('input.character.personality')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
                   </div>
                 </section>
                 <section>

@@ -50,6 +50,25 @@ const storySchema = {
   required: ["pages"],
 };
 
+const characterDetailsSchema = {
+  type: Type.OBJECT,
+  properties: {
+    characterName: {
+      type: Type.STRING,
+      description: 'The name of the main character, if mentioned or implied. If not, suggest a creative name appropriate for a child\'s story.',
+    },
+    characterType: {
+      type: Type.STRING,
+      description: 'A short description of the main character\'s type (e.g., "a brave lion", "a curious girl", "a happy little robot"). Infer this from the prompt.',
+    },
+    characterPersonality: {
+      type: Type.STRING,
+      description: 'A short description of the main character\'s personality (e.g., "adventurous and kind", "shy but clever"). Infer this from the prompt.',
+    },
+  },
+  required: ["characterName", "characterType", "characterPersonality"],
+};
+
 const getLanguageName = (lang: Language): string => {
     switch (lang) {
         case 'en': return 'English';
@@ -294,4 +313,34 @@ export const transcribeAudio = async (audio: { mimeType: string, data: string },
 
 export const regenerateImage = async (imagePrompt: string, illustrationStyle: string): Promise<string | 'GENERATION_FAILED'> => {
     return generateImageWithFal(`${imagePrompt}, in a beautiful ${illustrationStyle} style, G-rated, for a children's book`);
+};
+
+export const extractCharacterDetails = async (prompt: string, language: Language): Promise<{ characterName: string; characterType: string; characterPersonality: string; }> => {
+    const langName = getLanguageName(language);
+    const extractionPrompt = `
+Analyze the following children's story idea. Identify the main character.
+Based on the story idea, provide a suitable name, type, and personality for the main character.
+If a name is mentioned, use it. If not, invent a suitable, creative name.
+The response must be in ${langName}.
+
+Story Idea: "${prompt}"
+`;
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: extractionPrompt,
+            config: { responseMimeType: "application/json", responseSchema: characterDetailsSchema }
+        });
+
+        const result = JSON.parse(response.text);
+        return {
+            characterName: result.characterName || '',
+            characterType: result.characterType || '',
+            characterPersonality: result.characterPersonality || '',
+        };
+    } catch (error) {
+        console.error("Error extracting character details:", error);
+        // Return empty strings on failure to avoid breaking the UI
+        return { characterName: '', characterType: '', characterPersonality: '' };
+    }
 };

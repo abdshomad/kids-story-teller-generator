@@ -1,3 +1,4 @@
+
 // NOTE: This is a machine-generated translation
 export const ar = {
   // Welcome
@@ -23,6 +24,7 @@ export const ar = {
   'input.visualInspiration.change': 'تغيير الصورة',
   'input.visualInspiration.clearDrawing': 'مسح الرسم',
   'input.character.title': 'أنشئ شخصية (اختياري)',
+  'input.character.subtitle': "سنقترح شخصية بناءً على قصتك، لكن لا تتردد في تغييرها!",
   'input.character.name': 'الاسم',
   'input.character.type': 'النوع (على سبيل المثال، أسد شجاع)',
   'input.character.personality': 'الشخصية (على سبيل المثال، فضولي ولطيف)',

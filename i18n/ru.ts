@@ -1,3 +1,4 @@
+
 // NOTE: This is a machine-generated translation
 export const ru = {
   // Welcome
@@ -23,6 +24,7 @@ export const ru = {
   'input.visualInspiration.change': 'Изменить изображение',
   'input.visualInspiration.clearDrawing': 'Очистить рисунок',
   'input.character.title': 'Создайте персонажа (необязательно)',
+  'input.character.subtitle': "Мы предложим персонажа на основе вашей истории, но не стесняйтесь его менять!",
   'input.character.name': 'Имя',
   'input.character.type': 'Тип (например, храбрый лев)',
   'input.character.personality': 'Характер (например, любопытный и добрый)',

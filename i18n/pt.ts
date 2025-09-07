@@ -1,3 +1,4 @@
+
 // NOTE: This is a machine-generated translation
 export const pt = {
   // Welcome
@@ -23,6 +24,7 @@ export const pt = {
   'input.visualInspiration.change': 'Alterar Imagem',
   'input.visualInspiration.clearDrawing': 'Limpar Desenho',
   'input.character.title': 'Crie um Personagem (Opcional)',
+  'input.character.subtitle': "Sugeriremos um personagem com base na sua história, mas sinta-se à vontade para alterá-lo!",
   'input.character.name': 'Nome',
   'input.character.type': 'Tipo (ex: um leão corajoso)',
   'input.character.personality': 'Personalidade (ex: curioso e gentil)',

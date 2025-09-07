@@ -1,3 +1,4 @@
+
 // NOTE: This is a machine-generated translation
 export const nl = {
   // Welcome
@@ -23,6 +24,7 @@ export const nl = {
   'input.visualInspiration.change': 'Afbeelding wijzigen',
   'input.visualInspiration.clearDrawing': 'Tekening wissen',
   'input.character.title': 'Creëer een personage (optioneel)',
+  'input.character.subtitle': "We zullen een personage voorstellen op basis van je verhaal, maar voel je vrij om het te veranderen!",
   'input.character.name': 'Naam',
   'input.character.type': 'Type (bijv. een moedige leeuw)',
   'input.character.personality': 'Persoonlijkheid (bijv. nieuwsgierig en vriendelijk)',

@@ -1,3 +1,4 @@
+
 // NOTE: This is a machine-generated translation
 export const hi = {
   // Welcome
@@ -23,6 +24,7 @@ export const hi = {
   'input.visualInspiration.change': 'छवि बदलें',
   'input.visualInspiration.clearDrawing': 'ड्राइंग साफ़ करें',
   'input.character.title': 'एक चरित्र बनाएँ (वैकल्पिक)',
+  'input.character.subtitle': "हम आपकी कहानी के आधार पर एक चरित्र का सुझाव देंगे, लेकिन इसे बदलने के लिए स्वतंत्र महसूस करें!",
   'input.character.name': 'नाम',
   'input.character.type': 'प्रकार (जैसे, एक बहादुर शेर)',
   'input.character.personality': 'व्यक्तित्व (जैसे, जिज्ञासु और दयालु)',
