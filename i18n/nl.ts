@@ -56,11 +56,11 @@ export const nl = {
   'loading.sub.writingPages': 'De verhaalpagina\'s schrijven...',
   'loading.main.illustrating': 'Illustraties maken',
   'loading.sub.designingCharacters': 'De personages ontwerpen...',
-  'loading.sub.paintingScenes': 'De scènes schilderen...',
+  'loading.sub.paintingScenes': 'De scènes schilderen & geluiden componeren...',
   'loading.main.finalizing': 'Het verhalenboek afronden',
   'loading.sub.assembling': 'Het boek samenstellen...',
   'loading.sub.finalTouches': 'De laatste magische accenten toevoegen...',
-  'loading.illustratingPage': 'Pagina {current} van {total} illustreren...',
+  'loading.illustratingPage': 'Pagina {current} van {total} tot leven brengen...',
   'loading.finalTouchesPage': 'Pagina {current} van {total} polijsten...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const nl = {
   'story.newStory': 'Nieuw verhaal maken',
   'story.illustrating': 'Bezig met illustreren...',
   'story.imageError': 'Afbeelding kon niet worden gegenereerd.',
+  'story.sfx_tooltip': 'Klik op de gekleurde woorden om een geluid te horen!',
 
   // Error
   'error.title': 'Oh nee, een kink in de kabel van de magie!',
@@ -87,6 +88,7 @@ export const nl = {
   'theme.courage': 'Moed',
   'theme.kindness': 'Vriendelijkheid',
   'theme.adventure': 'Avontuur',
+  'length.very_short': 'Zeer Kort (3 pagina\'s)',
   'length.short': 'Kort (7 pagina\'s)',
   'length.medium': 'Gemiddeld (19 pagina\'s)',
   'length.long': 'Lang (25 pagina\'s)',
@@ -97,10 +99,4 @@ export const nl = {
   'style.3drender': '3D Render',
   'style.claymation': 'Kleianimatie',
   'style.pencilsketch': 'Potloodschets',
-
-  // Sample Prompts
-  'prompt.sample1': 'Een nieuwsgierige maar verlegen kat die een magische hoed vindt',
-  'prompt.sample2': 'Een vrolijke robot die graag bloemen plant voor vrienden',
-  'prompt.sample3': 'Een dapper spookje dat stiekem bang is in het donker',
-  'prompt.sample4': 'Twee opgewonden dinosaurussen die een mysterieuze schatkaart ontdekken',
 };

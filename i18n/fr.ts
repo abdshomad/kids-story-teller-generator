@@ -56,11 +56,11 @@ export const fr = {
   'loading.sub.writingPages': 'Écriture des pages de l\'histoire...',
   'loading.main.illustrating': 'Création des illustrations',
   'loading.sub.designingCharacters': 'Conception des personnages...',
-  'loading.sub.paintingScenes': 'Peinture des scènes...',
+  'loading.sub.paintingScenes': 'Peinture des scènes et composition des sons...',
   'loading.main.finalizing': 'Finalisation du livre d\'histoires',
   'loading.sub.assembling': 'Assemblage du livre...',
   'loading.sub.finalTouches': 'Ajout des touches magiques finales...',
-  'loading.illustratingPage': 'Illustration de la page {current} sur {total}...',
+  'loading.illustratingPage': 'Donner vie à la page {current} sur {total}...',
   'loading.finalTouchesPage': 'Polissage de la page {current} sur {total}...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const fr = {
   'story.newStory': 'Créer une nouvelle histoire',
   'story.illustrating': 'Illustration en cours...',
   'story.imageError': 'L\'image n\'a pas pu être générée.',
+  'story.sfx_tooltip': 'Cliquez sur les mots colorés pour entendre un son !',
 
   // Error
   'error.title': 'Oh non, un hoquet dans la magie !',
@@ -87,6 +88,7 @@ export const fr = {
   'theme.courage': 'Courage',
   'theme.kindness': 'Gentillesse',
   'theme.adventure': 'Aventure',
+  'length.very_short': 'Très Courte (3 pages)',
   'length.short': 'Courte (7 pages)',
   'length.medium': 'Moyenne (19 pages)',
   'length.long': 'Longue (25 pages)',
@@ -97,10 +99,4 @@ export const fr = {
   'style.3drender': 'Rendu 3D',
   'style.claymation': 'Pâte à modeler',
   'style.pencilsketch': 'Croquis au crayon',
-
-  // Sample Prompts
-  'prompt.sample1': 'Un chat curieux mais timide qui trouve un chapeau magique',
-  'prompt.sample2': 'Un robot heureux qui adore planter des fleurs pour ses amis',
-  'prompt.sample3': 'Un petit fantôme courageux qui a secrètement peur du noir',
-  'prompt.sample4': 'Deux dinosaures excités qui découvrent une mystérieuse carte au trésor',
 };

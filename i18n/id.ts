@@ -55,11 +55,11 @@ export const id = {
   'loading.sub.writingPages': 'Menulis halaman cerita...',
   'loading.main.illustrating': 'Membuat Ilustrasi',
   'loading.sub.designingCharacters': 'Merancang karakter...',
-  'loading.sub.paintingScenes': 'Melukis adegan...',
+  'loading.sub.paintingScenes': 'Melukis adegan & menyusun suara...',
   'loading.main.finalizing': 'Menyelesaikan Buku Cerita',
   'loading.sub.assembling': 'Menyusun buku...',
   'loading.sub.finalTouches': 'Menambahkan sentuhan ajaib terakhir...',
-  'loading.illustratingPage': 'Mengilustrasikan halaman {current} dari {total}...',
+  'loading.illustratingPage': 'Menghidupkan halaman {current} dari {total}...',
   'loading.finalTouchesPage': 'Memoles halaman {current} dari {total}...',
 
   // Story Viewer
@@ -67,6 +67,7 @@ export const id = {
   'story.newStory': 'Buat Cerita Baru',
   'story.illustrating': 'Mengilustrasikan...',
   'story.imageError': 'Gambar tidak dapat dibuat.',
+  'story.sfx_tooltip': 'Klik pada kata-kata berwarna untuk mendengar suara!',
 
   // Error
   'error.title': 'Oh tidak, ada gangguan dalam sihir!',
@@ -86,6 +87,7 @@ export const id = {
   'theme.courage': 'Keberanian',
   'theme.kindness': 'Kebaikan',
   'theme.adventure': 'Petualangan',
+  'length.very_short': 'Sangat Pendek (3 halaman)',
   'length.short': 'Pendek (7 halaman)',
   'length.medium': 'Sedang (19 halaman)',
   'length.long': 'Panjang (25 halaman)',
@@ -96,10 +98,4 @@ export const id = {
   'style.3drender': 'Render 3D',
   'style.claymation': 'Claymation',
   'style.pencilsketch': 'Sketsa Pensil',
-
-  // Sample Prompts
-  'prompt.sample1': 'Kucing penasaran tapi pemalu yang menemukan topi ajaib',
-  'prompt.sample2': 'Robot ceria yang suka menanam bunga untuk teman-temannya',
-  'prompt.sample3': 'Hantu kecil pemberani yang diam-diam takut gelap',
-  'prompt.sample4': 'Dua dinosaurus bersemangat yang menemukan peta harta karun misterius',
 };

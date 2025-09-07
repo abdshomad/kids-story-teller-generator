@@ -55,11 +55,11 @@ export const en = {
   'loading.sub.writingPages': 'Writing the story pages...',
   'loading.main.illustrating': 'Creating Illustrations',
   'loading.sub.designingCharacters': 'Designing the characters...',
-  'loading.sub.paintingScenes': 'Painting the scenes...',
+  'loading.sub.paintingScenes': 'Painting the scenes & composing sounds...',
   'loading.main.finalizing': 'Finalizing the Storybook',
   'loading.sub.assembling': 'Assembling the book...',
   'loading.sub.finalTouches': 'Adding the final magic touches...',
-  'loading.illustratingPage': 'Illustrating page {current} of {total}...',
+  'loading.illustratingPage': 'Bringing page {current} of {total} to life...',
   'loading.finalTouchesPage': 'Polishing page {current} of {total}...',
 
   // Story Viewer
@@ -67,6 +67,7 @@ export const en = {
   'story.newStory': 'Create New Story',
   'story.illustrating': 'Illustrating...',
   'story.imageError': 'Image could not be generated.',
+  'story.sfx_tooltip': 'Click on the colored words to hear a sound!',
 
   // Error
   'error.title': 'Oh no, a hiccup in the magic!',
@@ -86,6 +87,7 @@ export const en = {
   'theme.courage': 'Courage',
   'theme.kindness': 'Being Kind',
   'theme.adventure': 'Adventure',
+  'length.very_short': 'Very Short (3 pages)',
   'length.short': 'Short (7 pages)',
   'length.medium': 'Medium (19 pages)',
   'length.long': 'Long (25 pages)',
@@ -96,10 +98,4 @@ export const en = {
   'style.3drender': '3D Render',
   'style.claymation': 'Claymation',
   'style.pencilsketch': 'Pencil Sketch',
-
-  // Sample Prompts
-  'prompt.sample1': 'A curious but shy cat who finds a magic hat',
-  'prompt.sample2': 'A happy robot who loves to plant flowers for friends',
-  'prompt.sample3': 'A brave little ghost who is secretly afraid of the dark',
-  'prompt.sample4': 'Two excited dinosaurs who discover a mysterious treasure map',
 };

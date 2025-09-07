@@ -11,7 +11,7 @@ export const ar = {
   'welcome.card3.title': 'إشراف الوالدين',
   'welcome.card3.text': 'هذه أداة تعمل بالذكاء الاصطناعي. نوصي بالقراءة المشتركة مع طفلك لمشاركة التجربة وتوجيه العملية الإبداعية معًا.',
   'welcome.card4.title': 'إثارة الإبداع',
-  'welcome.card4.text': 'هذه الأداة هنا لتكون نقطة انطلاق لخيال طفلك! استخدمها لاستكشاف أفكار جديدة وخلق مغامرات رائعة معًا.',
+  'welcome.card4.text': 'هذه أداة هنا لتكون نقطة انطلاق لخيال طفلك! استخدمها لاستكشاف أفكار جديدة وخلق مغامرات رائعة معًا.',
   'welcome.button': 'هيا نبتكر قصة!',
 
   // Input Screen
@@ -56,11 +56,11 @@ export const ar = {
   'loading.sub.writingPages': 'كتابة صفحات القصة...',
   'loading.main.illustrating': 'إنشاء الرسوم التوضيحية',
   'loading.sub.designingCharacters': 'تصميم الشخصيات...',
-  'loading.sub.paintingScenes': 'رسم المشاهد...',
+  'loading.sub.paintingScenes': 'رسم المشاهد وتأليف الأصوات...',
   'loading.main.finalizing': 'اللمسات الأخيرة على كتاب القصة',
   'loading.sub.assembling': 'تجميع الكتاب...',
   'loading.sub.finalTouches': 'إضافة اللمسات السحرية الأخيرة...',
-  'loading.illustratingPage': 'توضيح الصفحة {current} من {total}...',
+  'loading.illustratingPage': 'إحياء الصفحة {current} من {total}...',
   'loading.finalTouchesPage': 'صقل الصفحة {current} من {total}...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const ar = {
   'story.newStory': 'أنشئ قصة جديدة',
   'story.illustrating': 'جاري الرسم...',
   'story.imageError': 'تعذر إنشاء الصورة.',
+  'story.sfx_tooltip': 'انقر على الكلمات الملونة لسماع صوت!',
 
   // Error
   'error.title': 'أوه لا، عثرة في السحر!',
@@ -87,6 +88,7 @@ export const ar = {
   'theme.courage': 'شجاعة',
   'theme.kindness': 'اللطف',
   'theme.adventure': 'مفامرة',
+  'length.very_short': 'قصيرة جدا (3 صفحات)',
   'length.short': 'قصيرة (7 صفحات)',
   'length.medium': 'متوسطة (19 صفحة)',
   'length.long': 'طويلة (25 صفحة)',
@@ -97,10 +99,4 @@ export const ar = {
   'style.3drender': 'عرض ثلاثي الأبعاد',
   'style.claymation': 'صلصال متحرك',
   'style.pencilsketch': 'رسم بالقلم الرصاص',
-
-  // Sample Prompts
-  'prompt.sample1': 'قطة فضولية ولكنها خجولة تجد قبعة سحرية',
-  'prompt.sample2': 'روبوت سعيد يحب زراعة الزهور للأصدقاء',
-  'prompt.sample3': 'شبح صغير شجاع يخاف سرًا من الظلام',
-  'prompt.sample4': 'ديناصوران متحمسين يكتشفان خريطة كنز غامضة',
 };

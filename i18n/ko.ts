@@ -56,11 +56,11 @@ export const ko = {
   'loading.sub.writingPages': '이야기 페이지 작성 중...',
   'loading.main.illustrating': '일러스트 제작 중',
   'loading.sub.designingCharacters': '캐릭터 디자인 중...',
-  'loading.sub.paintingScenes': '장면 그리는 중...',
+  'loading.sub.paintingScenes': '장면을 그리고 소리를 작곡하는 중...',
   'loading.main.finalizing': '동화책 마무리 중',
   'loading.sub.assembling': '책 조립 중...',
   'loading.sub.finalTouches': '마지막 마법의 손길 추가 중...',
-  'loading.illustratingPage': '{total}페이지 중 {current}페이지 일러스트 작업 중...',
+  'loading.illustratingPage': '{total}페이지 중 {current}페이지에 생명을 불어넣는 중...',
   'loading.finalTouchesPage': '{total}페이지 중 {current}페이지 다듬는 중...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const ko = {
   'story.newStory': '새 이야기 만들기',
   'story.illustrating': '일러스트 작업 중...',
   'story.imageError': '이미지를 생성할 수 없습니다.',
+  'story.sfx_tooltip': '색깔 있는 단어를 클릭하여 소리를 들어보세요!',
 
   // Error
   'error.title': 'おっと、魔法に問題が発生しました！',
@@ -87,6 +88,7 @@ export const ko = {
   'theme.courage': '용기',
   'theme.kindness': '친절',
   'theme.adventure': '모험',
+  'length.very_short': '매우 짧음 (3페이지)',
   'length.short': '짧게 (7페이지)',
   'length.medium': '중간 (19페이지)',
   'length.long': '길게 (25페이지)',
@@ -97,10 +99,4 @@ export const ko = {
   'style.3drender': '3D 렌더',
   'style.claymation': '클레이메이션',
   'style.pencilsketch': '연필 스케치',
-
-  // Sample Prompts
-  'prompt.sample1': '마법 모자를 발견한 호기심 많지만 수줍은 고양이',
-  'prompt.sample2': '친구들을 위해 꽃 심기를 좋아하는 행복한 로봇',
-  'prompt.sample3': '어둠을 몰래 무서워하는 용감한 작은 유령',
-  'prompt.sample4': '신비한 보물 지도를 발견한 신이 난 두 공룡',
 };

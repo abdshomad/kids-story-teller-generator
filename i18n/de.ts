@@ -56,11 +56,11 @@ export const de = {
   'loading.sub.writingPages': 'Die Geschichtenseiten schreiben...',
   'loading.main.illustrating': 'Illustrationen erstellen',
   'loading.sub.designingCharacters': 'Die Charaktere entwerfen...',
-  'loading.sub.paintingScenes': 'Die Szenen malen...',
+  'loading.sub.paintingScenes': 'Die Szenen malen & Geräusche komponieren...',
   'loading.main.finalizing': 'Das Geschichtenbuch fertigstellen',
   'loading.sub.assembling': 'Das Buch zusammenstellen...',
   'loading.sub.finalTouches': 'Die letzten magischen Handgriffe hinzufügen...',
-  'loading.illustratingPage': 'Illustriere Seite {current} von {total}...',
+  'loading.illustratingPage': 'Seite {current} von {total} zum Leben erwecken...',
   'loading.finalTouchesPage': 'Seite {current} von {total} polieren...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const de = {
   'story.newStory': 'Neue Geschichte erstellen',
   'story.illustrating': 'Wird illustriert...',
   'story.imageError': 'Bild konnte nicht generiert werden.',
+  'story.sfx_tooltip': 'Klicke auf die farbigen Wörter, um einen Ton zu hören!',
 
   // Error
   'error.title': 'Oh nein, ein Schluckauf in der Magie!',
@@ -87,6 +88,7 @@ export const de = {
   'theme.courage': 'Mut',
   'theme.kindness': 'Freundlichkeit',
   'theme.adventure': 'Abenteuer',
+  'length.very_short': 'Sehr Kurz (3 Seiten)',
   'length.short': 'Kurz (7 Seiten)',
   'length.medium': 'Mittel (19 Seiten)',
   'length.long': 'Lang (25 Seiten)',
@@ -97,10 +99,4 @@ export const de = {
   'style.3drender': '3D-Render',
   'style.claymation': 'Knetanimation',
   'style.pencilsketch': 'Bleistiftskizze',
-
-  // Sample Prompts
-  'prompt.sample1': 'Eine neugierige, aber schüchterne Katze, die einen magischen Hut findet',
-  'prompt.sample2': 'Ein glücklicher Roboter, der gerne Blumen für Freunde pflanzt',
-  'prompt.sample3': 'Ein tapferer kleiner Geist, der sich heimlich vor der Dunkelheit fürchtet',
-  'prompt.sample4': 'Zwei aufgeregte Dinosaurier, die eine mysteriöse Schatzkarte entdecken',
 };

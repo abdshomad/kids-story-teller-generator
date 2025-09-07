@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { StoryOptions, StoryData, StoryPage, Language, LoadingStage, StoryOutline } from '../types';
+import { StoryOptions, StoryData, StoryPage, Language, LoadingStage, StoryOutline, SoundEffect } from '../types';
 import { FAL_API_KEY, ELEVENLABS_API_KEY } from '../env';
 
 if (!process.env.API_KEY) {
@@ -8,7 +8,8 @@ if (!process.env.API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-const FAL_API_URL = 'https://fal.run/fal-ai/nano-banana';
+const FAL_IMG_API_URL = 'https://fal.run/fal-ai/nano-banana';
+
 
 const storyOutlineSchema = {
   type: Type.OBJECT,
@@ -42,6 +43,24 @@ const storySchema = {
             type: Type.STRING,
             description: 'A simple, descriptive prompt for generating an illustration that matches this part of the story. The prompt should be G-rated, child-friendly, and focus on characters and actions. Example: "A brave little squirrel wearing a tiny red cape, looking up at a tall oak tree, cartoon style."'
           },
+          soundEffects: {
+            type: Type.ARRAY,
+            description: 'An optional array of sound effects for this page. Identify 1-2 key moments.',
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    text_trigger: {
+                        type: Type.STRING,
+                        description: 'The exact text phrase from the page\'s main text that should trigger this sound effect.'
+                    },
+                    sfx_prompt: {
+                        type: Type.STRING,
+                        description: 'A simple, descriptive prompt for an AI to generate the sound effect. Example: "leaves rustling", "door creaking", "happy bird chirping".'
+                    }
+                },
+                required: ["text_trigger", "sfx_prompt"]
+            }
+          }
         },
         required: ["text", "imagePrompt"],
       },
@@ -69,6 +88,32 @@ const characterDetailsSchema = {
   required: ["characterName", "characterType", "characterPersonality"],
 };
 
+const samplePromptsSchema = {
+  type: Type.OBJECT,
+  properties: {
+    prompts: {
+      type: Type.ARRAY,
+      description: 'An array of 4 creative and imaginative story prompts for children aged 3-8.',
+      items: {
+        type: Type.OBJECT,
+        properties: {
+            title: {
+                type: Type.STRING,
+                description: 'A very short, catchy title for the story idea (max 5 words). Example: "The Flying Squirrel".'
+            },
+            prompt: {
+                type: Type.STRING,
+                description: 'A short story prompt, about 2-3 sentences long. Example: "A brave little squirrel is tired of climbing trees. He dreams of soaring through the sky with the birds. How will he make his dream come true?"'
+            }
+        },
+        required: ["title", "prompt"]
+      },
+    },
+  },
+  required: ["prompts"],
+};
+
+
 const getLanguageName = (lang: Language): string => {
     switch (lang) {
         case 'en': return 'English';
@@ -93,8 +138,81 @@ const getLanguageName = (lang: Language): string => {
     }
 };
 
-const getPageCount = (length: 'short' | 'medium' | 'long') => {
+export const generateSamplePrompts = async (language: Language): Promise<{ title: string; prompt: string; }[]> => {
+    const prompt = `
+Generate 4 unique, creative, and imaginative story prompts suitable for children aged 3-8.
+For each prompt, provide a very short, catchy title (max 5 words) and a longer prompt (2-3 sentences).
+Examples:
+- Title: "The Magical Hat", Prompt: "A curious but shy cat finds a magical hat in an old attic. When he puts it on, something amazing happens! What new adventures await?"
+- Title: "The Robot's Garden", Prompt: "A happy robot loves to plant flowers for his friends. One day, he finds a mysterious seed that grows into something unexpected. What could it be?"
+The prompts must be written in ${getLanguageName(language)}.
+`;
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: samplePromptsSchema,
+            },
+        });
+        const result = JSON.parse(response.text);
+        return result.prompts || [];
+    } catch (error) {
+        console.error("Failed to generate sample prompts:", error);
+        // Fallback to a default set of English prompts if generation fails
+        return [
+            { title: 'The Shy Ghost', prompt: 'A brave little ghost is secretly afraid of the dark. One night, the lights in his spooky mansion go out! How will he find his courage?' },
+            { title: 'The Lost Treasure Map', prompt: 'Two excited dinosaurs discover a mysterious treasure map. It leads them through jungles and past volcanoes. What treasure will they find at the end?' },
+            { title: 'The Magical Hat', prompt: 'A curious but shy cat finds a magical hat in an old attic. When he puts it on, something amazing happens! What new adventures await?' },
+            { title: 'The Robot\'s Garden', prompt: 'A happy robot loves to plant flowers for his friends. One day, he finds a mysterious seed that grows into something unexpected. What could it be?' },
+        ];
+    }
+};
+
+// FIX: Added extractCharacterDetails function to analyze the user's prompt and suggest character details.
+export const extractCharacterDetails = async (prompt: string, language: Language): Promise<{ characterName: string; characterType: string; characterPersonality: string; }> => {
+    const systemInstruction = `You are an expert at analyzing story ideas and identifying key character traits. Based on the user's prompt, extract or infer the main character's name, type, and personality. Respond in ${getLanguageName(language)}. If no details are available, provide creative, age-appropriate suggestions based on the prompt.`;
+    
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                systemInstruction,
+                responseMimeType: "application/json",
+                responseSchema: characterDetailsSchema,
+            },
+        });
+        return JSON.parse(response.text);
+    } catch (error) {
+        console.error("Failed to extract character details:", error);
+        // Return empty strings on failure to avoid breaking the UI
+        return { characterName: '', characterType: '', characterPersonality: '' };
+    }
+};
+
+// FIX: Added transcribeAudio function for speech-to-text functionality.
+export const transcribeAudio = async (audio: { mimeType: string; data: string }, language: Language): Promise<string> => {
+    const audioPart = {
+        inlineData: {
+            mimeType: audio.mimeType,
+            data: audio.data,
+        },
+    };
+    const prompt = `Transcribe the following audio. The speaker is describing a story idea for a child. The language is ${getLanguageName(language)}.`;
+    
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: { parts: [audioPart, { text: prompt }] },
+    });
+
+    return response.text;
+};
+
+const getPageCount = (length: 'very_short' | 'short' | 'medium' | 'long') => {
     switch(length) {
+        case 'very_short': return '3';
         case 'short': return '7';
         case 'medium': return '19';
         case 'long': return '25';
@@ -114,7 +232,7 @@ const generateImageWithFal = async (prompt: string): Promise<string | 'GENERATIO
 
     while (retries > 0) {
         try {
-            const response = await fetch(FAL_API_URL, {
+            const response = await fetch(FAL_IMG_API_URL, {
                 method: 'POST',
                 headers: { 'Authorization': `Key ${FAL_API_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt }),
@@ -143,6 +261,38 @@ const generateImageWithFal = async (prompt: string): Promise<string | 'GENERATIO
         }
     }
     return 'GENERATION_FAILED';
+};
+
+// FIX: Added regenerateImage function to allow users to retry failed image generations.
+export const regenerateImage = async (prompt: string, style: string): Promise<string | 'GENERATION_FAILED'> => {
+    // The style is often already in the prompt from the full story generation, but adding it again ensures consistency.
+    const fullPrompt = `${prompt}, in the style of ${style}`;
+    return await generateImageWithFal(fullPrompt);
+};
+
+const generateSoundEffect = async (prompt: string): Promise<string | undefined> => {
+    if (!ELEVENLABS_API_KEY) {
+        console.warn("ELEVENLABS_API_KEY not found. Skipping sound effect generation.");
+        return undefined;
+    }
+    try {
+        const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM`; // Rachel
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_API_KEY },
+            body: JSON.stringify({
+                text: `*${prompt}*`, // Wrap prompt in asterisks for SFX as per ElevenLabs docs
+                model_id: 'eleven_multilingual_v2',
+                 voice_settings: { stability: 0.6, similarity_boost: 0.8 },
+            }),
+        });
+        if (!response.ok) throw new Error(`ElevenLabs SFX API error: ${response.statusText}`);
+        const audioBlob = await response.blob();
+        return URL.createObjectURL(audioBlob);
+    } catch (error) {
+        console.error(`Failed to generate sound effect with ElevenLabs for prompt: "${prompt}"`, error);
+        return undefined;
+    }
 };
 
 const generateAudio = async (text: string): Promise<string | undefined> => {
@@ -234,7 +384,7 @@ export const generateFullStoryFromSelection = async (
 
   const characterDescription = [options.characterName, options.characterType, options.characterPersonality].filter(Boolean).join(', ');
   const fullStoryPrompt = `
-You are a world-class children's storyteller. Your task is to write a complete story in ${getLanguageName(options.language)} based on the provided synopsis.
+You are a world-class children's storyteller and a voice director. Your task is to write a complete story in ${getLanguageName(options.language)} based on the provided synopsis.
 
 **Story Guidelines:**
 - **Target Age:** ${options.ageGroup}
@@ -242,7 +392,11 @@ You are a world-class children's storyteller. Your task is to write a complete s
 - **Tone:** Positive, uplifting, and kind.
 - **Content Rules:** Absolutely NO violence, scary elements, or mature themes.
 - **Length:** Create a story with exactly ${getPageCount(options.length)} pages (paragraphs).
+- **Expressive Narration:** To make the narration more engaging, embed emotional context tags directly into the story text for the AI voice actor. These tags add reactions, emotional states, and pauses.
+    - **Use tags like:** [laughs], [sigh], [excited], [nervous], [whispers], [pauses], [gasps], [sorrowful].
+    - **Example of correctly formatted text:** "He looked at the giant cookie. [gasps] 'It's bigger than my head!' he shouted, [excited]."
 - **Image Prompts:** For each page, create a child-friendly, G-rated image prompt. These prompts MUST be visually consistent with the selected style.
+- **Sound Effects:** For each page, identify 1-2 key moments that can be enhanced with a sound effect. For each moment, provide the exact text phrase from the story that should trigger the sound, and a simple, descriptive prompt for an AI to generate the sound (e.g., "leaves rustling", "door creaking", "happy bird chirping").
 
 **Story Synopsis:**
 ${synopsis}
@@ -255,92 +409,81 @@ ${selectedCoverPrompt}
 
 Please generate the complete story now.
 `;
+    // FIX: Completed the Gemini API call and added the subsequent logic to process the story, generate images, and generate audio.
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: { parts: [{text: fullStoryPrompt}] },
-        config: { responseMimeType: "application/json", responseSchema: storySchema }
+        contents: fullStoryPrompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: storySchema,
+        },
     });
-    const storyContent: { pages: Omit<StoryPage, 'imageUrl' | 'audioUrl'>[] } = JSON.parse(response.text.trim());
 
-    if (!storyContent?.pages?.length) throw new Error("AI failed to generate a valid story structure.");
-    
-    const tempStoryData: StoryData = { title: '', pages: storyContent.pages.map(p => ({ ...p })), options };
-    onUpdate({ stage: LoadingStage.DESIGNING_CHARACTERS, storyData: tempStoryData });
-    await delay(1500);
-
-    const totalPages = tempStoryData.pages.length;
-    onUpdate({ stage: LoadingStage.PAINTING_SCENES, storyData: tempStoryData, progress: { current: 1, total: totalPages } });
-
-    for (let i = 0; i < totalPages; i++) {
-        const page = tempStoryData.pages[i];
-        const [imageUrl, audioUrl] = await Promise.all([
-            generateImageWithFal(`${page.imagePrompt}, in a beautiful ${options.illustrationStyle} style, G-rated, for a children's book`),
-            generateAudio(page.text)
-        ]);
-        page.imageUrl = imageUrl;
-        page.audioUrl = audioUrl;
-
-        onUpdate({ 
-            stage: LoadingStage.PAINTING_SCENES, 
-            storyData: { ...tempStoryData, pages: [...tempStoryData.pages] },
-            progress: { current: i + 1, total: totalPages }
-        });
-        if (i < totalPages - 1) await delay(1000);
-    }
-  
-    onUpdate({ stage: LoadingStage.ASSEMBLING_BOOK, storyData: tempStoryData });
-    await delay(1000);
-  
-    for (let i = 0; i < totalPages; i++) {
-        onUpdate({ stage: LoadingStage.FINAL_TOUCHES, storyData: tempStoryData, progress: { current: i + 1, total: totalPages }});
-        await delay(100);
-    }
-
-    return tempStoryData;
-};
-
-export const transcribeAudio = async (audio: { mimeType: string, data: string }, language: Language): Promise<string> => {
-  const langName = getLanguageName(language);
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: { parts: [
-        { text: `Transcribe the following audio recording precisely. The language is ${langName}.` },
-        { inlineData: { mimeType: audio.mimeType, data: audio.data } },
-    ]},
-  });
-  return response.text?.trim() ?? "";
-};
-
-export const regenerateImage = async (imagePrompt: string, illustrationStyle: string): Promise<string | 'GENERATION_FAILED'> => {
-    return generateImageWithFal(`${imagePrompt}, in a beautiful ${illustrationStyle} style, G-rated, for a children's book`);
-};
-
-export const extractCharacterDetails = async (prompt: string, language: Language): Promise<{ characterName: string; characterType: string; characterPersonality: string; }> => {
-    const langName = getLanguageName(language);
-    const extractionPrompt = `
-Analyze the following children's story idea. Identify the main character.
-Based on the story idea, provide a suitable name, type, and personality for the main character.
-If a name is mentioned, use it. If not, invent a suitable, creative name.
-The response must be in ${langName}.
-
-Story Idea: "${prompt}"
-`;
+    let parsedStory: { pages: StoryPage[] };
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: extractionPrompt,
-            config: { responseMimeType: "application/json", responseSchema: characterDetailsSchema }
-        });
-
-        const result = JSON.parse(response.text);
-        return {
-            characterName: result.characterName || '',
-            characterType: result.characterType || '',
-            characterPersonality: result.characterPersonality || '',
-        };
-    } catch (error) {
-        console.error("Error extracting character details:", error);
-        // Return empty strings on failure to avoid breaking the UI
-        return { characterName: '', characterType: '', characterPersonality: '' };
+        parsedStory = JSON.parse(response.text);
+    } catch (e) {
+        console.error("Failed to parse story JSON from Gemini:", e);
+        throw new Error(t('error.generic'));
     }
+
+    const pages: StoryPage[] = parsedStory.pages || [];
+    const totalPages = pages.length;
+
+    const storyData: StoryData = {
+        title: '', // Title is added back in App.tsx
+        pages: pages.map(p => ({ ...p, imageUrl: undefined, audioUrl: undefined })),
+        options,
+    };
+
+    onUpdate({ stage: LoadingStage.DESIGNING_CHARACTERS, storyData });
+    await delay(1000);
+
+    onUpdate({ stage: LoadingStage.PAINTING_SCENES, storyData, progress: { current: 0, total: totalPages } });
+
+    // Generate images in parallel
+    const imagePromises = pages.map((page, index) =>
+        generateImageWithFal(`${page.imagePrompt}, ${options.illustrationStyle}`).then(imageUrl => {
+            storyData.pages[index].imageUrl = imageUrl;
+            // Create a new object for the update to ensure React state changes are detected
+            onUpdate({
+                stage: LoadingStage.PAINTING_SCENES,
+                storyData: { ...storyData, pages: [...storyData.pages] },
+                progress: { current: index + 1, total: totalPages }
+            });
+            return imageUrl;
+        })
+    );
+    await Promise.all(imagePromises);
+    
+    onUpdate({ stage: LoadingStage.ASSEMBLING_BOOK, storyData, progress: { current: totalPages, total: totalPages } });
+    await delay(1000);
+
+    onUpdate({ stage: LoadingStage.FINAL_TOUCHES, storyData, progress: { current: 0, total: totalPages } });
+
+    // Generate audio and SFX sequentially per page to avoid rate-limiting and show progress
+    for (let i = 0; i < totalPages; i++) {
+        const page = storyData.pages[i];
+        
+        const narrationPromise = generateAudio(page.text);
+        
+        const sfxPromises = page.soundEffects?.map(sfx =>
+            generateSoundEffect(sfx.sfx_prompt).then(audioUrl => {
+                sfx.audioUrl = audioUrl;
+                return sfx;
+            })
+        ) || [];
+
+        const [narrationUrl] = await Promise.all([narrationPromise, ...sfxPromises]);
+        
+        storyData.pages[i].audioUrl = narrationUrl;
+
+        onUpdate({
+            stage: LoadingStage.FINAL_TOUCHES,
+            storyData: { ...storyData, pages: [...storyData.pages] },
+            progress: { current: i + 1, total: totalPages },
+        });
+    }
+
+    return storyData;
 };

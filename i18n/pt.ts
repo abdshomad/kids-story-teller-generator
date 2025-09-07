@@ -56,11 +56,11 @@ export const pt = {
   'loading.sub.writingPages': 'Escrevendo as páginas da história...',
   'loading.main.illustrating': 'Criando Ilustrações',
   'loading.sub.designingCharacters': 'Projetando os personagens...',
-  'loading.sub.paintingScenes': 'Pintando as cenas...',
+  'loading.sub.paintingScenes': 'Pintando as cenas e compondo sons...',
   'loading.main.finalizing': 'Finalizando o Livro de Histórias',
   'loading.sub.assembling': 'Montando o livro...',
   'loading.sub.finalTouches': 'Adicionando os toques mágicos finais...',
-  'loading.illustratingPage': 'Ilustrando a página {current} de {total}...',
+  'loading.illustratingPage': 'Dando vida à página {current} de {total}...',
   'loading.finalTouchesPage': 'Polindo a página {current} de {total}...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const pt = {
   'story.newStory': 'Criar Nova História',
   'story.illustrating': 'Ilustrando...',
   'story.imageError': 'Não foi possível gerar a imagem.',
+  'story.sfx_tooltip': 'Clique nas palavras coloridas para ouvir um som!',
 
   // Error
   'error.title': 'Oh não, um soluço na magia!',
@@ -87,6 +88,7 @@ export const pt = {
   'theme.courage': 'Coragem',
   'theme.kindness': 'Bondade',
   'theme.adventure': 'Aventura',
+  'length.very_short': 'Muito Curta (3 páginas)',
   'length.short': 'Curta (7 páginas)',
   'length.medium': 'Média (19 páginas)',
   'length.long': 'Longa (25 páginas)',
@@ -97,10 +99,4 @@ export const pt = {
   'style.3drender': 'Render 3D',
   'style.claymation': 'Claymation',
   'style.pencilsketch': 'Esboço a Lápis',
-
-  // Sample Prompts
-  'prompt.sample1': 'Um gato curioso mas tímido que encontra um chapéu mágico',
-  'prompt.sample2': 'Um robô feliz que adora plantar flores para os amigos',
-  'prompt.sample3': 'Um pequeno fantasma corajoso que secretamente tem medo do escuro',
-  'prompt.sample4': 'Dois dinossauros animados que descobrem um misterioso mapa do tesouro',
 };

@@ -56,11 +56,11 @@ export const tr = {
   'loading.sub.writingPages': 'Hikaye sayfalarını yazma...',
   'loading.main.illustrating': 'İllüstrasyonları Oluşturma',
   'loading.sub.designingCharacters': 'Karakterleri tasarlama...',
-  'loading.sub.paintingScenes': 'Sahneleri boyama...',
+  'loading.sub.paintingScenes': 'Sahneleri boyama ve sesleri besteleme...',
   'loading.main.finalizing': 'Hikaye Kitabını Son Haline Getirme',
   'loading.sub.assembling': 'Kitabı birleştirme...',
   'loading.sub.finalTouches': 'Son sihirli dokunuşları ekleme...',
-  'loading.illustratingPage': '{total} sayfanın {current}. sayfası resmediliyor...',
+  'loading.illustratingPage': '{total} sayfanın {current}. sayfasına hayat veriliyor...',
   'loading.finalTouchesPage': '{total} sayfanın {current}. sayfası cilalanıyor...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const tr = {
   'story.newStory': 'Yeni Hikaye Yarat',
   'story.illustrating': 'Resmediliyor...',
   'story.imageError': 'Resim oluşturulamadı.',
+  'story.sfx_tooltip': 'Bir ses duymak için renkli kelimelere tıklayın!',
 
   // Error
   'error.title': 'Eyvah, sihirde bir aksilik oldu!',
@@ -87,6 +88,7 @@ export const tr = {
   'theme.courage': 'Cesaret',
   'theme.kindness': 'Nezaket',
   'theme.adventure': 'Macera',
+  'length.very_short': 'Çok Kısa (3 sayfa)',
   'length.short': 'Kısa (7 sayfa)',
   'length.medium': 'Orta (19 sayfa)',
   'length.long': 'Uzun (25 sayfa)',
@@ -97,10 +99,4 @@ export const tr = {
   'style.3drender': '3D Render',
   'style.claymation': 'Kil Animasyon',
   'style.pencilsketch': 'Kalem Eskiz',
-
-  // Sample Prompts
-  'prompt.sample1': 'Sihirli bir şapka bulan meraklı ama utangaç bir kedi',
-  'prompt.sample2': 'Arkadaşları için çiçek dikmeyi seven mutlu bir robot',
-  'prompt.sample3': 'Karanlıktan gizlice korkan cesur küçük bir hayalet',
-  'prompt.sample4': 'Gizemli bir hazine haritası keşfeden iki heyecanlı dinozor',
 };

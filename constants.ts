@@ -36,6 +36,7 @@ export const THEMES = [
 ];
 
 export const STORY_LENGTHS = [
+    { value: 'very_short', labelKey: 'length.very_short' },
     { value: 'short', labelKey: 'length.short' },
     { value: 'medium', labelKey: 'length.medium' },
     { value: 'long', labelKey: 'length.long' },
@@ -49,11 +50,4 @@ export const ILLUSTRATION_STYLES = [
   { value: '3D Render', labelKey: 'style.3drender', icon: Box },
   { value: 'Claymation', labelKey: 'style.claymation', icon: Drama },
   { value: 'Pencil Sketch', labelKey: 'style.pencilsketch', icon: PenLine },
-];
-
-export const SAMPLE_PROMPTS = [
-  'prompt.sample1',
-  'prompt.sample2',
-  'prompt.sample3',
-  'prompt.sample4',
 ];

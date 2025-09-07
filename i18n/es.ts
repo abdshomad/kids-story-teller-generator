@@ -56,11 +56,11 @@ export const es = {
   'loading.sub.writingPages': 'Escribiendo las páginas de la historia...',
   'loading.main.illustrating': 'Creando ilustraciones',
   'loading.sub.designingCharacters': 'Diseñando los personajes...',
-  'loading.sub.paintingScenes': 'Pintando las escenas...',
+  'loading.sub.paintingScenes': 'Pintando las escenas y componiendo sonidos...',
   'loading.main.finalizing': 'Finalizando el libro de cuentos',
   'loading.sub.assembling': 'Montando el libro...',
   'loading.sub.finalTouches': 'Añadiendo los toques mágicos finales...',
-  'loading.illustratingPage': 'Ilustrando la página {current} de {total}...',
+  'loading.illustratingPage': 'Dando vida a la página {current} de {total}...',
   'loading.finalTouchesPage': 'Puliendo la página {current} de {total}...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const es = {
   'story.newStory': 'Crear nueva historia',
   'story.illustrating': 'Ilustrando...',
   'story.imageError': 'No se pudo generar la imagen.',
+  'story.sfx_tooltip': '¡Haz clic en las palabras de colores para escuchar un sonido!',
 
   // Error
   'error.title': '¡Oh, no, un contratiempo en la magia!',
@@ -87,6 +88,7 @@ export const es = {
   'theme.courage': 'Coraje',
   'theme.kindness': 'Amabilidad',
   'theme.adventure': 'Aventura',
+  'length.very_short': 'Muy Corta (3 páginas)',
   'length.short': 'Corta (7 páginas)',
   'length.medium': 'Mediana (19 páginas)',
   'length.long': 'Larga (25 páginas)',
@@ -97,10 +99,4 @@ export const es = {
   'style.3drender': 'Render 3D',
   'style.claymation': 'Plastimación',
   'style.pencilsketch': 'Boceto a lápiz',
-
-  // Sample Prompts
-  'prompt.sample1': 'Un gato curioso pero tímido que encuentra un sombrero mágico',
-  'prompt.sample2': 'Un robot feliz al que le encanta plantar flores para sus amigos',
-  'prompt.sample3': 'Un fantasmita valiente que en secreto le teme a la oscuridad',
-  'prompt.sample4': 'Dos dinosaurios emocionados que descubren un misterioso mapa del tesoro',
 };

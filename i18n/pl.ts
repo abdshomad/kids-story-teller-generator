@@ -56,11 +56,11 @@ export const pl = {
   'loading.sub.writingPages': 'Pisanie stron historii...',
   'loading.main.illustrating': 'Tworzenie ilustracji',
   'loading.sub.designingCharacters': 'Projektowanie postaci...',
-  'loading.sub.paintingScenes': 'Malowanie scen...',
+  'loading.sub.paintingScenes': 'Malowanie scen i komponowanie dźwięków...',
   'loading.main.finalizing': 'Finalizowanie książki z bajkami',
   'loading.sub.assembling': 'Składanie książki...',
   'loading.sub.finalTouches': 'Dodawanie ostatnich magicznych poprawek...',
-  'loading.illustratingPage': 'Ilustrowanie strony {current} z {total}...',
+  'loading.illustratingPage': 'Ożywianie strony {current} z {total}...',
   'loading.finalTouchesPage': 'Dopracowywanie strony {current} z {total}...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const pl = {
   'story.newStory': 'Stwórz nową historię',
   'story.illustrating': 'Ilustrowanie...',
   'story.imageError': 'Nie można wygenerować obrazu.',
+  'story.sfx_tooltip': 'Kliknij na kolorowe słowa, aby usłyszeć dźwięk!',
 
   // Error
   'error.title': 'O nie, czkawka w magii!',
@@ -87,6 +88,7 @@ export const pl = {
   'theme.courage': 'Odwaga',
   'theme.kindness': 'Życzliwość',
   'theme.adventure': 'Przygoda',
+  'length.very_short': 'Bardzo Krótka (3 strony)',
   'length.short': 'Krótka (7 stron)',
   'length.medium': 'Średnia (19 stron)',
   'length.long': 'Długa (25 stron)',
@@ -97,10 +99,4 @@ export const pl = {
   'style.3drender': 'Render 3D',
   'style.claymation': 'Animacja poklatkowa',
   'style.pencilsketch': 'Szkic ołówkiem',
-
-  // Sample Prompts
-  'prompt.sample1': 'Ciekawski, ale nieśmiały kot, który znajduje magiczny kapelusz',
-  'prompt.sample2': 'Szczęśliwy robot, który uwielbia sadzić kwiaty dla przyjaciół',
-  'prompt.sample3': 'Odważny mały duch, który w tajemnicy boi się ciemności',
-  'prompt.sample4': 'Dwa podekscytowane dinozaury, które odkrywają tajemniczą mapę skarbów',
 };

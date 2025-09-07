@@ -6,7 +6,7 @@ export interface StoryOptions {
   prompt: string;
   ageGroup: string;
   theme: string;
-  length: 'short' | 'medium' | 'long';
+  length: 'very_short' | 'short' | 'medium' | 'long';
   illustrationStyle: string;
   characterName: string;
   characterType: string;
@@ -18,11 +18,18 @@ export interface StoryOptions {
   };
 }
 
+export interface SoundEffect {
+  text_trigger: string;
+  sfx_prompt: string;
+  audioUrl?: string;
+}
+
 export interface StoryPage {
   text: string;
   imagePrompt: string;
   imageUrl?: string | 'GENERATION_FAILED';
   audioUrl?: string;
+  soundEffects?: SoundEffect[];
 }
 
 export interface StoryData {

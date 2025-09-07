@@ -56,11 +56,11 @@ export const hi = {
   'loading.sub.writingPages': 'कहानी के पन्ने लिखना...',
   'loading.main.illustrating': 'चित्र बनाना',
   'loading.sub.designingCharacters': 'पात्रों को डिजाइन करना...',
-  'loading.sub.paintingScenes': 'दृश्यों को चित्रित करना...',
+  'loading.sub.paintingScenes': 'दृश्यों को चित्रित करना और ध्वनियों की रचना करना...',
   'loading.main.finalizing': 'कहानी की किताब को अंतिम रूप देना',
   'loading.sub.assembling': 'किताब को इकट्ठा करना...',
   'loading.sub.finalTouches': 'अंतिम जादुई स्पर्श जोड़ना...',
-  'loading.illustratingPage': '{total} में से {current} पृष्ठ का चित्रण...',
+  'loading.illustratingPage': '{total} में से {current} पृष्ठ को जीवंत करना...',
   'loading.finalTouchesPage': '{total} में से {current} पृष्ठ को चमकाना...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const hi = {
   'story.newStory': 'नई कहानी बनाएँ',
   'story.illustrating': 'चित्रण हो रहा है...',
   'story.imageError': 'छवि उत्पन्न नहीं की जा सकी।',
+  'story.sfx_tooltip': 'ध्वनि सुनने के लिए रंगीन शब्दों पर क्लिक करें!',
 
   // Error
   'error.title': 'ओह नहीं, जादू में एक हिचकी!',
@@ -87,6 +88,7 @@ export const hi = {
   'theme.courage': 'साहस',
   'theme.kindness': 'दयालुता',
   'theme.adventure': 'साहसिक कार्य',
+  'length.very_short': 'बहुत छोटा (3 पृष्ठ)',
   'length.short': 'लघु (7 पृष्ठ)',
   'length.medium': 'मध्यम (19 पृष्ठ)',
   'length.long': 'लंबी (25 पृष्ठ)',
@@ -97,10 +99,4 @@ export const hi = {
   'style.3drender': '3डी रेंडर',
   'style.claymation': 'क्लेमेशन',
   'style.pencilsketch': 'पेंसिल स्केच',
-
-  // Sample Prompts
-  'prompt.sample1': 'एक जिज्ञासु लेकिन शर्मीली बिल्ली जिसे एक जादुई टोपी मिलती है',
-  'prompt.sample2': 'एक खुश रोबोट जो दोस्तों के लिए फूल लगाना पसंद करता है',
-  'prompt.sample3': 'एक बहादुर छोटा भूत जो गुप्त रूप से अंधेरे से डरता है',
-  'prompt.sample4': 'दो उत्साहित डायनासोर जो एक रहस्यमय खजाने का नक्शा खोजते हैं',
 };

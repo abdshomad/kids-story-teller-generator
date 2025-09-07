@@ -56,11 +56,11 @@ export const zh = {
   'loading.sub.writingPages': '撰写故事页面...',
   'loading.main.illustrating': '创作插图',
   'loading.sub.designingCharacters': '设计角色...',
-  'loading.sub.paintingScenes': '绘制场景...',
+  'loading.sub.paintingScenes': '绘制场景和创作声音...',
   'loading.main.finalizing': '完成故事书',
   'loading.sub.assembling': '组装书籍...',
   'loading.sub.finalTouches': '添加最后的魔法润色...',
-  'loading.illustratingPage': '正在为第 {current} 页（共 {total} 页）绘制插图...',
+  'loading.illustratingPage': '正在为第 {current} 页（共 {total} 页）注入生命...',
   'loading.finalTouchesPage': '正在润色第 {current} 页（共 {total} 页）...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const zh = {
   'story.newStory': '创作新故事',
   'story.illustrating': '正在绘制插图...',
   'story.imageError': '无法生成图像。',
+  'story.sfx_tooltip': '点击彩色文字即可听到声音！',
 
   // Error
   'error.title': '哦不，魔法出了一点小问题！',
@@ -87,6 +88,7 @@ export const zh = {
   'theme.courage': '勇气',
   'theme.kindness': '善良',
   'theme.adventure': '冒险',
+  'length.very_short': '很短 (3页)',
   'length.short': '短篇（7页）',
   'length.medium': '中篇（19页）',
   'length.long': '长篇（25页）',
@@ -97,10 +99,4 @@ export const zh = {
   'style.3drender': '3D渲染',
   'style.claymation': '粘土动画',
   'style.pencilsketch': '铅笔素描',
-
-  // Sample Prompts
-  'prompt.sample1': '一只好奇但害羞的猫发现了一顶魔法帽子',
-  'prompt.sample2': '一个喜欢为朋友种花的快乐机器人',
-  'prompt.sample3': '一个勇敢的小鬼，却偷偷害怕黑暗',
-  'prompt.sample4': '两只兴奋的恐龙发现了一张神秘的藏宝图',
 };

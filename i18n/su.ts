@@ -56,11 +56,11 @@ export const su = {
   'loading.sub.writingPages': 'Nulis halaman carita...',
   'loading.main.illustrating': 'Nyieun Ilustrasi',
   'loading.sub.designingCharacters': 'Ngararancang karakter...',
-  'loading.sub.paintingScenes': 'Ngalukis adegan...',
+  'loading.sub.paintingScenes': 'Ngalukis adegan & nyusun sora...',
   'loading.main.finalizing': 'Ngaréngsékeun Buku Carita',
   'loading.sub.assembling': 'Ngumpulkeun buku...',
   'loading.sub.finalTouches': 'Nambahkeun sentuhan sihir ahir...',
-  'loading.illustratingPage': 'Ngilustrasikeun halaman {current} tina {total}...',
+  'loading.illustratingPage': 'Ngahirupkeun halaman {current} tina {total}...',
   'loading.finalTouchesPage': 'Ngagosok halaman {current} tina {total}...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const su = {
   'story.newStory': 'Jieun Carita Anyar',
   'story.illustrating': 'Nuju ngagambar...',
   'story.imageError': 'Gambar teu tiasa didamel.',
+  'story.sfx_tooltip': 'Klik dina kecap-kecap anu warnaan pikeun ngadangu sora!',
 
   // Error
   'error.title': 'Oh henteu, aya gangguan dina sihir!',
@@ -87,6 +88,7 @@ export const su = {
   'theme.courage': 'Kawani',
   'theme.kindness': 'Kanyaah',
   'theme.adventure': 'Petualangan',
+  'length.very_short': 'Pondok Pisan (3 kaca)',
   'length.short': 'Pondok (7 halaman)',
   'length.medium': 'Sedeng (19 halaman)',
   'length.long': 'Panjang (25 halaman)',
@@ -97,10 +99,4 @@ export const su = {
   'style.3drender': 'Render 3D',
   'style.claymation': 'Claymation',
   'style.pencilsketch': 'Sketsa Patlot',
-
-  // Sample Prompts
-  'prompt.sample1': 'Ucing panasaran tapi isinan anu manggihan topi sihir',
-  'prompt.sample2': 'Robot bagja anu resep melak kembang pikeun babaturan',
-  'prompt.sample3': 'Jurig leutik anu gagah anu cicing-cicing sieun poék',
-  'prompt.sample4': 'Dua dinosaurus anu sumanget anu manggihan peta harta karun misterius',
 };

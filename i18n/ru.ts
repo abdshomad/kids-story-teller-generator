@@ -56,11 +56,11 @@ export const ru = {
   'loading.sub.writingPages': 'Написание страниц истории...',
   'loading.main.illustrating': 'Создание иллюстраций',
   'loading.sub.designingCharacters': 'Разработка персонажей...',
-  'loading.sub.paintingScenes': 'Рисование сцен...',
+  'loading.sub.paintingScenes': 'Рисование сцен и создание звуков...',
   'loading.main.finalizing': 'Завершение работы над книгой сказок',
   'loading.sub.assembling': 'Сборка книги...',
   'loading.sub.finalTouches': 'Добавление последних волшебных штрихов...',
-  'loading.illustratingPage': 'Иллюстрация страницы {current} из {total}...',
+  'loading.illustratingPage': 'Оживление страницы {current} из {total}...',
   'loading.finalTouchesPage': 'Полировка страницы {current} из {total}...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const ru = {
   'story.newStory': 'Создать новую историю',
   'story.illustrating': 'Идет иллюстрация...',
   'story.imageError': 'Не удалось сгенерировать изображение.',
+  'story.sfx_tooltip': 'Нажмите на цветные слова, чтобы услышать звук!',
 
   // Error
   'error.title': 'О нет, сбой в магии!',
@@ -87,6 +88,7 @@ export const ru = {
   'theme.courage': 'Храбрость',
   'theme.kindness': 'Доброта',
   'theme.adventure': 'Приключение',
+  'length.very_short': 'Очень короткая (3 страницы)',
   'length.short': 'Короткая (7 страниц)',
   'length.medium': 'Средняя (19 страниц)',
   'length.long': 'Длинная (25 страниц)',
@@ -97,10 +99,4 @@ export const ru = {
   'style.3drender': '3D-рендер',
   'style.claymation': 'Пластилиновая анимация',
   'style.pencilsketch': 'Карандашный набросок',
-
-  // Sample Prompts
-  'prompt.sample1': 'Любопытный, но застенчивый кот, который находит волшебную шляпу',
-  'prompt.sample2': 'Счастливый робот, который любит сажать цветы для друзей',
-  'prompt.sample3': 'Храбрый маленький призрак, который втайне боится темноты',
-  'prompt.sample4': 'Два взволнованных динозавра, которые обнаруживают таинственную карту сокровищ',
 };

@@ -56,11 +56,11 @@ export const jv = {
   'loading.sub.writingPages': 'Nulis kaca crita...',
   'loading.main.illustrating': 'Nggawe Ilustrasi',
   'loading.sub.designingCharacters': 'Ngrancang karakter...',
-  'loading.sub.paintingScenes': 'Nglukis adegan...',
+  'loading.sub.paintingScenes': 'Nglukis adegan & nyipta swara...',
   'loading.main.finalizing': ' ngrampungake Buku Crita',
   'loading.sub.assembling': 'Ngrakit buku...',
   'loading.sub.finalTouches': 'Nambahake sentuhan sihir pungkasan...',
-  'loading.illustratingPage': 'Nggambar ilustrasi kaca {current} saka {total}...',
+  'loading.illustratingPage': 'Nguripake kaca {current} saka {total}...',
   'loading.finalTouchesPage': 'Mungkasi kaca {current} saka {total}...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const jv = {
   'story.newStory': 'Gawe Crita Anyar',
   'story.illustrating': 'Lagi nggambar...',
   'story.imageError': 'Gambar ora bisa digawe.',
+  'story.sfx_tooltip': 'Klik tembung-tembung werni kanggo krungu swara!',
 
   // Error
   'error.title': 'Wah, ana gangguan ing sihir!',
@@ -87,6 +88,7 @@ export const jv = {
   'theme.courage': 'Kendel',
   'theme.kindness': 'Kabecikan',
   'theme.adventure': 'Petualangan',
+  'length.very_short': 'Cendhak Banget (3 kaca)',
   'length.short': 'Cendhak (7 kaca)',
   'length.medium': 'Sedheng (19 kaca)',
   'length.long': 'Dawa (25 kaca)',
@@ -97,10 +99,4 @@ export const jv = {
   'style.3drender': 'Render 3D',
   'style.claymation': 'Claymation',
   'style.pencilsketch': 'Sketsa Potlot',
-
-  // Sample Prompts
-  'prompt.sample1': 'Kucing sing penasaran nanging isin sing nemokake topi sihir',
-  'prompt.sample2': 'Robot seneng sing seneng nandur kembang kanggo kanca-kanca',
-  'prompt.sample3': 'Memedi cilik sing wani sing meneng-meneng wedi peteng',
-  'prompt.sample4': 'Loro dinosaurus sing seneng sing nemokake peta harta karun misterius',
 };

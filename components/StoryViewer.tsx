@@ -1,14 +1,8 @@
-
-
-
-
-
-
 import React, { useState, useEffect, useCallback } from 'react';
-import { StoryData } from '../types';
+import { StoryData, SoundEffect, StoryPage } from '../types';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
 import { useAppContext } from '../App';
-import { Volume2, VolumeX, ArrowLeft, ArrowRight, ImageOff, RefreshCw, Loader2 } from 'lucide-react';
+import { Volume2, VolumeX, ArrowLeft, ArrowRight, ImageOff, RefreshCw, Loader2, Info } from 'lucide-react';
 
 interface StoryViewerProps {
   story: StoryData;
@@ -17,17 +11,89 @@ interface StoryViewerProps {
   retryingPages: Set<number>;
 }
 
+const stripNarrationTags = (text: string): string => {
+  if (!text) return '';
+  // Removes tags like [laughs] or [sighs] used for narration AI
+  return text.replace(/\[.*?\]/g, '').replace(/\s\s+/g, ' ').trim();
+};
+
 const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryImage, retryingPages }) => {
   const [currentPage, setCurrentPage] = useState(-1); // -1 for title page
   const [isAutoPlay, setIsAutoPlay] = useState(false);
   const { language, t } = useAppContext();
   const { isSpeaking, speak, cancel, isSupported } = useTextToSpeech(language);
+  const [playingSfx, setPlayingSfx] = useState<HTMLAudioElement | null>(null);
 
   const totalPages = story.pages.length;
   const isTitlePage = currentPage === -1;
   const currentContent = isTitlePage
     ? { text: story.title, imageUrl: story.pages[0]?.imageUrl, audioUrl: story.pages[0]?.audioUrl }
     : story.pages[currentPage];
+    
+  const hasSoundEffectsOnPage = !isTitlePage && story.pages[currentPage]?.soundEffects?.some(sfx => sfx.audioUrl);
+
+  const playSfx = useCallback((audioUrl: string) => {
+    if (playingSfx) {
+      playingSfx.pause();
+      playingSfx.currentTime = 0;
+    }
+    const audio = new Audio(audioUrl);
+    audio.play().catch(e => console.error("Error playing sound effect:", e));
+    setPlayingSfx(audio);
+  }, [playingSfx]);
+
+  const renderPageTextWithSfx = useCallback((text: string, soundEffects: SoundEffect[] | undefined) => {
+    if (!soundEffects || soundEffects.length === 0) {
+      return stripNarrationTags(text);
+    }
+
+    const triggerMap = new Map<string, string>();
+    soundEffects.forEach(sfx => {
+      if (sfx.text_trigger && sfx.audioUrl) {
+        const strippedTrigger = stripNarrationTags(sfx.text_trigger.trim());
+        if (strippedTrigger) {
+          triggerMap.set(strippedTrigger, sfx.audioUrl);
+        }
+      }
+    });
+    
+    const strippedText = stripNarrationTags(text);
+
+    if (triggerMap.size === 0) {
+      return strippedText;
+    }
+
+    const triggers = Array.from(triggerMap.keys());
+    triggers.sort((a, b) => b.length - a.length);
+    const regex = new RegExp(`(${triggers.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'g');
+    
+    const parts = strippedText.split(regex).filter(Boolean);
+
+    return (
+      <>
+        {parts.map((part, index) => {
+          const audioUrl = triggerMap.get(part.trim());
+          if (audioUrl) {
+            return (
+              <span
+                key={index}
+                className="text-purple-600 font-bold cursor-pointer hover:underline"
+                onClick={() => playSfx(audioUrl)}
+                role="button"
+                tabIndex={0}
+                onKeyPress={(e) => e.key === 'Enter' && playSfx(audioUrl)}
+                title={t('story.sfx_tooltip')}
+              >
+                {part}
+              </span>
+            );
+          }
+          return <React.Fragment key={index}>{part}</React.Fragment>;
+        })}
+      </>
+    );
+  }, [playSfx, t]);
+
 
   const goToNextPage = useCallback(() => {
     setCurrentPage(prev => (prev < totalPages - 1 ? prev + 1 : prev));
@@ -42,7 +108,6 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryIma
           cancel();
           setIsAutoPlay(false);
       } else {
-          // Can only start if TTS is supported and there is audio content
           const canPlay = isSupported && story.pages.some(p => p.audioUrl);
           if (canPlay) {
               setIsAutoPlay(true);
@@ -61,11 +126,10 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryIma
             if (currentPage < totalPages - 1) {
               goToNextPage();
             } else {
-              setIsAutoPlay(false); // End of story
+              setIsAutoPlay(false);
             }
           });
       } else {
-          // If a page is missing audio, just skip to the next one
           console.warn(`Missing audio for page ${currentPage + 1}, skipping.`);
           if (currentPage < totalPages - 1) {
               goToNextPage();
@@ -74,12 +138,16 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryIma
           }
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAutoPlay, currentPage, isSpeaking, speak, story, totalPages]);
+  }, [isAutoPlay, currentPage, isSpeaking, speak, story, totalPages, goToNextPage]);
   
   useEffect(() => {
-    return () => { cancel(); }
-  }, [currentPage, cancel]);
+    return () => { 
+        cancel();
+        if (playingSfx) {
+            playingSfx.pause();
+        }
+    }
+  }, [currentPage, cancel, playingSfx]);
 
   return (
     <div className="h-screen w-screen bg-slate-800 flex flex-col p-4 sm:p-6 lg:p-8">
@@ -134,9 +202,17 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryIma
             <div className="w-full md:w-1/2 h-1/2 md:h-full p-6 sm:p-8 flex flex-col justify-center">
                  <div className="overflow-y-auto flex-grow">
                     <p className={`text-slate-800 ${isTitlePage ? 'text-3xl md:text-4xl lg:text-5xl font-extrabold text-center' : 'text-lg md:text-xl lg:text-2xl leading-relaxed'}`}>
-                        {currentContent.text}
+                        {isTitlePage 
+                            ? currentContent.text 
+                            : renderPageTextWithSfx(currentContent.text, (currentContent as StoryPage).soundEffects)}
                     </p>
                  </div>
+                 {hasSoundEffectsOnPage && (
+                    <div className="flex-shrink-0 text-center text-slate-500 text-sm mt-4 flex items-center justify-center gap-2 animate-pulse">
+                        <Info className="w-4 h-4" />
+                        <span>{t('story.sfx_tooltip')}</span>
+                    </div>
+                 )}
             </div>
         </div>
         

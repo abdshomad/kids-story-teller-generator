@@ -56,11 +56,11 @@ export const ja = {
   'loading.sub.writingPages': '物語のページを執筆中...',
   'loading.main.illustrating': 'イラストを作成中',
   'loading.sub.designingCharacters': 'キャラクターをデザイン中...',
-  'loading.sub.paintingScenes': 'シーンを描画中...',
+  'loading.sub.paintingScenes': 'シーンを描き、サウンドを作成中...',
   'loading.main.finalizing': '物語の本を最終処理中',
   'loading.sub.assembling': '本を組み立て中...',
   'loading.sub.finalTouches': '最後の魔法の仕上げを追加中...',
-  'loading.illustratingPage': '{total}ページ中{current}ページをイラスト中...',
+  'loading.illustratingPage': '{total}ページ中{current}ページを生き生きとさせています...',
   'loading.finalTouchesPage': '{total}ページ中{current}ページを磨き上げ中...',
 
   // Story Viewer
@@ -68,6 +68,7 @@ export const ja = {
   'story.newStory': '新しい物語を作成',
   'story.illustrating': 'イラスト作成中...',
   'story.imageError': '画像を生成できませんでした。',
+  'story.sfx_tooltip': '色付きの単語をクリックして音を聞いてください！',
 
   // Error
   'error.title': 'あらら、魔法に問題が発生しました！',
@@ -87,6 +88,7 @@ export const ja = {
   'theme.courage': '勇気',
   'theme.kindness': '優しさ',
   'theme.adventure': '冒険',
+  'length.very_short': '非常に短い（3ページ）',
   'length.short': '短い（7ページ）',
   'length.medium': '中くらい（19ページ）',
   'length.long': '長い（25ページ）',
@@ -97,10 +99,4 @@ export const ja = {
   'style.3drender': '3Dレンダリング',
   'style.claymation': 'クレイメーション',
   'style.pencilsketch': '鉛筆スケッチ',
-
-  // Sample Prompts
-  'prompt.sample1': '魔法の帽子を見つけた、好奇心旺盛だけど内気な猫',
-  'prompt.sample2': '友達のために花を植えるのが大好きな、幸せなロボット',
-  'prompt.sample3': '実は暗闇が怖い、勇敢な小さなおばけ',
-  'prompt.sample4': '不思議な宝の地図を発見した、興奮した2匹の恐竜',
 };
