@@ -92,6 +92,9 @@ export const en = {
   'style.cartoon': 'Cartoon',
   'style.pixel': 'Pixel Art',
   'style.fantasy': 'Fantasy',
+  'style.3drender': '3D Render',
+  'style.claymation': 'Claymation',
+  'style.pencilsketch': 'Pencil Sketch',
 
   // Sample Prompts
   'prompt.sample1': 'A curious but shy cat who finds a magic hat',

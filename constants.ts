@@ -1,4 +1,5 @@
-import { Heart, Shield, HandHeart, Compass, Paintbrush, Pencil, Grid, Castle } from 'lucide-react';
+// FIX: Replaced non-existent 'Cube' icon with 'Box' from lucide-react.
+import { Heart, Shield, HandHeart, Compass, Paintbrush, Pencil, Grid, Castle, Box, Drama, PenLine } from 'lucide-react';
 
 export const AGE_GROUPS = [
   { value: '3-5 years', labelKey: 'age.3-5' },
@@ -23,6 +24,9 @@ export const ILLUSTRATION_STYLES = [
   { value: 'Cartoon', labelKey: 'style.cartoon', icon: Pencil },
   { value: 'Pixel Art', labelKey: 'style.pixel', icon: Grid },
   { value: 'Fantasy', labelKey: 'style.fantasy', icon: Castle },
+  { value: '3D Render', labelKey: 'style.3drender', icon: Box },
+  { value: 'Claymation', labelKey: 'style.claymation', icon: Drama },
+  { value: 'Pencil Sketch', labelKey: 'style.pencilsketch', icon: PenLine },
 ];
 
 export const SAMPLE_PROMPTS = [

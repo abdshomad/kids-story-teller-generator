@@ -92,6 +92,9 @@ export const id = {
   'style.cartoon': 'Kartun',
   'style.pixel': 'Pixel Art',
   'style.fantasy': 'Fantasi',
+  'style.3drender': 'Render 3D',
+  'style.claymation': 'Claymation',
+  'style.pencilsketch': 'Sketsa Pensil',
 
   // Sample Prompts
   'prompt.sample1': 'Kucing penasaran tapi pemalu yang menemukan topi ajaib',
