@@ -1,8 +1,9 @@
 
 
+
 import React, { useState, useEffect, useCallback, useRef, FC } from 'react';
 import { StoryOptions } from '../types';
-import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, SAMPLE_PROMPTS } from '../constants';
+import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, SAMPLE_PROMPTS, LANGUAGES } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
 import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, ChevronDown, PenSquare, Loader2 } from 'lucide-react';
@@ -44,6 +45,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     characterName: '',
     characterType: '',
     characterPersonality: '',
+    language: language,
   });
   const [visualInspirationPreview, setVisualInspirationPreview] = useState<string | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -53,6 +55,17 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
 
 
   const { isListening, isTranscribing, transcript, startListening, stopListening, setTranscript, browserSupportsSpeechRecognition, error, clearError } = useSpeechToText(language);
+
+  const handleInputChange = useCallback(<K extends keyof StoryOptions>(field: K, value: StoryOptions[K]) => {
+    if (field === 'prompt' && error) {
+      clearError();
+    }
+    setOptions(prev => ({ ...prev, [field]: value }));
+  }, [error, clearError]);
+
+  useEffect(() => {
+    handleInputChange('language', language);
+  }, [language, handleInputChange]);
 
   useEffect(() => {
     if (transcript) {
@@ -76,12 +89,6 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     return () => clearInterval(intervalId);
   }, [options.prompt]);
   
-  const handleInputChange = useCallback(<K extends keyof StoryOptions>(field: K, value: StoryOptions[K]) => {
-    if (field === 'prompt' && error) {
-      clearError();
-    }
-    setOptions(prev => ({ ...prev, [field]: value }));
-  }, [error, clearError]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -134,8 +141,15 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
             {t('input.title')}
           </h1>
           <div className="flex gap-1 bg-gray-200/50 rounded-full p-1 shadow-inner">
-            <button onClick={() => setLanguage('en')} className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === 'en' ? 'bg-white shadow-md text-slate-800' : 'text-slate-500'}`}>EN</button>
-            <button onClick={() => setLanguage('id')} className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === 'id' ? 'bg-white shadow-md text-slate-800' : 'text-slate-500'}`}>ID</button>
+            {LANGUAGES.map(lang => (
+              <button
+                key={lang.code}
+                onClick={() => setLanguage(lang.code)}
+                className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === lang.code ? 'bg-white shadow-md text-slate-800' : 'text-slate-500'}`}
+              >
+                {lang.label}
+              </button>
+            ))}
           </div>
         </header>
 
@@ -146,7 +160,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                 value={options.prompt}
                 onChange={(e) => handleInputChange('prompt', e.target.value)}
                 placeholder={placeholder}
-                className="w-full h-32 p-4 pr-16 text-lg bg-white/60 border border-slate-300/80 rounded-xl focus:ring-4 focus:ring-fuchsia-300/50 focus:border-fuchsia-300 transition-all placeholder:text-slate-500"
+                className="w-full h-32 p-4 pe-16 text-lg bg-white/60 border border-slate-300/80 rounded-xl focus:ring-4 focus:ring-fuchsia-300/50 focus:border-fuchsia-300 transition-all placeholder:text-slate-500"
                 required
               />
               {browserSupportsSpeechRecognition && (
@@ -155,7 +169,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                   onClick={handleMicClick}
                   disabled={isTranscribing}
                   aria-label={isListening ? 'Stop recording' : (isTranscribing ? 'Processing audio' : 'Start recording')}
-                  className={`absolute top-4 right-4 p-3 rounded-full transition-all duration-300 ${
+                  className={`absolute top-4 end-4 p-3 rounded-full transition-all duration-300 ${
                       isListening
                           ? 'bg-red-500 text-white animate-pulse shadow-lg'
                           : 'bg-white/80 text-slate-600 hover:bg-white'
@@ -210,7 +224,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                         </button>
                         
                         {visualInspirationPreview && (
-                          <div className="w-full sm:w-auto sm:ml-4 pt-4 sm:pt-0">
+                          <div className="w-full sm:w-auto sm:ms-4 pt-4 sm:pt-0">
                             <img src={visualInspirationPreview} alt="Preview" className="rounded-lg object-cover h-24 w-24 mx-auto shadow-md"/>
                           </div>
                         )}

@@ -1,5 +1,13 @@
 // FIX: Replaced non-existent 'Cube' icon with 'Box' from lucide-react.
 import { Heart, Shield, HandHeart, Compass, Paintbrush, Pencil, Grid, Castle, Box, Drama, PenLine } from 'lucide-react';
+import { Language } from './types';
+
+export const LANGUAGES: { code: Language; label: string }[] = [
+  { code: 'en', label: 'EN' },
+  { code: 'id', label: 'ID' },
+  { code: 'ar', label: 'AR' },
+  { code: 'hi', label: 'HI' },
+];
 
 export const AGE_GROUPS = [
   { value: '3-5 years', labelKey: 'age.3-5' },

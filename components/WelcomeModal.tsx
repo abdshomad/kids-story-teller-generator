@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAppContext } from '../App';
 import { CheckCircle2, Heart, Eye, Sparkles } from 'lucide-react';
+import { LANGUAGES } from '../constants';
 
 interface WelcomeModalProps {
   onAcknowledge: () => void;
@@ -21,20 +22,17 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onAcknowledge }) => {
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity duration-300">
       <div className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl max-w-4xl w-full p-6 sm:p-8 text-center transform transition-all duration-300 scale-100 opacity-100">
         
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 end-4">
             <div className="flex gap-1 bg-gray-200/50 rounded-full p-1 shadow-inner">
-                <button 
-                    onClick={() => setLanguage('id')} 
-                    className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === 'id' ? 'bg-white shadow-md text-slate-800' : 'text-slate-500'}`}
-                >
-                    ID
-                </button>
-                <button 
-                    onClick={() => setLanguage('en')} 
-                    className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === 'en' ? 'bg-white shadow-md text-slate-800' : 'text-slate-500'}`}
-                >
-                    EN
-                </button>
+                {LANGUAGES.map(lang => (
+                    <button
+                        key={lang.code}
+                        onClick={() => setLanguage(lang.code)}
+                        className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === lang.code ? 'bg-white shadow-md text-slate-800' : 'text-slate-500'}`}
+                    >
+                        {lang.label}
+                    </button>
+                ))}
             </div>
         </div>
 

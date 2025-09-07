@@ -1,6 +1,6 @@
 
 
-export type Language = 'en' | 'id';
+export type Language = 'en' | 'id' | 'ar' | 'hi';
 
 export interface StoryOptions {
   prompt: string;
@@ -11,6 +11,7 @@ export interface StoryOptions {
   characterName: string;
   characterType: string;
   characterPersonality: string;
+  language: Language;
   visualInspiration?: {
     mimeType: string;
     data: string; // base64

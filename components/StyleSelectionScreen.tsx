@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { StoryOutline } from '../types';
 import { useAppContext } from '../App';
@@ -38,7 +39,7 @@ const StyleSelectionScreen: React.FC<StyleSelectionScreenProps> = ({ outlineData
             <p className="text-slate-600 mt-2 max-w-2xl mx-auto">{t('style.subtitle')}</p>
         </header>
         
-        <section className="bg-slate-50/50 rounded-2xl p-6 mb-8 text-left shadow-inner">
+        <section className="bg-slate-50/50 rounded-2xl p-6 mb-8 text-start shadow-inner">
             <h2 className="text-2xl font-bold text-slate-700 mb-2">{outlineData.title}</h2>
             <p className="text-slate-600 leading-relaxed">{outlineData.synopsis}</p>
         </section>
@@ -62,7 +63,7 @@ const StyleSelectionScreen: React.FC<StyleSelectionScreenProps> = ({ outlineData
                         )}
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                    <p className="absolute bottom-2 left-3 right-3 text-white text-xs font-semibold truncate" title={option.prompt.split(' Style: ')[1] || ''}>
+                    <p className="absolute bottom-2 start-3 end-3 text-white text-xs font-semibold truncate" title={option.prompt.split(' Style: ')[1] || ''}>
                         {option.prompt.split(' Style: ')[1] || ''}
                     </p>
                 </button>

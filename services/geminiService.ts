@@ -1,6 +1,7 @@
 
 
 
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { StoryOptions, StoryData, StoryPage, Language, LoadingStage, StoryOutline } from '../types';
 import { FAL_API_KEY, ELEVENLABS_API_KEY } from '../env';
@@ -51,6 +52,16 @@ const storySchema = {
     },
   },
   required: ["pages"],
+};
+
+const getLanguageName = (lang: Language): string => {
+    switch (lang) {
+        case 'en': return 'English';
+        case 'id': return 'Indonesian';
+        case 'ar': return 'Arabic';
+        case 'hi': return 'Hindi';
+        default: return 'English';
+    }
 };
 
 const getPageCount = (length: 'short' | 'medium' | 'long') => {
@@ -137,6 +148,7 @@ export const generateStoryOutline = async (options: StoryOptions, onUpdate: (upd
     const characterDescription = [options.characterName, options.characterType, options.characterPersonality].filter(Boolean).join(', ');
     const outlinePrompt = `
 You are a creative author for children. Based on the user's idea, generate a creative title and a short, one-paragraph synopsis for a story.
+The entire response, including the values for title and synopsis, must be written in ${getLanguageName(options.language)}.
 The synopsis should be exciting and give a taste of the adventure to come. Be strictly G-rated, positive, and safe for all ages.
 
 Story Idea: "${options.prompt}"
@@ -193,7 +205,7 @@ export const generateFullStoryFromSelection = async (
 
   const characterDescription = [options.characterName, options.characterType, options.characterPersonality].filter(Boolean).join(', ');
   const fullStoryPrompt = `
-You are a world-class children's storyteller. Your task is to write a complete story based on the provided synopsis.
+You are a world-class children's storyteller. Your task is to write a complete story in ${getLanguageName(options.language)} based on the provided synopsis.
 
 **Story Guidelines:**
 - **Target Age:** ${options.ageGroup}

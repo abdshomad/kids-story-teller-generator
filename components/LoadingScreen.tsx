@@ -1,6 +1,7 @@
 
 
 
+
 import React from 'react';
 import { LoadingStage, StoryData, StoryPage } from '../types';
 import { useAppContext } from '../App';
@@ -126,7 +127,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ stage, phase, progress, s
                                 {isMainStepCompleted ? <CheckCircle2 className="w-7 h-7" /> : (isMainStepActive ? <Loader2 className="w-7 h-7 animate-spin" /> : React.cloneElement(mainStep.icon, { className: 'w-7 h-7' }))}
                                 <h3 className="text-2xl font-bold">{mainStep.title}</h3>
                             </div>
-                            <div className="pl-11 space-y-2 border-l-2 border-slate-300/80 ml-3">
+                            <div className="ps-11 space-y-2 border-s-2 border-slate-300/80 ms-3">
                                 {mainStep.substeps.map((substep) => {
                                     const globalSubstepIndex = allSubsteps.indexOf(substep.id);
                                     let status: 'completed' | 'in_progress' | 'pending' = (globalSubstepIndex < currentSubstepIndex) ? 'completed' : (globalSubstepIndex === currentSubstepIndex) ? 'in_progress' : 'pending';

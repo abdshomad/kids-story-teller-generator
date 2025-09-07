@@ -1,0 +1,103 @@
+// NOTE: This is a machine-generated translation
+export const hi = {
+  // Welcome
+  'welcome.title': 'कहानी के समय में एक जादुई स्वागत!',
+  'welcome.subtitle': 'माता-पिता और अभिभावकों के लिए एक त्वरित नोट',
+  'welcome.card1.title': 'बाल सुरक्षा पहले',
+  'welcome.card1.text': 'सभी कहानियाँ जी-रेटेड, सकारात्मक और किसी भी डरावने या अनुचित विषयों से पूरी तरह से मुक्त होने के लिए डिज़ाइन की गई हैं। आपके बच्चे की सुरक्षा हमारी सर्वोच्च प्राथमिकता है।',
+  'welcome.card2.title': 'दया और सकारात्मकता',
+  'welcome.card2.text': 'हमारा एआई कहानीकार दोस्ती, साहस और दया की कहानियों से प्यार करता है। हमारा लक्ष्य ऐसी कहानियाँ बनाना है जो न केवल मजेदार हों, बल्कि उत्थानकारी भी हों।',
+  'welcome.card3.title': 'माता-पिता का पर्यवेक्षण',
+  'welcome.card3.text': 'यह एक एआई-संचालित उपकरण है। हम अनुभव साझा करने और रचनात्मक प्रक्रिया को एक साथ निर्देशित करने के लिए आपके बच्चे के साथ सह-पठन की सलाह देते हैं।',
+  'welcome.card4.title': 'रचनात्मकता को जगाना',
+  'welcome.card4.text': 'यह उपकरण आपके बच्चे की कल्पना के लिए एक लॉन्चपैड बनने के लिए यहाँ है! इसका उपयोग नए विचारों का पता लगाने और एक साथ अद्भुत रोमांच बनाने के लिए करें।',
+  'welcome.button': 'चलो एक कहानी बनाते हैं!',
+
+  // Input Screen
+  'input.title': 'एक जादुई कहानी बनाएँ',
+  'input.prompt.placeholder': 'एक बहादुर छोटी गिलहरी जो उड़ना चाहती है...',
+  'input.visualInspiration.label': 'दृश्य प्रेरणा (वैकल्पिक)',
+  'input.visualInspiration.uploadDescription': 'एक ड्राइंग या फोटो अपलोड करें!',
+  'input.visualInspiration.drawDescription': 'अपना चरित्र बनाएँ!',
+  'input.visualInspiration.button': 'छवि अपलोड करें',
+  'input.visualInspiration.change': 'छवि बदलें',
+  'input.visualInspiration.clearDrawing': 'ड्राइंग साफ़ करें',
+  'input.character.title': 'एक चरित्र बनाएँ (वैकल्पिक)',
+  'input.character.name': 'नाम',
+  'input.character.type': 'प्रकार (जैसे, एक बहादुर शेर)',
+  'input.character.personality': 'व्यक्तित्व (जैसे, जिज्ञासु और दयालु)',
+  'input.options.title': 'अपनी कहानी को अनुकूलित करें',
+  'input.options.age': 'आयु समूह',
+  'input.options.theme': 'विषय',
+  'input.options.length': 'लंबाई',
+  'input.options.style': 'चित्रण शैली',
+  'input.button.create': 'मेरी कहानी बनाएँ!',
+  'input.draw.done': 'हो गया',
+  'input.draw.clear': 'साफ़ करें',
+  'input.draw.close': 'बंद करें',
+  'input.draw.brush': 'ब्रश',
+  'input.draw.eraser': 'इरेज़र',
+  'input.draw.color': 'ब्रश का रंग',
+  'input.draw.size': 'ब्रश का आकार',
+
+  // Style Selection
+  'style.title': "अपनी कहानी की शैली चुनें",
+  'style.subtitle': 'आपकी कहानी एक चिंगारी से शुरू होती है। एक ऐसा कवर चुनें जो आपको प्रेरित करे, और हम बाकी कहानी को उसी शैली में जीवंत कर देंगे!',
+  'style.button': 'इस शैली के साथ कहानी बनाएँ',
+
+  // Loading Screen
+  'loading.main.drafting': 'कहानी के विचारों का मसौदा तैयार करना',
+  'loading.sub.draftingIdeas': 'एक शीर्षक और कथानक पर विचार-मंथन...',
+  'loading.sub.sketchingCovers': 'कुछ कवर विकल्पों का स्केचिंग...',
+  'loading.main.writing': 'कथा लिखना',
+  'loading.sub.analyzing': 'आपकी चुनी हुई शैली का विश्लेषण...',
+  'loading.sub.writingPages': 'कहानी के पन्ने लिखना...',
+  'loading.main.illustrating': 'चित्र बनाना',
+  'loading.sub.designingCharacters': 'पात्रों को डिजाइन करना...',
+  'loading.sub.paintingScenes': 'दृश्यों को चित्रित करना...',
+  'loading.main.finalizing': 'कहानी की किताब को अंतिम रूप देना',
+  'loading.sub.assembling': 'किताब को इकट्ठा करना...',
+  'loading.sub.finalTouches': 'अंतिम जादुई स्पर्श जोड़ना...',
+  'loading.illustratingPage': '{total} में से {current} पृष्ठ का चित्रण...',
+  'loading.finalTouchesPage': '{total} में से {current} पृष्ठ को चमकाना...',
+
+  // Story Viewer
+  'story.readAloud': 'जोर से पढ़ें',
+  'story.newStory': 'नई कहानी बनाएँ',
+  'story.illustrating': 'चित्रण हो रहा है...',
+  'story.imageError': 'छवि उत्पन्न नहीं की जा सकी।',
+
+  // Error
+  'error.title': 'ओह नहीं, जादू में एक हिचकी!',
+  'error.generic': 'कहानी बनाते समय कुछ गलत हो गया। कृपया पुन: प्रयास करें।',
+  'error.micDenied': 'माइक्रोफ़ोन की अनुमति अस्वीकार कर दी गई थी। वॉयस इनपुट का उपयोग करने के लिए कृपया इसे अपनी ब्राउज़र सेटिंग्स में अनुमति दें।',
+  'error.micGeneric': 'माइक्रोफ़ोन तक नहीं पहुँच सका। कृपया अपने हार्डवेयर और अनुमतियों की जाँच करें।',
+
+  // Common
+  'common.tryAgain': 'पुनः प्रयास करें',
+  'common.loading': 'बनाया जा रहा है...',
+
+  // Options
+  'age.3-5': '3-5 साल',
+  'age.6-8': '6-8 साल',
+  'theme.friendship': 'मित्रता',
+  'theme.courage': 'साहस',
+  'theme.kindness': 'दयालुता',
+  'theme.adventure': 'साहसिक कार्य',
+  'length.short': 'लघु (7 पृष्ठ)',
+  'length.medium': 'मध्यम (19 पृष्ठ)',
+  'length.long': 'लंबी (25 पृष्ठ)',
+  'style.watercolor': 'जल रंग',
+  'style.cartoon': 'कार्टून',
+  'style.pixel': 'पिक्सेल आर्ट',
+  'style.fantasy': 'कपोल कल्पित',
+  'style.3drender': '3डी रेंडर',
+  'style.claymation': 'क्लेमेशन',
+  'style.pencilsketch': 'पेंसिल स्केच',
+
+  // Sample Prompts
+  'prompt.sample1': 'एक जिज्ञासु लेकिन शर्मीली बिल्ली जिसे एक जादुई टोपी मिलती है',
+  'prompt.sample2': 'एक खुश रोबोट जो दोस्तों के लिए फूल लगाना पसंद करता है',
+  'prompt.sample3': 'एक बहादुर छोटा भूत जो गुप्त रूप से अंधेरे से डरता है',
+  'prompt.sample4': 'दो उत्साहित डायनासोर जो एक रहस्यमय खजाने का नक्शा खोजते हैं',
+};

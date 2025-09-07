@@ -1,7 +1,8 @@
 
 
 
-import React, { useState, useCallback, useMemo, createContext, useContext } from 'react';
+
+import React, { useState, useCallback, useMemo, createContext, useContext, useEffect } from 'react';
 import WelcomeModal from './components/WelcomeModal';
 import InputScreen from './components/InputScreen';
 import LoadingScreen from './components/LoadingScreen';
@@ -30,6 +31,11 @@ export const useAppContext = () => {
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>({ status: AppStatus.WELCOME });
   const [language, setLanguage] = useState<Language>('en');
+
+  useEffect(() => {
+    const isRtl = language === 'ar';
+    document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+  }, [language]);
 
   const t = useCallback((key: string, params: Record<string, string | number> = {}) => {
     let translation = locales[language][key] || key;

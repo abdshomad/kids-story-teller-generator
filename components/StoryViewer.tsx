@@ -1,5 +1,7 @@
 
 
+
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryData } from '../types';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
@@ -123,10 +125,10 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory }) => {
             </div>
         </div>
         
-        <button onClick={goToPrevPage} disabled={isTitlePage} className="absolute left-0 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 p-3 bg-white/50 rounded-full text-slate-800 hover:bg-white disabled:opacity-0 disabled:cursor-not-allowed transition-all">
+        <button onClick={goToPrevPage} disabled={isTitlePage} className="absolute start-0 sm:start-4 lg:start-8 top-1/2 -translate-y-1/2 p-3 bg-white/50 rounded-full text-slate-800 hover:bg-white disabled:opacity-0 disabled:cursor-not-allowed transition-all">
           <ArrowLeft className="w-8 h-8"/>
         </button>
-        <button onClick={goToNextPage} disabled={currentPage === totalPages - 1} className="absolute right-0 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 p-3 bg-white/50 rounded-full text-slate-800 hover:bg-white disabled:opacity-0 disabled:cursor-not-allowed transition-all">
+        <button onClick={goToNextPage} disabled={currentPage === totalPages - 1} className="absolute end-0 sm:end-4 lg:end-8 top-1/2 -translate-y-1/2 p-3 bg-white/50 rounded-full text-slate-800 hover:bg-white disabled:opacity-0 disabled:cursor-not-allowed transition-all">
           <ArrowRight className="w-8 h-8"/>
         </button>
       </div>
