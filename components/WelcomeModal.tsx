@@ -39,7 +39,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onAcknowledge }) => {
         </div>
 
         <div className="flex justify-center items-center gap-4 mb-4 mt-8 sm:mt-0">
-            <span className="text-5xl">🤖</span>
+            <span className="text-5xl">🤗</span>
             <span className="text-5xl">📚</span>
         </div>
         
