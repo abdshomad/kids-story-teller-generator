@@ -5,8 +5,22 @@ import { Language } from './types';
 export const LANGUAGES: { code: Language; label: string }[] = [
   { code: 'en', label: 'EN' },
   { code: 'id', label: 'ID' },
+  { code: 'jv', label: 'JV' },
+  { code: 'su', label: 'SU' },
   { code: 'ar', label: 'AR' },
   { code: 'hi', label: 'HI' },
+  { code: 'es', label: 'ES' },
+  { code: 'fr', label: 'FR' },
+  { code: 'de', label: 'DE' },
+  { code: 'zh', label: 'ZH' },
+  { code: 'ja', label: 'JA' },
+  { code: 'pt', label: 'PT' },
+  { code: 'ru', label: 'RU' },
+  { code: 'it', label: 'IT' },
+  { code: 'ko', label: 'KO' },
+  { code: 'tr', label: 'TR' },
+  { code: 'nl', label: 'NL' },
+  { code: 'pl', label: 'PL' },
 ];
 
 export const AGE_GROUPS = [

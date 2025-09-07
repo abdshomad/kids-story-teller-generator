@@ -1,0 +1,103 @@
+// NOTE: This is a machine-generated translation
+export const ru = {
+  // Welcome
+  'welcome.title': 'Волшебное приветствие в сказочное время!',
+  'welcome.subtitle': 'Краткая заметка для родителей и опекунов',
+  'welcome.card1.title': 'Безопасность детей превыше всего',
+  'welcome.card1.text': 'Все истории предназначены для любой аудитории, позитивны и полностью свободны от страшных или неуместных тем. Безопасность вашего ребенка - наш главный приоритет.',
+  'welcome.card2.title': 'Доброта и позитив',
+  'welcome.card2.text': 'Наш ИИ-рассказчик любит сказки о дружбе, храбрости и доброте. Мы стремимся создавать истории, которые не только веселые, но и вдохновляющие.',
+  'welcome.card3.title': 'Родительский надзор',
+  'welcome.card3.text': 'Это инструмент на базе ИИ. Мы рекомендуем читать вместе с ребенком, чтобы разделить опыт и вместе направлять творческий процесс.',
+  'welcome.card4.title': 'Пробуждение творчества',
+  'welcome.card4.text': 'Этот инструмент здесь, чтобы стать стартовой площадкой для воображения вашего ребенка! Используйте его для исследования новых идей и создания замечательных приключений вместе.',
+  'welcome.button': 'ДАВАЙТЕ СОЗДАДИМ ИСТОРИЮ!',
+
+  // Input Screen
+  'input.title': 'Создайте волшебную историю',
+  'input.prompt.placeholder': 'Храбрая маленькая белка, которая хочет летать...',
+  'input.visualInspiration.label': 'Визуальное вдохновение (необязательно)',
+  'input.visualInspiration.uploadDescription': 'Загрузите рисунок или фото!',
+  'input.visualInspiration.drawDescription': 'Нарисуйте своего персонажа!',
+  'input.visualInspiration.button': 'Загрузить изображение',
+  'input.visualInspiration.change': 'Изменить изображение',
+  'input.visualInspiration.clearDrawing': 'Очистить рисунок',
+  'input.character.title': 'Создайте персонажа (необязательно)',
+  'input.character.name': 'Имя',
+  'input.character.type': 'Тип (например, храбрый лев)',
+  'input.character.personality': 'Характер (например, любопытный и добрый)',
+  'input.options.title': 'Настройте свою историю',
+  'input.options.age': 'Возрастная группа',
+  'input.options.theme': 'Тема',
+  'input.options.length': 'Длина',
+  'input.options.style': 'Стиль иллюстрации',
+  'input.button.create': 'Создать мою историю!',
+  'input.draw.done': 'Готово',
+  'input.draw.clear': 'Очистить',
+  'input.draw.close': 'Закрыть',
+  'input.draw.brush': 'Кисть',
+  'input.draw.eraser': 'Ластик',
+  'input.draw.color': 'Цвет кисти',
+  'input.draw.size': 'Размер кисти',
+
+  // Style Selection
+  'style.title': "Выберите стиль вашей истории",
+  'style.subtitle': 'Ваша история начинается с одной искры. Выберите обложку, которая вас вдохновляет, и мы оживим остальную часть сказки в этом стиле!',
+  'style.button': 'Создать историю в этом стиле',
+
+  // Loading Screen
+  'loading.main.drafting': 'Разработка идей для истории',
+  'loading.sub.draftingIdeas': 'Мозговой штурм над названием и сюжетом...',
+  'loading.sub.sketchingCovers': 'Наброски нескольких вариантов обложек...',
+  'loading.main.writing': 'Написание повествования',
+  'loading.sub.analyzing': 'Анализ выбранного вами стиля...',
+  'loading.sub.writingPages': 'Написание страниц истории...',
+  'loading.main.illustrating': 'Создание иллюстраций',
+  'loading.sub.designingCharacters': 'Разработка персонажей...',
+  'loading.sub.paintingScenes': 'Рисование сцен...',
+  'loading.main.finalizing': 'Завершение работы над книгой сказок',
+  'loading.sub.assembling': 'Сборка книги...',
+  'loading.sub.finalTouches': 'Добавление последних волшебных штрихов...',
+  'loading.illustratingPage': 'Иллюстрация страницы {current} из {total}...',
+  'loading.finalTouchesPage': 'Полировка страницы {current} из {total}...',
+
+  // Story Viewer
+  'story.readAloud': 'Читать вслух',
+  'story.newStory': 'Создать новую историю',
+  'story.illustrating': 'Идет иллюстрация...',
+  'story.imageError': 'Не удалось сгенерировать изображение.',
+
+  // Error
+  'error.title': 'О нет, сбой в магии!',
+  'error.generic': 'Что-то пошло не так при создании истории. Пожалуйста, попробуйте еще раз.',
+  'error.micDenied': 'Доступ к микрофону был запрещен. Пожалуйста, разрешите его в настройках вашего браузера, чтобы использовать голосовой ввод.',
+  'error.micGeneric': 'Не удалось получить доступ к микрофону. Пожалуйста, проверьте ваше оборудование и разрешения.',
+
+  // Common
+  'common.tryAgain': 'Попробовать снова',
+  'common.loading': 'Создание...',
+
+  // Options
+  'age.3-5': '3-5 лет',
+  'age.6-8': '6-8 лет',
+  'theme.friendship': 'Дружба',
+  'theme.courage': 'Храбрость',
+  'theme.kindness': 'Доброта',
+  'theme.adventure': 'Приключение',
+  'length.short': 'Короткая (7 страниц)',
+  'length.medium': 'Средняя (19 страниц)',
+  'length.long': 'Длинная (25 страниц)',
+  'style.watercolor': 'Акварель',
+  'style.cartoon': 'Мультфильм',
+  'style.pixel': 'Пиксель-арт',
+  'style.fantasy': 'Фэнтези',
+  'style.3drender': '3D-рендер',
+  'style.claymation': 'Пластилиновая анимация',
+  'style.pencilsketch': 'Карандашный набросок',
+
+  // Sample Prompts
+  'prompt.sample1': 'Любопытный, но застенчивый кот, который находит волшебную шляпу',
+  'prompt.sample2': 'Счастливый робот, который любит сажать цветы для друзей',
+  'prompt.sample3': 'Храбрый маленький призрак, который втайне боится темноты',
+  'prompt.sample4': 'Два взволнованных динозавра, которые обнаруживают таинственную карту сокровищ',
+};

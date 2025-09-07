@@ -1,7 +1,3 @@
-
-
-
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { StoryOptions, StoryData, StoryPage, Language, LoadingStage, StoryOutline } from '../types';
 import { FAL_API_KEY, ELEVENLABS_API_KEY } from '../env';
@@ -60,6 +56,20 @@ const getLanguageName = (lang: Language): string => {
         case 'id': return 'Indonesian';
         case 'ar': return 'Arabic';
         case 'hi': return 'Hindi';
+        case 'es': return 'Spanish';
+        case 'fr': return 'French';
+        case 'de': return 'German';
+        case 'ja': return 'Japanese';
+        case 'zh': return 'Chinese';
+        case 'jv': return 'Javanese';
+        case 'su': return 'Sundanese';
+        case 'pt': return 'Portuguese';
+        case 'ru': return 'Russian';
+        case 'it': return 'Italian';
+        case 'ko': return 'Korean';
+        case 'tr': return 'Turkish';
+        case 'nl': return 'Dutch';
+        case 'pl': return 'Polish';
         default: return 'English';
     }
 };
@@ -235,7 +245,7 @@ Please generate the complete story now.
 
     if (!storyContent?.pages?.length) throw new Error("AI failed to generate a valid story structure.");
     
-    const tempStoryData: StoryData = { title: '', pages: storyContent.pages.map(p => ({ ...p })) };
+    const tempStoryData: StoryData = { title: '', pages: storyContent.pages.map(p => ({ ...p })), options };
     onUpdate({ stage: LoadingStage.DESIGNING_CHARACTERS, storyData: tempStoryData });
     await delay(1500);
 
@@ -271,7 +281,7 @@ Please generate the complete story now.
 };
 
 export const transcribeAudio = async (audio: { mimeType: string, data: string }, language: Language): Promise<string> => {
-  const langName = language === 'id' ? 'Indonesian' : 'English';
+  const langName = getLanguageName(language);
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
     contents: { parts: [
@@ -280,4 +290,8 @@ export const transcribeAudio = async (audio: { mimeType: string, data: string },
     ]},
   });
   return response.text?.trim() ?? "";
+};
+
+export const regenerateImage = async (imagePrompt: string, illustrationStyle: string): Promise<string | 'GENERATION_FAILED'> => {
+    return generateImageWithFal(`${imagePrompt}, in a beautiful ${illustrationStyle} style, G-rated, for a children's book`);
 };

@@ -22,27 +22,30 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onAcknowledge }) => {
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity duration-300">
       <div className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl max-w-4xl w-full p-6 sm:p-8 text-center transform transition-all duration-300 scale-100 opacity-100">
         
-        <div className="absolute top-4 end-4">
-            <div className="flex gap-1 bg-gray-200/50 rounded-full p-1 shadow-inner">
-                {LANGUAGES.map(lang => (
-                    <button
-                        key={lang.code}
-                        onClick={() => setLanguage(lang.code)}
-                        className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === lang.code ? 'bg-white shadow-md text-slate-800' : 'text-slate-500'}`}
-                    >
-                        {lang.label}
-                    </button>
-                ))}
+        <header className="flex flex-col-reverse sm:flex-row justify-between sm:items-start gap-4 mb-6">
+            <div className="text-center sm:text-start">
+                <div className="flex justify-center sm:justify-start items-center gap-4 mb-4">
+                    <span className="text-5xl">🤗</span>
+                    <span className="text-5xl">📚</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1">{t('welcome.title')}</h2>
+                <p className="text-fuchsia-600 font-bold">{t('welcome.subtitle')}</p>
             </div>
-        </div>
-
-        <div className="flex justify-center items-center gap-4 mb-4 mt-8 sm:mt-0">
-            <span className="text-5xl">🤗</span>
-            <span className="text-5xl">📚</span>
-        </div>
-        
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1">{t('welcome.title')}</h2>
-        <p className="text-fuchsia-600 font-bold mb-6 sm:mb-8">{t('welcome.subtitle')}</p>
+            
+            <div className="w-full sm:w-auto flex justify-center sm:justify-end">
+                <div className="flex flex-wrap justify-center gap-1 bg-gray-200/50 rounded-full p-1 shadow-inner max-w-sm">
+                    {LANGUAGES.map(lang => (
+                        <button
+                            key={lang.code}
+                            onClick={() => setLanguage(lang.code)}
+                            className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === lang.code ? 'bg-white shadow-md text-slate-800' : 'text-slate-500'}`}
+                        >
+                            {lang.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             <InfoCard 

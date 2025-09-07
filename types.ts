@@ -1,6 +1,6 @@
 
 
-export type Language = 'en' | 'id' | 'ar' | 'hi';
+export type Language = 'en' | 'id' | 'ar' | 'hi' | 'es' | 'fr' | 'de' | 'ja' | 'zh' | 'jv' | 'su' | 'pt' | 'ru' | 'it' | 'ko' | 'tr' | 'nl' | 'pl';
 
 export interface StoryOptions {
   prompt: string;
@@ -28,6 +28,7 @@ export interface StoryPage {
 export interface StoryData {
   title: string;
   pages: StoryPage[];
+  options: StoryOptions;
 }
 
 export interface StoryOutline {

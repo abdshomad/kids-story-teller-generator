@@ -2,6 +2,7 @@
 
 
 
+
 import React, { useState, useCallback, useMemo, createContext, useContext, useEffect } from 'react';
 import WelcomeModal from './components/WelcomeModal';
 import InputScreen from './components/InputScreen';
@@ -9,7 +10,7 @@ import LoadingScreen from './components/LoadingScreen';
 import StoryViewer from './components/StoryViewer';
 import StyleSelectionScreen from './components/StyleSelectionScreen';
 import { StoryData, StoryOptions, Language, AppState, AppStatus, LoadingStage, StoryOutline } from './types';
-import { generateStoryOutline, generateFullStoryFromSelection } from './services/geminiService';
+import { generateStoryOutline, generateFullStoryFromSelection, regenerateImage } from './services/geminiService';
 import { locales } from './i18n/locales';
 
 interface AppContextType {
@@ -31,6 +32,8 @@ export const useAppContext = () => {
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>({ status: AppStatus.WELCOME });
   const [language, setLanguage] = useState<Language>('en');
+  const [retryingPages, setRetryingPages] = useState<Set<number>>(new Set());
+
 
   useEffect(() => {
     const isRtl = language === 'ar';
@@ -87,13 +90,14 @@ const App: React.FC = () => {
                         phase: 'full',
                         stage: update.stage,
                         progress: update.progress,
-                        storyData: update.storyData || currentState.storyData,
+                        storyData: update.storyData ? { ...update.storyData, title: outlineData.title } : currentState.storyData,
                     };
                     return newState;
                 });
             }
         );
-        setAppState({ status: AppStatus.STORY, storyData: finalStoryData });
+        const completeStoryData: StoryData = { ...finalStoryData, title: outlineData.title };
+        setAppState({ status: AppStatus.STORY, storyData: completeStoryData });
     } catch (error) {
         console.error("Failed to generate full story:", error);
         const errorMessage = error instanceof Error ? error.message : t('error.generic');
@@ -108,6 +112,49 @@ const App: React.FC = () => {
   const handleWelcomeAcknowledge = () => {
       setAppState({ status: AppStatus.INPUT });
   };
+  
+  const handleStopGeneration = () => {
+    setAppState({ status: AppStatus.INPUT });
+  };
+  
+  const handleRetryImage = async (pageIndex: number) => {
+      if (appState.status !== AppStatus.STORY || retryingPages.has(pageIndex)) return;
+
+      const currentStoryData = appState.storyData;
+      const pageToRetry = currentStoryData.pages[pageIndex];
+
+      setRetryingPages(prev => new Set(prev).add(pageIndex));
+
+      // Set page image to undefined to show loading spinner
+      const storyDataWithLoading = {
+          ...currentStoryData,
+          pages: currentStoryData.pages.map((p, i) => i === pageIndex ? { ...p, imageUrl: undefined } : p)
+      };
+      setAppState({ status: AppStatus.STORY, storyData: storyDataWithLoading });
+      
+      try {
+        const newImageUrl = await regenerateImage(
+            pageToRetry.imagePrompt,
+            currentStoryData.options.illustrationStyle
+        );
+
+        const storyDataWithNewImage = {
+            ...currentStoryData,
+            pages: currentStoryData.pages.map((p, i) => i === pageIndex ? { ...p, imageUrl: newImageUrl } : p)
+        };
+        setAppState({ status: AppStatus.STORY, storyData: storyDataWithNewImage });
+      } catch (error) {
+         console.error(`Failed to regenerate image for page ${pageIndex}`, error);
+         // Restore the failed state
+         setAppState({ status: AppStatus.STORY, storyData: currentStoryData });
+      } finally {
+        setRetryingPages(prev => {
+            const next = new Set(prev);
+            next.delete(pageIndex);
+            return next;
+        });
+      }
+  };
 
   const renderContent = () => {
     switch (appState.status) {
@@ -116,11 +163,11 @@ const App: React.FC = () => {
       case AppStatus.INPUT:
         return <InputScreen onCreateStory={handleStoryCreate} />;
       case AppStatus.LOADING:
-        return <LoadingScreen phase={appState.phase} stage={appState.stage} progress={appState.progress} storyData={appState.storyData} />;
+        return <LoadingScreen onStop={handleStopGeneration} phase={appState.phase} stage={appState.stage} progress={appState.progress} storyData={appState.storyData} />;
       case AppStatus.STYLE_SELECTION:
         return <StyleSelectionScreen outlineData={appState.outlineData} onStyleSelect={handleStyleSelect} />;
       case AppStatus.STORY:
-        return <StoryViewer story={appState.storyData} onNewStory={handleNewStory} />;
+        return <StoryViewer story={appState.storyData} onNewStory={handleNewStory} onRetryImage={handleRetryImage} retryingPages={retryingPages} />;
       case AppStatus.ERROR:
         return (
           <div className="flex flex-col items-center justify-center h-screen bg-red-100 text-red-800 p-4">

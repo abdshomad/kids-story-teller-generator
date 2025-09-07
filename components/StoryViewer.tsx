@@ -2,18 +2,22 @@
 
 
 
+
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryData } from '../types';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
 import { useAppContext } from '../App';
-import { Volume2, VolumeX, ArrowLeft, ArrowRight, ImageOff } from 'lucide-react';
+import { Volume2, VolumeX, ArrowLeft, ArrowRight, ImageOff, RefreshCw, Loader2 } from 'lucide-react';
 
 interface StoryViewerProps {
   story: StoryData;
   onNewStory: () => void;
+  onRetryImage: (pageIndex: number) => void;
+  retryingPages: Set<number>;
 }
 
-const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory }) => {
+const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryImage, retryingPages }) => {
   const [currentPage, setCurrentPage] = useState(-1); // -1 for title page
   const [isAutoPlay, setIsAutoPlay] = useState(false);
   const { language, t } = useAppContext();
@@ -101,10 +105,21 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory }) => {
                         return <img src={currentContent.imageUrl} alt={isTitlePage ? 'Story cover' : `Illustration for page ${currentPage + 1}`} className="w-full h-full object-cover rounded-lg"/>;
                     }
                     if (currentContent.imageUrl === 'GENERATION_FAILED') {
+                        const isRetrying = !isTitlePage && retryingPages.has(currentPage);
                         return (
-                            <div className="flex flex-col items-center justify-center text-red-500 gap-2 p-4">
+                            <div className="flex flex-col items-center justify-center text-red-500 gap-4 p-4 text-center">
                                 <ImageOff className="w-16 h-16" />
-                                <span className="font-bold text-lg text-center">{t('story.imageError')}</span>
+                                <span className="font-bold text-lg">{t('story.imageError')}</span>
+                                {!isTitlePage && (
+                                    <button 
+                                        onClick={() => onRetryImage(currentPage)} 
+                                        disabled={isRetrying}
+                                        className="mt-2 px-4 py-2 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-600 transition-colors disabled:bg-slate-400 flex items-center gap-2"
+                                    >
+                                        {isRetrying ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCw className="w-5 h-5" />}
+                                        {isRetrying ? t('common.loading') : t('common.tryAgain')}
+                                    </button>
+                                )}
                             </div>
                         );
                     }

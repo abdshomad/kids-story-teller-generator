@@ -1,0 +1,103 @@
+// NOTE: This is a machine-generated translation
+export const nl = {
+  // Welcome
+  'welcome.title': 'Een magisch welkom bij het verhaaltjesuur!',
+  'welcome.subtitle': 'Een korte opmerking voor ouders en voogden',
+  'welcome.card1.title': 'Kindveiligheid voorop',
+  'welcome.card1.text': 'Alle verhalen zijn ontworpen om geschikt te zijn voor alle leeftijden, positief en volledig vrij van enge of ongepaste thema\'s. De veiligheid van uw kind is onze topprioriteit.',
+  'welcome.card2.title': 'Vriendelijkheid en positiviteit',
+  'welcome.card2.text': 'Onze AI-verhalenverteller houdt van verhalen over vriendschap, moed en vriendelijkheid. We streven ernaar verhalen te creëren die niet alleen leuk zijn, maar ook opbeurend.',
+  'welcome.card3.title': 'Ouderlijk toezicht',
+  'welcome.card3.text': 'Dit is een door AI aangedreven hulpmiddel. We raden aan om samen met uw kind te lezen om de ervaring te delen en het creatieve proces samen te begeleiden.',
+  'welcome.card4.title': 'Creativiteit stimuleren',
+  'welcome.card4.text': 'Dit hulpmiddel is hier om een springplank te zijn voor de verbeelding van uw kind! Gebruik het om nieuwe ideeën te verkennen en samen prachtige avonturen te creëren.',
+  'welcome.button': 'LATEN WE EEN VERHAAL MAKEN!',
+
+  // Input Screen
+  'input.title': 'Creëer een magisch verhaal',
+  'input.prompt.placeholder': 'Een dappere kleine eekhoorn die wil vliegen...',
+  'input.visualInspiration.label': 'Visuele inspiratie (optioneel)',
+  'input.visualInspiration.uploadDescription': 'Upload een tekening of foto!',
+  'input.visualInspiration.drawDescription': 'Teken je personage!',
+  'input.visualInspiration.button': 'Afbeelding uploaden',
+  'input.visualInspiration.change': 'Afbeelding wijzigen',
+  'input.visualInspiration.clearDrawing': 'Tekening wissen',
+  'input.character.title': 'Creëer een personage (optioneel)',
+  'input.character.name': 'Naam',
+  'input.character.type': 'Type (bijv. een moedige leeuw)',
+  'input.character.personality': 'Persoonlijkheid (bijv. nieuwsgierig en vriendelijk)',
+  'input.options.title': 'Pas je verhaal aan',
+  'input.options.age': 'Leeftijdsgroep',
+  'input.options.theme': 'Thema',
+  'input.options.length': 'Lengte',
+  'input.options.style': 'Illustratiestijl',
+  'input.button.create': 'Mijn verhaal maken!',
+  'input.draw.done': 'Klaar',
+  'input.draw.clear': 'Wissen',
+  'input.draw.close': 'Sluiten',
+  'input.draw.brush': 'Penseel',
+  'input.draw.eraser': 'Gum',
+  'input.draw.color': 'Penseelkleur',
+  'input.draw.size': 'Penseelgrootte',
+
+  // Style Selection
+  'style.title': "Kies de stijl van je verhaal",
+  'style.subtitle': 'Je verhaal begint met een enkele vonk. Kies een omslag die je inspireert, en we brengen de rest van het verhaal in die stijl tot leven!',
+  'style.button': 'Verhaal maken met deze stijl',
+
+  // Loading Screen
+  'loading.main.drafting': 'Verhaalideeën opstellen',
+  'loading.sub.draftingIdeas': 'Brainstormen over een titel en plot...',
+  'loading.sub.sketchingCovers': 'Schetsen van enkele omslagopties...',
+  'loading.main.writing': 'Het verhaal schrijven',
+  'loading.sub.analyzing': 'Analyse van je gekozen stijl...',
+  'loading.sub.writingPages': 'De verhaalpagina\'s schrijven...',
+  'loading.main.illustrating': 'Illustraties maken',
+  'loading.sub.designingCharacters': 'De personages ontwerpen...',
+  'loading.sub.paintingScenes': 'De scènes schilderen...',
+  'loading.main.finalizing': 'Het verhalenboek afronden',
+  'loading.sub.assembling': 'Het boek samenstellen...',
+  'loading.sub.finalTouches': 'De laatste magische accenten toevoegen...',
+  'loading.illustratingPage': 'Pagina {current} van {total} illustreren...',
+  'loading.finalTouchesPage': 'Pagina {current} van {total} polijsten...',
+
+  // Story Viewer
+  'story.readAloud': 'Voorlezen',
+  'story.newStory': 'Nieuw verhaal maken',
+  'story.illustrating': 'Bezig met illustreren...',
+  'story.imageError': 'Afbeelding kon niet worden gegenereerd.',
+
+  // Error
+  'error.title': 'Oh nee, een kink in de kabel van de magie!',
+  'error.generic': 'Er is iets misgegaan bij het maken van het verhaal. Probeer het opnieuw.',
+  'error.micDenied': 'Microfoontoestemming is geweigerd. Sta dit toe in je browserinstellingen om spraakinvoer te gebruiken.',
+  'error.micGeneric': 'Kon geen toegang krijgen tot de microfoon. Controleer je hardware en toestemmingen.',
+
+  // Common
+  'common.tryAgain': 'Opnieuw proberen',
+  'common.loading': 'Bezig met maken...',
+
+  // Options
+  'age.3-5': '3-5 jaar',
+  'age.6-8': '6-8 jaar',
+  'theme.friendship': 'Vriendschap',
+  'theme.courage': 'Moed',
+  'theme.kindness': 'Vriendelijkheid',
+  'theme.adventure': 'Avontuur',
+  'length.short': 'Kort (7 pagina\'s)',
+  'length.medium': 'Gemiddeld (19 pagina\'s)',
+  'length.long': 'Lang (25 pagina\'s)',
+  'style.watercolor': 'Aquarel',
+  'style.cartoon': 'Tekenfilm',
+  'style.pixel': 'Pixel Art',
+  'style.fantasy': 'Fantasie',
+  'style.3drender': '3D Render',
+  'style.claymation': 'Kleianimatie',
+  'style.pencilsketch': 'Potloodschets',
+
+  // Sample Prompts
+  'prompt.sample1': 'Een nieuwsgierige maar verlegen kat die een magische hoed vindt',
+  'prompt.sample2': 'Een vrolijke robot die graag bloemen plant voor vrienden',
+  'prompt.sample3': 'Een dapper spookje dat stiekem bang is in het donker',
+  'prompt.sample4': 'Twee opgewonden dinosaurussen die een mysterieuze schatkaart ontdekken',
+};

@@ -2,16 +2,18 @@
 
 
 
+
 import React from 'react';
 import { LoadingStage, StoryData, StoryPage } from '../types';
 import { useAppContext } from '../App';
-import { CheckCircle2, Loader2, Circle, BookText, Images, Sparkles, ImageOff, Edit } from 'lucide-react';
+import { CheckCircle2, Loader2, Circle, BookText, Images, Sparkles, ImageOff, Edit, XCircle } from 'lucide-react';
 
 interface LoadingScreenProps {
   stage: LoadingStage;
   phase: 'outline' | 'full';
   progress?: { current: number; total: number };
   storyData?: StoryData;
+  onStop: () => void;
 }
 
 const outlineStepsConfig = (t: (key: string) => string) => [
@@ -94,7 +96,7 @@ const PageThumbnail: React.FC<{ page: StoryPage; pageNumber: number }> = ({ page
     </div>
 );
 
-const LoadingScreen: React.FC<LoadingScreenProps> = ({ stage, phase, progress, storyData }) => {
+const LoadingScreen: React.FC<LoadingScreenProps> = ({ stage, phase, progress, storyData, onStop }) => {
   const { t } = useAppContext();
   const steps = phase === 'outline' ? outlineStepsConfig(t) : fullStepsConfig(t);
   
@@ -150,6 +152,15 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ stage, phase, progress, s
                         </div>
                     );
                 })}
+            </div>
+             <div className="mt-12 text-center">
+                <button 
+                    onClick={onStop}
+                    className="px-6 py-3 bg-red-500/80 text-white font-bold rounded-full shadow-lg hover:bg-red-600 transition-colors flex items-center gap-2 mx-auto"
+                >
+                    <XCircle className="w-5 h-5" />
+                    Stop
+                </button>
             </div>
         </div>
 

@@ -1,0 +1,103 @@
+// NOTE: This is a machine-generated translation
+export const zh = {
+  // Welcome
+  'welcome.title': '欢迎来到神奇的故事时间！',
+  'welcome.subtitle': '给家长和监护人的温馨提示',
+  'welcome.card1.title': '儿童安全第一',
+  'welcome.card1.text': '所有故事都设计为G级（普通级），内容积极，完全不含任何恐怖或不当主题。您孩子的安全是我们的首要任务。',
+  'welcome.card2.title': '善良与积极',
+  'welcome.card2.text': '我们的AI故事讲述者喜欢关于友谊、勇气和善良的故事。我们的目标是创作不仅有趣，而且能振奋人心的故事。',
+  'welcome.card3.title': '家长监督',
+  'welcome.card3.text': '这是一个由人工智能驱动的工具。我们建议您与孩子一起阅读，分享体验并共同引导创作过程。',
+  'welcome.card4.title': '激发创造力',
+  'welcome.card4.text': '这个工具旨在成为您孩子想象力的发射台！用它来探索新想法，一起创造奇妙的冒险。',
+  'welcome.button': '让我们开始创作故事吧！',
+
+  // Input Screen
+  'input.title': '创作一个神奇的故事',
+  'input.prompt.placeholder': '一只想飞的勇敢小松鼠...',
+  'input.visualInspiration.label': '视觉灵感（可选）',
+  'input.visualInspiration.uploadDescription': '上传一幅画或一张照片！',
+  'input.visualInspiration.drawDescription': '画出你的角色！',
+  'input.visualInspiration.button': '上传图片',
+  'input.visualInspiration.change': '更换图片',
+  'input.visualInspiration.clearDrawing': '清除绘画',
+  'input.character.title': '创建一个角色（可选）',
+  'input.character.name': '名字',
+  'input.character.type': '类型（例如，一只勇敢的狮子）',
+  'input.character.personality': '性格（例如，好奇又善良）',
+  'input.options.title': '自定义您的故事',
+  'input.options.age': '年龄组',
+  'input.options.theme': '主题',
+  'input.options.length': '长度',
+  'input.options.style': '插图风格',
+  'input.button.create': '创作我的故事！',
+  'input.draw.done': '完成',
+  'input.draw.clear': '清除',
+  'input.draw.close': '关闭',
+  'input.draw.brush': '画笔',
+  'input.draw.eraser': '橡皮擦',
+  'input.draw.color': '画笔颜色',
+  'input.draw.size': '画笔大小',
+
+  // Style Selection
+  'style.title': "选择你的故事风格",
+  'style.subtitle': '你的故事始于一个火花。选择一个能激励你的封面，我们将用那种风格将故事的其余部分变为现实！',
+  'style.button': '用这种风格创作故事',
+
+  // Loading Screen
+  'loading.main.drafting': '构思故事创意',
+  'loading.sub.draftingIdeas': '构思标题和情节...',
+  'loading.sub.sketchingCovers': '草拟一些封面选项...',
+  'loading.main.writing': '撰写叙事',
+  'loading.sub.analyzing': '分析您选择的风格...',
+  'loading.sub.writingPages': '撰写故事页面...',
+  'loading.main.illustrating': '创作插图',
+  'loading.sub.designingCharacters': '设计角色...',
+  'loading.sub.paintingScenes': '绘制场景...',
+  'loading.main.finalizing': '完成故事书',
+  'loading.sub.assembling': '组装书籍...',
+  'loading.sub.finalTouches': '添加最后的魔法润色...',
+  'loading.illustratingPage': '正在为第 {current} 页（共 {total} 页）绘制插图...',
+  'loading.finalTouchesPage': '正在润色第 {current} 页（共 {total} 页）...',
+
+  // Story Viewer
+  'story.readAloud': '朗读',
+  'story.newStory': '创作新故事',
+  'story.illustrating': '正在绘制插图...',
+  'story.imageError': '无法生成图像。',
+
+  // Error
+  'error.title': '哦不，魔法出了一点小问题！',
+  'error.generic': '创作故事时出了点问题。请重试。',
+  'error.micDenied': '麦克风权限被拒绝。请在浏览器设置中允许使用语音输入。',
+  'error.micGeneric': '无法访问麦克风。请检查您的硬件和权限。',
+
+  // Common
+  'common.tryAgain': '再试一次',
+  'common.loading': '正在创作...',
+
+  // Options
+  'age.3-5': '3-5岁',
+  'age.6-8': '6-8岁',
+  'theme.friendship': '友谊',
+  'theme.courage': '勇气',
+  'theme.kindness': '善良',
+  'theme.adventure': '冒险',
+  'length.short': '短篇（7页）',
+  'length.medium': '中篇（19页）',
+  'length.long': '长篇（25页）',
+  'style.watercolor': '水彩',
+  'style.cartoon': '卡通',
+  'style.pixel': '像素艺术',
+  'style.fantasy': '幻想',
+  'style.3drender': '3D渲染',
+  'style.claymation': '粘土动画',
+  'style.pencilsketch': '铅笔素描',
+
+  // Sample Prompts
+  'prompt.sample1': '一只好奇但害羞的猫发现了一顶魔法帽子',
+  'prompt.sample2': '一个喜欢为朋友种花的快乐机器人',
+  'prompt.sample3': '一个勇敢的小鬼，却偷偷害怕黑暗',
+  'prompt.sample4': '两只兴奋的恐龙发现了一张神秘的藏宝图',
+};

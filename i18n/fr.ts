@@ -1,0 +1,103 @@
+// NOTE: This is a machine-generated translation
+export const fr = {
+  // Welcome
+  'welcome.title': 'Un accueil magique à l\'heure du conte !',
+  'welcome.subtitle': 'Une note rapide pour les parents et tuteurs',
+  'welcome.card1.title': 'La sécurité des enfants d\'abord',
+  'welcome.card1.text': 'Toutes les histoires sont conçues pour être tout public, positives et totalement exemptes de thèmes effrayants ou inappropriés. La sécurité de votre enfant est notre priorité absolue.',
+  'welcome.card2.title': 'Gentillesse et positivité',
+  'welcome.card2.text': 'Notre conteur IA adore les histoires d\'amitié, de courage et de gentillesse. Nous visons à créer des histoires qui ne sont pas seulement amusantes, mais aussi inspirantes.',
+  'welcome.card3.title': 'Surveillance parentale',
+  'welcome.card3.text': 'Ceci est un outil alimenté par l\'IA. Nous recommandons de lire avec votre enfant pour partager l\'expérience et guider ensemble le processus de création.',
+  'welcome.card4.title': 'Stimuler la créativité',
+  'welcome.card4.text': 'Cet outil est là pour servir de rampe de lancement à l\'imagination de votre enfant ! Utilisez-le pour explorer de nouvelles idées et créer de merveilleuses aventures ensemble.',
+  'welcome.button': 'CRÉONS UNE HISTOIRE !',
+
+  // Input Screen
+  'input.title': 'Créez une histoire magique',
+  'input.prompt.placeholder': 'Un petit écureuil courageux qui veut voler...',
+  'input.visualInspiration.label': 'Inspiration visuelle (facultatif)',
+  'input.visualInspiration.uploadDescription': 'Téléchargez un dessin ou une photo !',
+  'input.visualInspiration.drawDescription': 'Dessinez votre personnage !',
+  'input.visualInspiration.button': 'Télécharger une image',
+  'input.visualInspiration.change': 'Changer d\'image',
+  'input.visualInspiration.clearDrawing': 'Effacer le dessin',
+  'input.character.title': 'Créer un personnage (facultatif)',
+  'input.character.name': 'Nom',
+  'input.character.type': 'Type (par exemple, un lion courageux)',
+  'input.character.personality': 'Personnalité (par exemple, curieux et gentil)',
+  'input.options.title': 'Personnalisez votre histoire',
+  'input.options.age': 'Groupe d\'âge',
+  'input.options.theme': 'Thème',
+  'input.options.length': 'Longueur',
+  'input.options.style': 'Style d\'illustration',
+  'input.button.create': 'Créer mon histoire !',
+  'input.draw.done': 'Terminé',
+  'input.draw.clear': 'Effacer',
+  'input.draw.close': 'Fermer',
+  'input.draw.brush': 'Pinceau',
+  'input.draw.eraser': 'Gomme',
+  'input.draw.color': 'Couleur du pinceau',
+  'input.draw.size': 'Taille du pinceau',
+
+  // Style Selection
+  'style.title': "Choisissez le style de votre histoire",
+  'style.subtitle': 'Votre histoire commence par une seule étincelle. Sélectionnez une couverture qui vous inspire, et nous donnerons vie au reste du conte dans ce style !',
+  'style.button': 'Créer une histoire avec ce style',
+
+  // Loading Screen
+  'loading.main.drafting': 'Rédaction des idées d\'histoire',
+  'loading.sub.draftingIdeas': 'Recherche d\'un titre et d\'une intrigue...',
+  'loading.sub.sketchingCovers': 'Esquisse de quelques options de couverture...',
+  'loading.main.writing': 'Écriture du récit',
+  'loading.sub.analyzing': 'Analyse de votre style choisi...',
+  'loading.sub.writingPages': 'Écriture des pages de l\'histoire...',
+  'loading.main.illustrating': 'Création des illustrations',
+  'loading.sub.designingCharacters': 'Conception des personnages...',
+  'loading.sub.paintingScenes': 'Peinture des scènes...',
+  'loading.main.finalizing': 'Finalisation du livre d\'histoires',
+  'loading.sub.assembling': 'Assemblage du livre...',
+  'loading.sub.finalTouches': 'Ajout des touches magiques finales...',
+  'loading.illustratingPage': 'Illustration de la page {current} sur {total}...',
+  'loading.finalTouchesPage': 'Polissage de la page {current} sur {total}...',
+
+  // Story Viewer
+  'story.readAloud': 'Lire à voix haute',
+  'story.newStory': 'Créer une nouvelle histoire',
+  'story.illustrating': 'Illustration en cours...',
+  'story.imageError': 'L\'image n\'a pas pu être générée.',
+
+  // Error
+  'error.title': 'Oh non, un hoquet dans la magie !',
+  'error.generic': 'Une erreur est survenue lors de la création de l\'histoire. Veuillez réessayer.',
+  'error.micDenied': 'L\'autorisation du microphone a été refusée. Veuillez l\'autoriser dans les paramètres de votre navigateur pour utiliser la saisie vocale.',
+  'error.micGeneric': 'Impossible d\'accéder au microphone. Veuillez vérifier votre matériel et vos autorisations.',
+
+  // Common
+  'common.tryAgain': 'Réessayer',
+  'common.loading': 'Création...',
+
+  // Options
+  'age.3-5': '3-5 ans',
+  'age.6-8': '6-8 ans',
+  'theme.friendship': 'Amitié',
+  'theme.courage': 'Courage',
+  'theme.kindness': 'Gentillesse',
+  'theme.adventure': 'Aventure',
+  'length.short': 'Courte (7 pages)',
+  'length.medium': 'Moyenne (19 pages)',
+  'length.long': 'Longue (25 pages)',
+  'style.watercolor': 'Aquarelle',
+  'style.cartoon': 'Dessin animé',
+  'style.pixel': 'Pixel Art',
+  'style.fantasy': 'Fantaisie',
+  'style.3drender': 'Rendu 3D',
+  'style.claymation': 'Pâte à modeler',
+  'style.pencilsketch': 'Croquis au crayon',
+
+  // Sample Prompts
+  'prompt.sample1': 'Un chat curieux mais timide qui trouve un chapeau magique',
+  'prompt.sample2': 'Un robot heureux qui adore planter des fleurs pour ses amis',
+  'prompt.sample3': 'Un petit fantôme courageux qui a secrètement peur du noir',
+  'prompt.sample4': 'Deux dinosaures excités qui découvrent une mystérieuse carte au trésor',
+};

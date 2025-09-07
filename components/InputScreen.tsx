@@ -140,7 +140,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
             <Sparkles className="w-8 h-8 text-fuchsia-500" />
             {t('input.title')}
           </h1>
-          <div className="flex gap-1 bg-gray-200/50 rounded-full p-1 shadow-inner">
+          <div className="flex flex-wrap justify-end gap-1 bg-gray-200/50 rounded-full p-1 shadow-inner">
             {LANGUAGES.map(lang => (
               <button
                 key={lang.code}
