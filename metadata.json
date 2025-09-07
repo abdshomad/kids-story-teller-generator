@@ -1,0 +1,7 @@
+{
+  "name": "Kids Story Teller Generator",
+  "description": "A magical web application that transforms a child's imagination into a beautifully written and illustrated storybook using AI.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
