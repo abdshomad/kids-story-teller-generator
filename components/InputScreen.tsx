@@ -166,7 +166,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
               )}
             </div>
              {error && <p className="text-red-600 text-sm mt-2 text-center" role="alert">{t(error)}</p>}
-             <div className="flex flex-wrap justify-center gap-5 my-5">
+             <div className="flex flex-wrap justify-center gap-8 my-6">
               {SAMPLE_PROMPTS.map((promptKey, i) => {
                 const isActive = i === activeSampleIndex && !options.prompt;
                 return (
