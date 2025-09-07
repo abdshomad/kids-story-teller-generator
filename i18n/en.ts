@@ -50,8 +50,9 @@ export const en = {
   'loading.sub.paintingScenes': 'Painting the scenes...',
   'loading.main.finalizing': 'Finalizing the Storybook',
   'loading.sub.assembling': 'Assembling the book...',
-  'loading.sub.sparkles': 'Adding the final magic sparkles!',
+  'loading.sub.finalTouches': 'Adding the final magic touches...',
   'loading.illustratingPage': 'Painting page {current} of {total}...',
+  'loading.finalTouchesPage': 'Polishing page {current} of {total}...',
 
   // Story Viewer
   'story.readAloud': 'Read Aloud',

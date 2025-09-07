@@ -50,8 +50,10 @@ export const id = {
   'loading.sub.paintingScenes': 'Melukis adegan...',
   'loading.main.finalizing': 'Menyelesaikan Buku Cerita',
   'loading.sub.assembling': 'Menyusun buku...',
-  'loading.sub.sparkles': 'Menambahkan kilau sihir terakhir!',
+  'loading.sub.finalTouches': 'Menambahkan sentuhan ajaib terakhir...',
   'loading.illustratingPage': 'Melukis halaman {current} dari {total}...',
+  'loading.finalTouchesPage': 'Memoles halaman {current} dari {total}...',
+
 
   // Story Viewer
   'story.readAloud': 'Bacakan',

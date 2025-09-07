@@ -5,7 +5,7 @@ import WelcomeModal from './components/WelcomeModal';
 import InputScreen from './components/InputScreen';
 import LoadingScreen from './components/LoadingScreen';
 import StoryViewer from './components/StoryViewer';
-import { StoryData, StoryOptions, Language, AppState, AppStatus, StoryPage, LoadingStage } from './types';
+import { StoryData, StoryOptions, Language, AppState, AppStatus, LoadingStage } from './types';
 import { generateStoryAndImages } from './services/geminiService';
 import { locales } from './i18n/locales';
 
@@ -44,34 +44,27 @@ const App: React.FC = () => {
   }), [language, t]);
 
   const handleStoryCreate = async (options: StoryOptions) => {
-    setAppState({ status: AppStatus.LOADING, stage: LoadingStage.ANALYZING_PROMPT });
+    setAppState({ status: AppStatus.LOADING, stage: LoadingStage.ANALYZING_PROMPT, storyData: undefined });
     try {
-      await generateStoryAndImages(
+      const finalStoryData = await generateStoryAndImages(
         options,
         t,
-        (initialStory) => {
-          setAppState({ status: AppStatus.STORY, storyData: initialStory });
-        },
-        (illustratedPage, index) => {
-          setAppState(currentState => {
-            if (currentState.status !== AppStatus.STORY) return currentState;
-            
-            const newPages = [...currentState.storyData.pages];
-            newPages[index] = illustratedPage;
-
-            return {
-              ...currentState,
-              storyData: {
-                ...currentState.storyData,
-                pages: newPages,
-              },
+        (update) => {
+           setAppState(currentState => {
+            if (currentState.status !== AppStatus.LOADING) return currentState;
+            // Create a new state object for the update
+            const newState: AppState = {
+                status: AppStatus.LOADING,
+                stage: update.stage,
+                progress: update.progress,
+                // Use new storyData if provided, otherwise persist the existing one
+                storyData: update.storyData || currentState.storyData,
             };
-          });
-        },
-        (stage, progress) => {
-            setAppState({ status: AppStatus.LOADING, stage, progress });
+            return newState;
+        });
         }
       );
+       setAppState({ status: AppStatus.STORY, storyData: finalStoryData });
     } catch (error) {
       console.error("Failed to generate story:", error);
       const errorMessage = error instanceof Error ? error.message : t('error.generic');
@@ -94,7 +87,7 @@ const App: React.FC = () => {
       case AppStatus.INPUT:
         return <InputScreen onCreateStory={handleStoryCreate} />;
       case AppStatus.LOADING:
-        return <LoadingScreen stage={appState.stage} progress={appState.progress} />;
+        return <LoadingScreen stage={appState.stage} progress={appState.progress} storyData={appState.storyData} />;
       case AppStatus.STORY:
         return <StoryViewer story={appState.storyData} onNewStory={handleNewStory} />;
       case AppStatus.ERROR:

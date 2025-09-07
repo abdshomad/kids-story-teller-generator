@@ -100,72 +100,11 @@ const blobToBase64 = (blob: Blob): Promise<string> => {
     });
 };
 
-
-export const generateStoryAndImages = async (
-  options: StoryOptions, 
-  t: (key: string, params?: Record<string, string | number>) => string,
-  onTextComplete: (story: StoryData) => void,
-  onPageIllustrated: (page: StoryPage, index: number) => void,
-  onProgressUpdate: (stage: LoadingStage, progress?: { current: number, total: number }) => void
-): Promise<void> => {
-    
-  // 1. Generate story text
-  onProgressUpdate(LoadingStage.ANALYZING_PROMPT);
-  await delay(1500);
-  onProgressUpdate(LoadingStage.WRITING_PAGES);
-
-  const storyPromptParts = buildStoryPrompt(options);
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: { parts: storyPromptParts },
-    config: {
-        responseMimeType: "application/json",
-        responseSchema: storySchema,
-    }
-  });
-
-  const storyJsonText = response.text.trim();
-  const storyContent: Omit<StoryData, 'pages'> & { pages: Omit<StoryPage, 'imageUrl'>[] } = JSON.parse(storyJsonText);
-
-  if (!storyContent || !storyContent.pages || storyContent.pages.length === 0) {
-    throw new Error("AI failed to generate a valid story structure.");
-  }
-  
-  const initialStoryData: StoryData = {
-    title: storyContent.title,
-    pages: storyContent.pages.map(page => ({ ...page, imageUrl: undefined })),
-  };
-
-  onTextComplete(initialStoryData);
-  
-  onProgressUpdate(LoadingStage.DESIGNING_CHARACTERS);
-  await delay(1500);
-
-  // 2. Generate images for each page.
-  if (!FAL_API_KEY) {
-    console.warn("FAL_API_KEY not found. Skipping image generation.");
-    onProgressUpdate(LoadingStage.PAINTING_SCENES, { current: 1, total: initialStoryData.pages.length });
-    for (let i = 0; i < initialStoryData.pages.length; i++) {
-        onPageIllustrated({ ...initialStoryData.pages[i], imageUrl: 'GENERATION_FAILED' }, i);
-        onProgressUpdate(LoadingStage.PAINTING_SCENES, { current: i + 1, total: initialStoryData.pages.length });
-    }
-    onProgressUpdate(LoadingStage.ASSEMBLING_BOOK);
-    await delay(1000);
-    onProgressUpdate(LoadingStage.ADDING_SPARKLES);
-    await delay(1000);
-    return;
-  }
-  
-  onProgressUpdate(LoadingStage.PAINTING_SCENES, { current: 1, total: initialStoryData.pages.length });
-  for (let i = 0; i < initialStoryData.pages.length; i++) {
-    onProgressUpdate(LoadingStage.PAINTING_SCENES, { current: i + 1, total: initialStoryData.pages.length });
-    const page = initialStoryData.pages[i];
-    
-    let success = false;
+const generateImageWithFal = async (prompt: string, style: string): Promise<string> => {
     let retries = 3;
-    let attemptDelay = 2000; // Start with 2 seconds for retry attempts
+    let attemptDelay = 2000;
 
-    while (!success && retries > 0) {
+    while (retries > 0) {
         try {
             const falResponse = await fetch(FAL_API_URL, {
                 method: 'POST',
@@ -174,7 +113,7 @@ export const generateStoryAndImages = async (
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    prompt: `${page.imagePrompt}, in a beautiful ${options.illustrationStyle} style, G-rated, for a children's book`,
+                    prompt: `${prompt}, in a beautiful ${style} style, G-rated, for a children's book`,
                 })
             });
 
@@ -197,39 +136,114 @@ export const generateStoryAndImages = async (
             }
 
             const imageBlob = await imageDownloadResponse.blob();
-            const imageUrl = await blobToBase64(imageBlob);
-            
-            onPageIllustrated({ ...page, imageUrl }, i);
-            success = true;
+            return await blobToBase64(imageBlob);
 
         } catch (imageError) {
-            console.error(`Failed to generate image for page ${i + 1}:`, imageError);
-            
+            console.error(`Failed to generate image.`, imageError);
+            retries--;
+
             const errorMessage = imageError instanceof Error ? imageError.message : String(imageError);
             const isRateLimitError = errorMessage.includes('429') || errorMessage.toUpperCase().includes('RESOURCE_EXHAUSTED');
 
             if (isRateLimitError && retries > 0) {
-                retries--;
-                console.warn(`Rate limit hit for page ${i + 1}. Retrying in ${attemptDelay / 1000}s... (${retries} retries left)`);
+                console.warn(`Rate limit hit. Retrying in ${attemptDelay / 1000}s... (${retries} retries left)`);
                 await delay(attemptDelay);
-                attemptDelay *= 2; // Exponential backoff
-            } else {
-                console.error(`Could not generate image for page ${i + 1}. Skipping.`);
-                onPageIllustrated({ ...page, imageUrl: 'GENERATION_FAILED' }, i);
-                success = true; // Mark as "handled" to exit the while loop
+                attemptDelay *= 2;
+            } else if (retries === 0) {
+                console.error(`Could not generate image after multiple retries. Failing.`);
+                return 'GENERATION_FAILED';
             }
         }
     }
+    return 'GENERATION_FAILED';
+};
 
-    // Proactively add a delay between requests to avoid hitting rate limits.
-    if (i < initialStoryData.pages.length - 1) {
-      await delay(1000); // 1-second delay between each page's image generation request
+
+interface LoadingUpdate {
+    stage: LoadingStage;
+    storyData?: StoryData;
+    progress?: { current: number; total: number };
+}
+
+export const generateStoryAndImages = async (
+  options: StoryOptions, 
+  t: (key: string, params?: Record<string, string | number>) => string,
+  onUpdate: (update: LoadingUpdate) => void
+): Promise<StoryData> => {
+    
+  // 1. Analyze
+  onUpdate({ stage: LoadingStage.ANALYZING_PROMPT });
+  await delay(1500);
+  
+  // 2. Write Text
+  onUpdate({ stage: LoadingStage.WRITING_PAGES });
+
+  const storyPromptParts = buildStoryPrompt(options);
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: { parts: storyPromptParts },
+    config: {
+        responseMimeType: "application/json",
+        responseSchema: storySchema,
     }
+  });
+
+  const storyJsonText = response.text.trim();
+  const storyContent: Omit<StoryData, 'pages'> & { pages: Omit<StoryPage, 'imageUrl'>[] } = JSON.parse(storyJsonText);
+
+  if (!storyContent || !storyContent.pages || storyContent.pages.length === 0) {
+    throw new Error("AI failed to generate a valid story structure.");
   }
-  onProgressUpdate(LoadingStage.ASSEMBLING_BOOK);
+  
+  const storyData: StoryData = {
+    title: storyContent.title,
+    pages: storyContent.pages.map(page => ({ ...page, imageUrl: undefined })),
+  };
+
+  // 3. Design Characters (transition step, provides text data to UI)
+  onUpdate({ stage: LoadingStage.DESIGNING_CHARACTERS, storyData });
+  await delay(1500);
+
+  // 4. Generate Images
+  if (!FAL_API_KEY) {
+      console.warn("FAL_API_KEY not found. Skipping image generation.");
+      storyData.pages.forEach(p => p.imageUrl = 'GENERATION_FAILED');
+  } else {
+      const totalPages = storyData.pages.length;
+      onUpdate({ stage: LoadingStage.PAINTING_SCENES, storyData, progress: { current: 1, total: totalPages } });
+
+      for (let i = 0; i < totalPages; i++) {
+          const imageUrl = await generateImageWithFal(storyData.pages[i].imagePrompt, options.illustrationStyle);
+          storyData.pages[i].imageUrl = imageUrl;
+          
+          onUpdate({ 
+              stage: LoadingStage.PAINTING_SCENES, 
+              storyData: { ...storyData, pages: [...storyData.pages] }, // Create new object to trigger re-render
+              progress: { current: i + 1, total: totalPages }
+          });
+          
+          if (i < totalPages - 1) {
+            await delay(1000); // Proactive delay between image requests
+          }
+      }
+  }
+  
+  // 5. Assemble
+  onUpdate({ stage: LoadingStage.ASSEMBLING_BOOK, storyData });
   await delay(1000);
-  onProgressUpdate(LoadingStage.ADDING_SPARKLES);
-  await delay(1000);
+  
+  // 6. Final Touches
+  const totalPages = storyData.pages.length;
+  for (let i = 0; i < totalPages; i++) {
+    onUpdate({
+        stage: LoadingStage.FINAL_TOUCHES,
+        storyData,
+        progress: { current: i + 1, total: totalPages }
+    });
+    await delay(100); // Short delay per page for visual effect
+  }
+
+  return storyData;
 };
 
 export const transcribeAudio = async (audio: { mimeType: string, data: string }, language: Language): Promise<string> => {

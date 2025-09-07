@@ -47,12 +47,12 @@ export enum LoadingStage {
 
   // Finalizing
   ASSEMBLING_BOOK = 'assembling_book',
-  ADDING_SPARKLES = 'adding_sparkles',
+  FINAL_TOUCHES = 'final_touches',
 }
 
 export type AppState =
   | { status: AppStatus.WELCOME }
   | { status: AppStatus.INPUT }
-  | { status: AppStatus.LOADING, stage: LoadingStage, progress?: { current: number, total: number } }
+  | { status: AppStatus.LOADING, stage: LoadingStage, progress?: { current: number, total: number }, storyData?: StoryData }
   | { status: AppStatus.STORY, storyData: StoryData }
   | { status: AppStatus.ERROR, message: string };
