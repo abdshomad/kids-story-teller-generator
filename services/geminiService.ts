@@ -1,5 +1,6 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
-import { StoryOptions, StoryData, StoryPage, Language } from '../types';
+import { StoryOptions, StoryData, StoryPage, Language, LoadingStage } from '../types';
 
 if (!process.env.API_KEY) {
   throw new Error("API_KEY environment variable not set");
@@ -102,10 +103,12 @@ export const generateStoryAndImages = async (
   options: StoryOptions, 
   t: (key: string, params?: Record<string, string | number>) => string,
   onTextComplete: (story: StoryData) => void,
-  onPageIllustrated: (page: StoryPage, index: number) => void
+  onPageIllustrated: (page: StoryPage, index: number) => void,
+  onProgressUpdate: (stage: LoadingStage, progress?: { current: number, total: number }) => void
 ): Promise<void> => {
     
   // 1. Generate story text
+  onProgressUpdate(LoadingStage.WRITING);
   const storyPromptParts = buildStoryPrompt(options);
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
@@ -133,13 +136,18 @@ export const generateStoryAndImages = async (
   // 2. Generate images for each page.
   if (!process.env.FAL_API_KEY) {
     console.warn("FAL_API_KEY environment variable not set. Skipping image generation.");
+    onProgressUpdate(LoadingStage.ILLUSTRATING, { current: 1, total: initialStoryData.pages.length });
     for (let i = 0; i < initialStoryData.pages.length; i++) {
         onPageIllustrated({ ...initialStoryData.pages[i], imageUrl: 'GENERATION_FAILED' }, i);
+        onProgressUpdate(LoadingStage.ILLUSTRATING, { current: i + 1, total: initialStoryData.pages.length });
     }
+    onProgressUpdate(LoadingStage.FINISHING);
     return;
   }
-
+  
+  onProgressUpdate(LoadingStage.ILLUSTRATING, { current: 1, total: initialStoryData.pages.length });
   for (let i = 0; i < initialStoryData.pages.length; i++) {
+    onProgressUpdate(LoadingStage.ILLUSTRATING, { current: i + 1, total: initialStoryData.pages.length });
     const page = initialStoryData.pages[i];
     
     let success = false;
@@ -207,6 +215,7 @@ export const generateStoryAndImages = async (
       await delay(1000); // 1-second delay between each page's image generation request
     }
   }
+  onProgressUpdate(LoadingStage.FINISHING);
 };
 
 export const transcribeAudio = async (audio: { mimeType: string, data: string }, language: Language): Promise<string> => {

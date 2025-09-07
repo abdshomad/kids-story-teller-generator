@@ -35,9 +35,15 @@ export enum AppStatus {
   ERROR = 'error'
 }
 
+export enum LoadingStage {
+  WRITING = 'writing',
+  ILLUSTRATING = 'illustrating',
+  FINISHING = 'finishing'
+}
+
 export type AppState =
   | { status: AppStatus.WELCOME }
   | { status: AppStatus.INPUT }
-  | { status: AppStatus.LOADING, progressMessage: string }
+  | { status: AppStatus.LOADING, stage: LoadingStage, progress?: { current: number, total: number } }
   | { status: AppStatus.STORY, storyData: StoryData }
   | { status: AppStatus.ERROR, message: string };

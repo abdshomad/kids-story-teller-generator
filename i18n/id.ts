@@ -16,8 +16,6 @@ export const id = {
   // Input Screen
   'input.title': 'Buat Cerita Ajaib',
   'input.prompt.placeholder': 'Seekor tupai kecil pemberani yang ingin terbang...',
-  'input.inspiration': 'Butuh inspirasi?',
-  'input.cycleSamples': 'Ganti Inspirasi',
   'input.visualInspiration.label': 'Inspirasi Visual (Opsional)',
   'input.visualInspiration.uploadDescription': 'Unggah gambar atau foto!',
   'input.visualInspiration.drawDescription': 'Gambar karaktermu!',
@@ -39,12 +37,10 @@ export const id = {
   'input.draw.close': 'Tutup',
 
   // Loading Screen
-  'loading.dreaming': 'Memimpikan ceritamu...',
-  'loading.building': 'Membangun dunia magis...',
-  'loading.painting': 'Melukis gambar...',
-  'loading.finishing': 'Menambahkan kilauan terakhir...',
-  'loading.generatingPage': 'Membuat halaman {currentPage} dari {totalPages}...',
-  'loading.illustratingPage': 'Mengilustrasikan halaman {currentPage} dari {totalPages}...',
+  'loading.steps.writing': 'Menulis Narasi',
+  'loading.steps.illustrating': 'Membuat Ilustrasi',
+  'loading.steps.finishing': 'Menyelesaikan Buku Cerita',
+  'loading.illustratingPage': 'Melukis halaman {current} dari {total}...',
 
   // Story Viewer
   'story.readAloud': 'Bacakan',

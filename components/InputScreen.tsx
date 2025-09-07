@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryOptions } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, SAMPLE_PROMPTS } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
-import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, ChevronDown, PenSquare, Loader2, RefreshCcw } from 'lucide-react';
+import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, ChevronDown, PenSquare, Loader2 } from 'lucide-react';
 import FullscreenCanvas from './FullscreenCanvas';
 
 interface InputScreenProps {
@@ -38,7 +39,8 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   });
   const [visualInspirationPreview, setVisualInspirationPreview] = useState<string | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [samplePromptIndex, setSamplePromptIndex] = useState(-1);
+  const [placeholder, setPlaceholder] = useState(t(SAMPLE_PROMPTS[0]));
+
 
   const { isListening, isTranscribing, transcript, startListening, stopListening, setTranscript, browserSupportsSpeechRecognition } = useSpeechToText(language);
 
@@ -48,6 +50,21 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
       setTranscript('');
     }
   }, [transcript, setTranscript]);
+
+  useEffect(() => {
+    if (options.prompt) {
+        return; 
+    }
+
+    let promptIndex = 0;
+    const intervalId = setInterval(() => {
+        const promptKey = SAMPLE_PROMPTS[promptIndex];
+        setPlaceholder(t(promptKey));
+        promptIndex = (promptIndex + 1) % SAMPLE_PROMPTS.length;
+    }, 4000);
+
+    return () => clearInterval(intervalId);
+  }, [t, options.prompt]);
   
   const handleInputChange = useCallback(<K extends keyof StoryOptions>(field: K, value: StoryOptions[K]) => {
     setOptions(prev => ({ ...prev, [field]: value }));
@@ -83,13 +100,6 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     }
   };
 
-  const handleCycleSamplePrompt = useCallback(() => {
-    const newIndex = (samplePromptIndex + 1) % SAMPLE_PROMPTS.length;
-    setSamplePromptIndex(newIndex);
-    const promptKey = SAMPLE_PROMPTS[newIndex];
-    handleInputChange('prompt', t(promptKey));
-  }, [samplePromptIndex, handleInputChange, t]);
-
   const handleMicClick = useCallback(() => {
     if (isListening) {
       stopListening();
@@ -122,7 +132,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
               <textarea
                 value={options.prompt}
                 onChange={(e) => handleInputChange('prompt', e.target.value)}
-                placeholder={t('input.prompt.placeholder')}
+                placeholder={placeholder}
                 className="w-full h-32 p-4 pr-16 text-lg bg-white/60 border border-slate-300/80 rounded-xl focus:ring-4 focus:ring-fuchsia-300/50 focus:border-fuchsia-300 transition-all placeholder:text-slate-500"
                 required
               />
@@ -141,20 +151,6 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                   {isTranscribing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Mic className="w-5 h-5" />}
                 </button>
               )}
-            </div>
-            <div className="mt-4 flex flex-col items-center">
-                <div className="flex items-center gap-3">
-                    <h3 className="text-sm font-bold text-slate-500">{t('input.inspiration')}</h3>
-                    <button 
-                        type="button" 
-                        onClick={handleCycleSamplePrompt} 
-                        className="px-4 py-2 bg-sky-100/70 text-sky-800 text-sm font-semibold rounded-full hover:bg-sky-200/80 transition-all flex items-center gap-2 shadow-sm border border-sky-200"
-                        aria-label={t('input.cycleSamples')}
-                    >
-                        <RefreshCcw className="w-4 h-4" />
-                        <span>{t('input.cycleSamples')}</span>
-                    </button>
-                </div>
             </div>
           </section>
           

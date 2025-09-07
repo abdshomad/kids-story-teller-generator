@@ -16,8 +16,6 @@ export const en = {
   // Input Screen
   'input.title': 'Create a Magical Story',
   'input.prompt.placeholder': 'A brave little squirrel who wants to fly...',
-  'input.inspiration': 'Need inspiration?',
-  'input.cycleSamples': 'Cycle Inspiration',
   'input.visualInspiration.label': 'Visual Inspiration (Optional)',
   'input.visualInspiration.uploadDescription': 'Upload a drawing or photo!',
   'input.visualInspiration.drawDescription': 'Draw your character!',
@@ -39,12 +37,10 @@ export const en = {
   'input.draw.close': 'Close',
 
   // Loading Screen
-  'loading.dreaming': 'Dreaming up your story...',
-  'loading.building': 'Building a magical world...',
-  'loading.painting': 'Painting the pictures...',
-  'loading.finishing': 'Adding the final sparkles...',
-  'loading.generatingPage': 'Generating page {currentPage} of {totalPages}...',
-  'loading.illustratingPage': 'Illustrating page {currentPage} of {totalPages}...',
+  'loading.steps.writing': 'Writing the Narrative',
+  'loading.steps.illustrating': 'Creating Illustrations',
+  'loading.steps.finishing': 'Finalizing the Storybook',
+  'loading.illustratingPage': 'Painting page {current} of {total}...',
 
   // Story Viewer
   'story.readAloud': 'Read Aloud',

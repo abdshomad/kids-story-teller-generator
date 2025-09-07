@@ -4,14 +4,14 @@ import WelcomeModal from './components/WelcomeModal';
 import InputScreen from './components/InputScreen';
 import LoadingScreen from './components/LoadingScreen';
 import StoryViewer from './components/StoryViewer';
-import { StoryData, StoryOptions, Language, AppState, AppStatus, StoryPage } from './types';
+import { StoryData, StoryOptions, Language, AppState, AppStatus, StoryPage, LoadingStage } from './types';
 import { generateStoryAndImages } from './services/geminiService';
 import { locales } from './i18n/locales';
 
 interface AppContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -28,8 +28,12 @@ const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>({ status: AppStatus.WELCOME });
   const [language, setLanguage] = useState<Language>('en');
 
-  const t = useCallback((key: string) => {
-    return locales[language][key] || key;
+  const t = useCallback((key: string, params: Record<string, string | number> = {}) => {
+    let translation = locales[language][key] || key;
+    Object.keys(params).forEach(paramKey => {
+      translation = translation.replace(`{${paramKey}}`, String(params[paramKey]));
+    });
+    return translation;
   }, [language]);
 
   const contextValue = useMemo(() => ({
@@ -39,7 +43,7 @@ const App: React.FC = () => {
   }), [language, t]);
 
   const handleStoryCreate = async (options: StoryOptions) => {
-    setAppState({ status: AppStatus.LOADING, progressMessage: t('loading.dreaming') });
+    setAppState({ status: AppStatus.LOADING, stage: LoadingStage.WRITING });
     try {
       await generateStoryAndImages(
         options,
@@ -62,6 +66,9 @@ const App: React.FC = () => {
               },
             };
           });
+        },
+        (stage, progress) => {
+            setAppState({ status: AppStatus.LOADING, stage, progress });
         }
       );
     } catch (error) {
@@ -86,7 +93,7 @@ const App: React.FC = () => {
       case AppStatus.INPUT:
         return <InputScreen onCreateStory={handleStoryCreate} />;
       case AppStatus.LOADING:
-        return <LoadingScreen message={appState.progressMessage} />;
+        return <LoadingScreen stage={appState.stage} progress={appState.progress} />;
       case AppStatus.STORY:
         return <StoryViewer story={appState.storyData} onNewStory={handleNewStory} />;
       case AppStatus.ERROR:
