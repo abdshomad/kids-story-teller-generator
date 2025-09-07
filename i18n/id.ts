@@ -1,4 +1,3 @@
-
 export const id = {
   // Welcome
   'welcome.title': 'Selamat Datang di Waktu Cerita Ajaib!',
@@ -16,7 +15,7 @@ export const id = {
   // Input Screen
   'input.title': 'Buat Cerita Ajaib',
   'input.prompt.placeholder': 'Seekor tupai kecil pemberani yang ingin terbang...',
-  'input.samples.refresh': 'Segarkan contoh prompt',
+  'input.samples.addMore': 'Ide Lainnya',
   'input.visualInspiration.label': 'Inspirasi Visual (Opsional)',
   'input.visualInspiration.uploadDescription': 'Unggah gambar atau foto!',
   'input.visualInspiration.drawDescription': 'Gambar karaktermu!',

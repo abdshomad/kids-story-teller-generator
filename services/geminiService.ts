@@ -125,7 +125,11 @@ const getLanguageName = (lang: Language): string => {
     }
 };
 
-export const generateSamplePrompts = async (language: Language): Promise<{ title: string; prompt: string; }[]> => {
+export const generateSamplePrompts = async (language: Language, existingPrompts: { title: string; prompt: string; }[] = []): Promise<{ title: string; prompt: string; }[]> => {
+    const existingPromptsText = existingPrompts.length > 0
+        ? `To ensure variety, please do not generate prompts that are similar in theme or content to the following existing prompts:\n${existingPrompts.map(p => `- "${p.title}: ${p.prompt}"`).join('\n')}`
+        : '';
+    
     const prompt = `
 Generate 4 unique, creative, and imaginative story prompts suitable for children aged 3-8.
 The prompts should be very different from each other. For instance, if one is about a magical animal, another could be about a child's everyday adventure, another about a friendly robot, and another about exploring nature. Be surprising and avoid clichés.
@@ -134,6 +138,8 @@ For each prompt, provide a very short, catchy title (max 5 words) and a longer p
 Examples of the desired format (do not copy these ideas):
 - Title: "The Magical Hat", Prompt: "A curious but shy cat finds a magical hat in an old attic. When he puts it on, something amazing happens! What new adventures await?"
 - Title: "The Robot's Garden", Prompt: "A happy robot loves to plant flowers for his friends. One day, he finds a mysterious seed that grows into something unexpected. What could it be?"
+
+${existingPromptsText}
 
 The prompts must be written in ${getLanguageName(language)}.
 `;
@@ -296,14 +302,14 @@ const generateAudio = async (text: string): Promise<string | undefined> => {
             return undefined;
         }
 
-        const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb`; // Fin - An old, wise, and expressive storyteller.
+        const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/piTKgcLEGmPE4e6mEKli`; // Nicole - An engaging and clear American female voice.
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_API_KEY },
             body: JSON.stringify({
                 text: textToSpeak,
-                model_id: 'eleven_multilingual_v2',
-                voice_settings: { stability: 0.7, similarity_boost: 0.2 },
+                model_id: 'eleven_v3',
+                voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0.2, use_speaker_boost: true },
             }),
         });
         if (!response.ok) throw new Error(`ElevenLabs API error: ${response.status}`);

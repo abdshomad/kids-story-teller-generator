@@ -1,12 +1,9 @@
-
-
-
 import React, { useState, useEffect, useCallback, useRef, FC } from 'react';
 import { StoryOptions } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, LANGUAGES } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
-import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, PenSquare, Loader2, ChevronDown, RefreshCw } from 'lucide-react';
+import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, PenSquare, Loader2, ChevronDown } from 'lucide-react';
 import FullscreenCanvas from './FullscreenCanvas';
 import { extractCharacterDetails, generateSamplePrompts } from '../services/geminiService';
 
@@ -101,16 +98,34 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     }
   }, [transcript, setTranscript]);
 
-  const fetchPrompts = useCallback(async () => {
+  const fetchInitialPrompts = useCallback(async () => {
     setIsLoadingSamples(true);
-    const prompts = await generateSamplePrompts(language);
-    setSamplePrompts(prompts);
-    setIsLoadingSamples(false);
+    setSamplePrompts([]);
+    try {
+        const prompts = await generateSamplePrompts(language);
+        setSamplePrompts(prompts);
+    } catch (e) {
+        console.error("Failed to fetch initial prompts", e);
+    } finally {
+        setIsLoadingSamples(false);
+    }
   }, [language]);
 
+  const addMorePrompts = useCallback(async () => {
+    setIsLoadingSamples(true);
+    try {
+        const newPrompts = await generateSamplePrompts(language, samplePrompts);
+        setSamplePrompts(prev => [...prev, ...newPrompts]);
+    } catch (e) {
+        console.error("Failed to add more prompts", e);
+    } finally {
+        setIsLoadingSamples(false);
+    }
+  }, [language, samplePrompts]);
+  
   useEffect(() => {
-    fetchPrompts();
-  }, [fetchPrompts]);
+    fetchInitialPrompts();
+  }, [fetchInitialPrompts]);
 
 
   useEffect(() => {
@@ -275,10 +290,10 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
               )}
             </div>
              {error && <p className="text-red-600 text-sm mt-2 text-center" role="alert">{t(error)}</p>}
-             <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 my-6">
+             <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-4 my-6">
               {(isLoadingSamples && samplePrompts.length === 0) ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className={`h-12 w-56 rounded-full animate-pulse ${sampleButtonColors[i % sampleButtonColors.length]}`} />
+                    <div key={i} className={`h-12 w-48 rounded-full animate-pulse ${sampleButtonColors[i % sampleButtonColors.length]}`} />
                 ))
               ) : (
                 <>
@@ -295,17 +310,17 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                           </button>
                       );
                   })}
-                  <button
-                    type="button"
-                    onClick={fetchPrompts}
-                    disabled={isLoadingSamples}
-                    aria-label={t('input.samples.refresh')}
-                    className="p-3 bg-white/80 text-slate-600 rounded-full hover:bg-white shadow-md transition-all disabled:opacity-50 disabled:cursor-wait"
-                  >
-                    <RefreshCw className={`w-5 h-5 ${isLoadingSamples ? 'animate-spin' : ''}`} />
-                  </button>
                 </>
               )}
+               <button
+                  type="button"
+                  onClick={addMorePrompts}
+                  disabled={isLoadingSamples}
+                  className="px-5 py-3 text-slate-700 bg-white/80 font-semibold rounded-full text-sm shadow-md transition-all duration-300 hover:scale-105 hover:bg-white disabled:opacity-50 disabled:cursor-wait flex items-center gap-2"
+                >
+                  {isLoadingSamples ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5 text-fuchsia-500" />}
+                  {t('input.samples.addMore')}
+                </button>
             </div>
           </section>
           

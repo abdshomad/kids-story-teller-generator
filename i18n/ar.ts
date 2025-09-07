@@ -1,4 +1,3 @@
-
 // NOTE: This is a machine-generated translation
 export const ar = {
   // Welcome
@@ -17,7 +16,7 @@ export const ar = {
   // Input Screen
   'input.title': 'أنشئ قصة ساحرة',
   'input.prompt.placeholder': 'سنجاب صغير شجاع يريد أن يطير...',
-  'input.samples.refresh': 'تحديث المطالبات النموذجية',
+  'input.samples.addMore': 'المزيد من الأفكار',
   'input.visualInspiration.label': 'إلهام بصري (اختياري)',
   'input.visualInspiration.uploadDescription': 'حمّل رسمًا أو صورة!',
   'input.visualInspiration.drawDescription': 'ارسم شخصيتك!',

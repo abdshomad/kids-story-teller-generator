@@ -1,4 +1,3 @@
-
 // NOTE: This is a machine-generated translation
 export const hi = {
   // Welcome
@@ -17,7 +16,7 @@ export const hi = {
   // Input Screen
   'input.title': 'एक जादुई कहानी बनाएँ',
   'input.prompt.placeholder': 'एक बहादुर छोटी गिलहरी जो उड़ना चाहती है...',
-  'input.samples.refresh': 'नमूना प्रॉम्प्ट रीफ़्रेश करें',
+  'input.samples.addMore': 'और विचार',
   'input.visualInspiration.label': 'दृश्य प्रेरणा (वैकल्पिक)',
   'input.visualInspiration.uploadDescription': 'एक ड्राइंग या फोटो अपलोड करें!',
   'input.visualInspiration.drawDescription': 'अपना चरित्र बनाएँ!',
