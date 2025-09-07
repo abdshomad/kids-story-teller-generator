@@ -3,7 +3,7 @@ import { StoryOptions } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, SAMPLE_PROMPTS } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
-import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, ChevronDown, PenSquare, Loader2 } from 'lucide-react';
+import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, ChevronDown, PenSquare, Loader2, RefreshCcw } from 'lucide-react';
 import FullscreenCanvas from './FullscreenCanvas';
 
 interface InputScreenProps {
@@ -38,6 +38,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   });
   const [visualInspirationPreview, setVisualInspirationPreview] = useState<string | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [samplePromptIndex, setSamplePromptIndex] = useState(-1);
 
   const { isListening, isTranscribing, transcript, startListening, stopListening, setTranscript, browserSupportsSpeechRecognition } = useSpeechToText(language);
 
@@ -82,9 +83,12 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     }
   };
 
-  const handleSamplePrompt = (promptKey: string) => {
+  const handleCycleSamplePrompt = useCallback(() => {
+    const newIndex = (samplePromptIndex + 1) % SAMPLE_PROMPTS.length;
+    setSamplePromptIndex(newIndex);
+    const promptKey = SAMPLE_PROMPTS[newIndex];
     handleInputChange('prompt', t(promptKey));
-  };
+  }, [samplePromptIndex, handleInputChange, t]);
 
   const handleMicClick = useCallback(() => {
     if (isListening) {
@@ -138,14 +142,18 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                 </button>
               )}
             </div>
-             <div className="mt-4 flex flex-col items-center">
-                <h3 className="text-sm font-bold text-slate-500 mb-2">{t('input.inspiration')}</h3>
-                <div className="flex flex-wrap gap-2 justify-center">
-                    {SAMPLE_PROMPTS.map(key => (
-                        <button type="button" key={key} onClick={() => handleSamplePrompt(key)} className="px-3 py-1 bg-sky-100/70 text-sky-800 text-sm rounded-full hover:bg-sky-200/80 transition-colors">
-                            {t(key)}
-                        </button>
-                    ))}
+            <div className="mt-4 flex flex-col items-center">
+                <div className="flex items-center gap-3">
+                    <h3 className="text-sm font-bold text-slate-500">{t('input.inspiration')}</h3>
+                    <button 
+                        type="button" 
+                        onClick={handleCycleSamplePrompt} 
+                        className="px-4 py-2 bg-sky-100/70 text-sky-800 text-sm font-semibold rounded-full hover:bg-sky-200/80 transition-all flex items-center gap-2 shadow-sm border border-sky-200"
+                        aria-label={t('input.cycleSamples')}
+                    >
+                        <RefreshCcw className="w-4 h-4" />
+                        <span>{t('input.cycleSamples')}</span>
+                    </button>
                 </div>
             </div>
           </section>
