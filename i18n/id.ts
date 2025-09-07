@@ -41,9 +41,17 @@ export const id = {
   'input.draw.color': 'Warna kuas',
   'input.draw.size': 'Ukuran kuas',
 
+  // Style Selection
+  'style.title': 'Pilih Gaya Ceritamu',
+  'style.subtitle': 'Ceritamu dimulai dengan satu percikan. Pilih sampul yang menginspirasimu, dan kami akan menghidupkan sisa ceritanya dengan gaya itu!',
+  'style.button': 'Buat Cerita Dengan Gaya Ini',
+
   // Loading Screen
+  'loading.main.drafting': 'Menyusun Ide Cerita',
+  'loading.sub.draftingIdeas': 'Mencari judul dan alur cerita...',
+  'loading.sub.sketchingCovers': 'Membuat sketsa beberapa pilihan sampul...',
   'loading.main.writing': 'Menulis Narasi',
-  'loading.sub.analyzing': 'Menganalisis ide ajaibmu...',
+  'loading.sub.analyzing': 'Menganalisis gaya pilihanmu...',
   'loading.sub.writingPages': 'Menulis halaman cerita...',
   'loading.main.illustrating': 'Membuat Ilustrasi',
   'loading.sub.designingCharacters': 'Merancang karakter...',
@@ -51,9 +59,8 @@ export const id = {
   'loading.main.finalizing': 'Menyelesaikan Buku Cerita',
   'loading.sub.assembling': 'Menyusun buku...',
   'loading.sub.finalTouches': 'Menambahkan sentuhan ajaib terakhir...',
-  'loading.illustratingPage': 'Melukis halaman {current} dari {total}...',
+  'loading.illustratingPage': 'Mengilustrasikan halaman {current} dari {total}...',
   'loading.finalTouchesPage': 'Memoles halaman {current} dari {total}...',
-
 
   // Story Viewer
   'story.readAloud': 'Bacakan',
@@ -69,6 +76,7 @@ export const id = {
 
   // Common
   'common.tryAgain': 'Coba Lagi',
+  'common.loading': 'Membuat...',
 
   // Options
   'age.3-5': '3-5 tahun',

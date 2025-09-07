@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryData } from '../types';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
@@ -18,6 +19,9 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory }) => {
 
   const totalPages = story.pages.length;
   const isTitlePage = currentPage === -1;
+  const currentContent = isTitlePage
+    ? { text: story.title, imageUrl: story.pages[0]?.imageUrl, audioUrl: story.pages[0]?.audioUrl }
+    : story.pages[currentPage];
 
   const goToNextPage = useCallback(() => {
     setCurrentPage(prev => (prev < totalPages - 1 ? prev + 1 : prev));
@@ -32,43 +36,51 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory }) => {
           cancel();
           setIsAutoPlay(false);
       } else {
-          setIsAutoPlay(true);
-          if (isTitlePage) {
-            goToNextPage();
+          // Can only start if TTS is supported and there is audio content
+          const canPlay = isSupported && story.pages.some(p => p.audioUrl);
+          if (canPlay) {
+              setIsAutoPlay(true);
+              if (isTitlePage) {
+                goToNextPage();
+              }
           }
       }
   };
 
   useEffect(() => {
     if (isAutoPlay && !isSpeaking && currentPage >= 0 && currentPage < totalPages) {
-      speak(story.pages[currentPage].text, () => {
-        if (currentPage < totalPages - 1) {
-          goToNextPage();
-        } else {
-          setIsAutoPlay(false); // End of story
-        }
-      });
+      const page = story.pages[currentPage];
+      if (page.audioUrl) {
+          speak(page.audioUrl, () => {
+            if (currentPage < totalPages - 1) {
+              goToNextPage();
+            } else {
+              setIsAutoPlay(false); // End of story
+            }
+          });
+      } else {
+          // If a page is missing audio, just skip to the next one
+          console.warn(`Missing audio for page ${currentPage + 1}, skipping.`);
+          if (currentPage < totalPages - 1) {
+              goToNextPage();
+          } else {
+              setIsAutoPlay(false);
+          }
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAutoPlay, currentPage, isSpeaking, speak, story, totalPages]);
   
   useEffect(() => {
-    // Stop speaking if user navigates manually while autoplay is on
-    return () => {
-        cancel();
-    }
+    return () => { cancel(); }
   }, [currentPage, cancel]);
-
-  const currentContent = isTitlePage
-    ? { text: story.title, imageUrl: story.pages[0]?.imageUrl }
-    : story.pages[currentPage];
 
   return (
     <div className="h-screen w-screen bg-slate-800 flex flex-col p-4 sm:p-6 lg:p-8">
       <div className="flex justify-between items-center mb-4 text-white flex-shrink-0">
         <h1 className="text-xl font-bold truncate">{story.title}</h1>
         <div className="flex items-center gap-4">
-          {isSupported && (
+          {isSupported && story.pages.some(p => p.audioUrl) && (
             <button onClick={handleReadAloud} title={t('story.readAloud')} className="p-2 rounded-full hover:bg-slate-700 transition-colors">
               {isSpeaking ? <Volume2 className="w-6 h-6 text-yellow-400" /> : <VolumeX className="w-6 h-6" />}
             </button>
@@ -94,7 +106,6 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory }) => {
                             </div>
                         );
                     }
-                    // Default case: imageUrl is undefined (still loading)
                     return (
                         <div className="flex flex-col items-center justify-center text-slate-500 gap-4">
                             <div className="w-16 h-16 border-4 border-slate-300 border-t-purple-400 rounded-full animate-spin"></div>
@@ -112,7 +123,6 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory }) => {
             </div>
         </div>
         
-        {/* Navigation Buttons */}
         <button onClick={goToPrevPage} disabled={isTitlePage} className="absolute left-0 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 p-3 bg-white/50 rounded-full text-slate-800 hover:bg-white disabled:opacity-0 disabled:cursor-not-allowed transition-all">
           <ArrowLeft className="w-8 h-8"/>
         </button>

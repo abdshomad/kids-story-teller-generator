@@ -1,10 +1,7 @@
 
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { ELEVENLABS_API_KEY } from '../env';
 
-const VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel - good for storytelling
-const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`;
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 // Polyfill for webkit browsers
 const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
@@ -16,17 +13,14 @@ export const useTextToSpeech = (language: string) => {
   const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
   useEffect(() => {
-    // Check if the browser supports Web Audio API
     if (AudioContext) {
       setIsSupported(true);
-      // Initialize AudioContext. It's best practice to create it once.
       audioContextRef.current = new AudioContext();
     } else {
       setIsSupported(false);
       console.warn('Web Audio API is not supported in this browser.');
     }
 
-    // Cleanup function to cancel speech and close audio context
     return () => {
       if (audioSourceRef.current) {
         audioSourceRef.current.stop();
@@ -39,24 +33,19 @@ export const useTextToSpeech = (language: string) => {
   
   const cancel = useCallback(() => {
     if (audioSourceRef.current) {
-      // Stop the sound. The onended event will fire, which handles cleanup.
-      audioSourceRef.current.onended = null; // Prevent onEnd from firing on manual cancel
+      audioSourceRef.current.onended = null; 
       audioSourceRef.current.stop();
       audioSourceRef.current = null;
     }
     setIsSpeaking(false);
   }, []);
 
-  const speak = useCallback(async (text: string, onEnd: () => void) => {
-    if (!ELEVENLABS_API_KEY) {
-      console.error("ELEVENLABS_API_KEY not found. Text-to-speech will fail.");
-      onEnd();
-      return;
+  const speak = useCallback(async (audioUrl: string, onEnd: () => void) => {
+    if (!isSupported || isSpeaking || !audioContextRef.current) {
+        onEnd();
+        return;
     }
-
-    if (!isSupported || isSpeaking || !audioContextRef.current) return;
     
-    // Resume AudioContext if it's suspended (browser autoplay policies)
     if (audioContextRef.current.state === 'suspended') {
       await audioContextRef.current.resume();
     }
@@ -64,31 +53,14 @@ export const useTextToSpeech = (language: string) => {
     setIsSpeaking(true);
 
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'xi-api-key': ELEVENLABS_API_KEY,
-        },
-        body: JSON.stringify({
-          text: text,
-          model_id: 'eleven_multilingual_v2', // Good for both English and Indonesian
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-          },
-        }),
-      });
-
+      const response = await fetch(audioUrl);
       if (!response.ok) {
-        const errorBody = await response.json();
-        throw new Error(`ElevenLabs API error: ${response.status} - ${JSON.stringify(errorBody)}`);
+        throw new Error(`Failed to fetch audio from URL: ${response.statusText}`);
       }
       
       const audioData = await response.arrayBuffer();
       const audioBuffer = await audioContextRef.current.decodeAudioData(audioData);
 
-      // If a sound is already playing, stop it before starting the new one.
       if (audioSourceRef.current) {
         audioSourceRef.current.stop();
       }
@@ -107,9 +79,8 @@ export const useTextToSpeech = (language: string) => {
       audioSourceRef.current = source;
 
     } catch (error) {
-      console.error('Text-to-speech error:', error);
+      console.error('Audio playback error:', error);
       setIsSpeaking(false);
-      // call onEnd to allow the app to proceed even if TTS fails for one page
       onEnd();
     }
   }, [isSupported, isSpeaking, language]);

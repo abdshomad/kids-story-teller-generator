@@ -21,6 +21,7 @@ export interface StoryPage {
   text: string;
   imagePrompt: string;
   imageUrl?: string | 'GENERATION_FAILED';
+  audioUrl?: string;
 }
 
 export interface StoryData {
@@ -28,24 +29,35 @@ export interface StoryData {
   pages: StoryPage[];
 }
 
+export interface StoryOutline {
+  title: string;
+  synopsis: string;
+  coverImageOptions: {
+    prompt: string;
+    imageUrl: string | 'GENERATION_FAILED';
+  }[];
+  originalOptions: StoryOptions;
+}
+
 export enum AppStatus {
   WELCOME = 'welcome',
   INPUT = 'input',
   LOADING = 'loading',
+  STYLE_SELECTION = 'style_selection',
   STORY = 'story',
   ERROR = 'error'
 }
 
 export enum LoadingStage {
-  // Writing
+  // --- Phase 1: Outline ---
+  DRAFTING_IDEAS = 'drafting_ideas',
+  SKETCHING_COVERS = 'sketching_covers',
+
+  // --- Phase 2: Full Story ---
   ANALYZING_PROMPT = 'analyzing_prompt',
   WRITING_PAGES = 'writing_pages',
-  
-  // Illustrating
   DESIGNING_CHARACTERS = 'designing_characters',
   PAINTING_SCENES = 'painting_scenes',
-
-  // Finalizing
   ASSEMBLING_BOOK = 'assembling_book',
   FINAL_TOUCHES = 'final_touches',
 }
@@ -53,6 +65,7 @@ export enum LoadingStage {
 export type AppState =
   | { status: AppStatus.WELCOME }
   | { status: AppStatus.INPUT }
-  | { status: AppStatus.LOADING, stage: LoadingStage, progress?: { current: number, total: number }, storyData?: StoryData }
+  | { status: AppStatus.LOADING, stage: LoadingStage, phase: 'outline' | 'full', progress?: { current: number, total: number }, storyData?: StoryData }
+  | { status: AppStatus.STYLE_SELECTION, outlineData: StoryOutline }
   | { status: AppStatus.STORY, storyData: StoryData }
   | { status: AppStatus.ERROR, message: string };

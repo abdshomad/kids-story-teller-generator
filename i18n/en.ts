@@ -41,9 +41,17 @@ export const en = {
   'input.draw.color': 'Brush color',
   'input.draw.size': 'Brush size',
 
+  // Style Selection
+  'style.title': "Choose Your Story's Style",
+  'style.subtitle': 'Your story begins with a single spark. Select a cover that inspires you, and we\'ll bring the rest of the tale to life in that style!',
+  'style.button': 'Create Story With This Style',
+
   // Loading Screen
+  'loading.main.drafting': 'Drafting Story Ideas',
+  'loading.sub.draftingIdeas': 'Brainstorming a title and plot...',
+  'loading.sub.sketchingCovers': 'Sketching some cover options...',
   'loading.main.writing': 'Writing the Narrative',
-  'loading.sub.analyzing': 'Analyzing your magical idea...',
+  'loading.sub.analyzing': 'Analyzing your chosen style...',
   'loading.sub.writingPages': 'Writing the story pages...',
   'loading.main.illustrating': 'Creating Illustrations',
   'loading.sub.designingCharacters': 'Designing the characters...',
@@ -51,7 +59,7 @@ export const en = {
   'loading.main.finalizing': 'Finalizing the Storybook',
   'loading.sub.assembling': 'Assembling the book...',
   'loading.sub.finalTouches': 'Adding the final magic touches...',
-  'loading.illustratingPage': 'Painting page {current} of {total}...',
+  'loading.illustratingPage': 'Illustrating page {current} of {total}...',
   'loading.finalTouchesPage': 'Polishing page {current} of {total}...',
 
   // Story Viewer
@@ -68,6 +76,7 @@ export const en = {
 
   // Common
   'common.tryAgain': 'Try Again',
+  'common.loading': 'Creating...',
 
   // Options
   'age.3-5': '3-5 years',

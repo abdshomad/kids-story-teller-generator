@@ -1,12 +1,14 @@
 
 
+
 import React, { useState, useCallback, useMemo, createContext, useContext } from 'react';
 import WelcomeModal from './components/WelcomeModal';
 import InputScreen from './components/InputScreen';
 import LoadingScreen from './components/LoadingScreen';
 import StoryViewer from './components/StoryViewer';
-import { StoryData, StoryOptions, Language, AppState, AppStatus, LoadingStage } from './types';
-import { generateStoryAndImages } from './services/geminiService';
+import StyleSelectionScreen from './components/StyleSelectionScreen';
+import { StoryData, StoryOptions, Language, AppState, AppStatus, LoadingStage, StoryOutline } from './types';
+import { generateStoryOutline, generateFullStoryFromSelection } from './services/geminiService';
 import { locales } from './i18n/locales';
 
 interface AppContextType {
@@ -44,31 +46,52 @@ const App: React.FC = () => {
   }), [language, t]);
 
   const handleStoryCreate = async (options: StoryOptions) => {
-    setAppState({ status: AppStatus.LOADING, stage: LoadingStage.ANALYZING_PROMPT, storyData: undefined });
+    setAppState({ status: AppStatus.LOADING, phase: 'outline', stage: LoadingStage.DRAFTING_IDEAS });
     try {
-      const finalStoryData = await generateStoryAndImages(
+      const outlineData = await generateStoryOutline(
         options,
-        t,
         (update) => {
            setAppState(currentState => {
-            if (currentState.status !== AppStatus.LOADING) return currentState;
-            // Create a new state object for the update
-            const newState: AppState = {
-                status: AppStatus.LOADING,
-                stage: update.stage,
-                progress: update.progress,
-                // Use new storyData if provided, otherwise persist the existing one
-                storyData: update.storyData || currentState.storyData,
-            };
-            return newState;
+            if (currentState.status !== AppStatus.LOADING || currentState.phase !== 'outline') return currentState;
+            return { ...currentState, stage: update.stage };
         });
         }
       );
-       setAppState({ status: AppStatus.STORY, storyData: finalStoryData });
+       setAppState({ status: AppStatus.STYLE_SELECTION, outlineData });
     } catch (error) {
-      console.error("Failed to generate story:", error);
+      console.error("Failed to generate story outline:", error);
       const errorMessage = error instanceof Error ? error.message : t('error.generic');
       setAppState({ status: AppStatus.ERROR, message: errorMessage });
+    }
+  };
+
+  const handleStyleSelect = async (outlineData: StoryOutline, selectedCoverPrompt: string) => {
+    setAppState({ status: AppStatus.LOADING, phase: 'full', stage: LoadingStage.ANALYZING_PROMPT });
+    try {
+        const finalStoryData = await generateFullStoryFromSelection(
+            outlineData.originalOptions,
+            selectedCoverPrompt,
+            outlineData.synopsis,
+            t,
+            (update) => {
+                setAppState(currentState => {
+                    if (currentState.status !== AppStatus.LOADING || currentState.phase !== 'full') return currentState;
+                    const newState: AppState = {
+                        status: AppStatus.LOADING,
+                        phase: 'full',
+                        stage: update.stage,
+                        progress: update.progress,
+                        storyData: update.storyData || currentState.storyData,
+                    };
+                    return newState;
+                });
+            }
+        );
+        setAppState({ status: AppStatus.STORY, storyData: finalStoryData });
+    } catch (error) {
+        console.error("Failed to generate full story:", error);
+        const errorMessage = error instanceof Error ? error.message : t('error.generic');
+        setAppState({ status: AppStatus.ERROR, message: errorMessage });
     }
   };
 
@@ -87,7 +110,9 @@ const App: React.FC = () => {
       case AppStatus.INPUT:
         return <InputScreen onCreateStory={handleStoryCreate} />;
       case AppStatus.LOADING:
-        return <LoadingScreen stage={appState.stage} progress={appState.progress} storyData={appState.storyData} />;
+        return <LoadingScreen phase={appState.phase} stage={appState.stage} progress={appState.progress} storyData={appState.storyData} />;
+      case AppStatus.STYLE_SELECTION:
+        return <StyleSelectionScreen outlineData={appState.outlineData} onStyleSelect={handleStyleSelect} />;
       case AppStatus.STORY:
         return <StoryViewer story={appState.storyData} onNewStory={handleNewStory} />;
       case AppStatus.ERROR:
