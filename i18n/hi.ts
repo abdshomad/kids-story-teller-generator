@@ -48,6 +48,7 @@ export const hi = {
   'style.button': 'इस शैली के साथ कहानी बनाएँ',
 
   // Loading Screen
+  'loading.main.title': 'जादू हो रहा है...',
   'loading.main.drafting': 'कहानी के विचारों का मसौदा तैयार करना',
   'loading.sub.draftingIdeas': 'एक शीर्षक और कथानक पर विचार-मंथन...',
   'loading.sub.sketchingCovers': 'कुछ कवर विकल्पों का स्केचिंग...',

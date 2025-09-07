@@ -1,8 +1,3 @@
-
-
-
-
-
 import React from 'react';
 import { LoadingStage, StoryData, StoryPage } from '../types';
 import { useAppContext } from '../App';
@@ -102,77 +97,87 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ stage, phase, progress, s
   
   const allSubsteps = steps.flatMap(s => s.substeps.map(sub => sub.id));
   const currentSubstepIndex = allSubsteps.indexOf(stage);
+  
+  const showImagePanel = phase === 'full' && storyData?.pages && storyData.pages.length > 0;
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-200 flex flex-col items-center p-4 z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-200 flex flex-col p-4 sm:p-8 z-50 overflow-hidden">
         <style>{`
           @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
           .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
         `}</style>
         
-        <div className="w-full max-w-2xl mx-auto my-8 flex-shrink-0">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-800 text-center mb-10 animate-pulse">The magic is happening...</h2>
-            <div className="space-y-8">
-                {steps.map((mainStep) => {
-                    const mainStepSubstepIds = mainStep.substeps.map(s => s.id);
-                    const firstSubstepIndexForMain = allSubsteps.indexOf(mainStepSubstepIds[0]);
-                    const lastSubstepIndexForMain = allSubsteps.indexOf(mainStepSubstepIds[mainStepSubstepIds.length - 1]);
-                    
-                    const isMainStepActive = currentSubstepIndex >= firstSubstepIndexForMain && currentSubstepIndex <= lastSubstepIndexForMain;
-                    const isMainStepCompleted = currentSubstepIndex > lastSubstepIndexForMain;
-                    
-                    let mainStepTextColor = isMainStepActive ? 'text-purple-600' : isMainStepCompleted ? 'text-green-600' : 'text-slate-500';
-                    
-                    return (
-                        <div key={mainStep.id}>
-                            <div className={`flex items-center gap-4 mb-3 transition-all duration-500 ${mainStepTextColor}`}>
-                                {isMainStepCompleted ? <CheckCircle2 className="w-7 h-7" /> : (isMainStepActive ? <Loader2 className="w-7 h-7 animate-spin" /> : React.cloneElement(mainStep.icon, { className: 'w-7 h-7' }))}
-                                <h3 className="text-2xl font-bold">{mainStep.title}</h3>
-                            </div>
-                            <div className="ps-11 space-y-2 border-s-2 border-slate-300/80 ms-3">
-                                {mainStep.substeps.map((substep) => {
-                                    const globalSubstepIndex = allSubsteps.indexOf(substep.id);
-                                    let status: 'completed' | 'in_progress' | 'pending' = (globalSubstepIndex < currentSubstepIndex) ? 'completed' : (globalSubstepIndex === currentSubstepIndex) ? 'in_progress' : 'pending';
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-800 text-center mb-6 flex-shrink-0 animate-pulse">{t('loading.main.title')}</h2>
 
-                                    let progressText: string | undefined;
-                                    if (status === 'in_progress' && progress) {
-                                        if (substep.id === LoadingStage.PAINTING_SCENES) progressText = t('loading.illustratingPage', { current: progress.current, total: progress.total });
-                                        else if (substep.id === LoadingStage.FINAL_TOUCHES) progressText = t('loading.finalTouchesPage', { current: progress.current, total: progress.total });
-                                    }
-                                    
-                                    const isVisible = globalSubstepIndex <= currentSubstepIndex;
-                                    
-                                    return (
-                                        <div key={substep.id} className={`transition-all duration-500 ${isVisible ? 'opacity-100 max-h-20' : 'opacity-0 max-h-0 overflow-hidden'}`}>
-                                            <SubStep title={substep.title} status={status} progressText={progressText} />
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-             <div className="mt-12 text-center">
-                <button 
-                    onClick={onStop}
-                    className="px-6 py-3 bg-red-500/80 text-white font-bold rounded-full shadow-lg hover:bg-red-600 transition-colors flex items-center gap-2 mx-auto"
-                >
-                    <XCircle className="w-5 h-5" />
-                    Stop
-                </button>
-            </div>
-        </div>
+        <div className="flex-grow flex flex-col lg:flex-row gap-8 overflow-hidden">
+        
+            {/* Left Side: Steps */}
+            <div className={`w-full flex-shrink-0 flex flex-col transition-all duration-500 ${showImagePanel ? 'lg:w-2/5 xl:w-1/3' : 'lg:w-full lg:max-w-2xl mx-auto'}`}>
+                <div className="bg-white/40 backdrop-blur-md rounded-2xl p-6 overflow-y-auto flex-grow">
+                    <div className="space-y-8">
+                        {steps.map((mainStep) => {
+                            const mainStepSubstepIds = mainStep.substeps.map(s => s.id);
+                            const firstSubstepIndexForMain = allSubsteps.indexOf(mainStepSubstepIds[0]);
+                            const lastSubstepIndexForMain = allSubsteps.indexOf(mainStepSubstepIds[mainStepSubstepIds.length - 1]);
+                            
+                            const isMainStepActive = currentSubstepIndex >= firstSubstepIndexForMain && currentSubstepIndex <= lastSubstepIndexForMain;
+                            const isMainStepCompleted = currentSubstepIndex > lastSubstepIndexForMain;
+                            
+                            let mainStepTextColor = isMainStepActive ? 'text-purple-600' : isMainStepCompleted ? 'text-green-600' : 'text-slate-500';
+                            
+                            return (
+                                <div key={mainStep.id}>
+                                    <div className={`flex items-center gap-4 mb-3 transition-all duration-500 ${mainStepTextColor}`}>
+                                        {isMainStepCompleted ? <CheckCircle2 className="w-7 h-7" /> : (isMainStepActive ? <Loader2 className="w-7 h-7 animate-spin" /> : React.cloneElement(mainStep.icon, { className: 'w-7 h-7' }))}
+                                        <h3 className="text-2xl font-bold">{mainStep.title}</h3>
+                                    </div>
+                                    <div className="ps-11 space-y-2 border-s-2 border-slate-300/80 ms-3">
+                                        {mainStep.substeps.map((substep) => {
+                                            const globalSubstepIndex = allSubsteps.indexOf(substep.id);
+                                            let status: 'completed' | 'in_progress' | 'pending' = (globalSubstepIndex < currentSubstepIndex) ? 'completed' : (globalSubstepIndex === currentSubstepIndex) ? 'in_progress' : 'pending';
 
-        {phase === 'full' && storyData?.pages && (
-            <div className="w-full flex-grow py-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    {storyData.pages.map((page, index) => (
-                        <PageThumbnail key={index} page={page} pageNumber={index + 1} />
-                    ))}
+                                            let progressText: string | undefined;
+                                            if (status === 'in_progress' && progress) {
+                                                if (substep.id === LoadingStage.PAINTING_SCENES) progressText = t('loading.illustratingPage', { current: progress.current, total: progress.total });
+                                                else if (substep.id === LoadingStage.FINAL_TOUCHES) progressText = t('loading.finalTouchesPage', { current: progress.current, total: progress.total });
+                                            }
+                                            
+                                            const isVisible = globalSubstepIndex <= currentSubstepIndex;
+                                            
+                                            return (
+                                                <div key={substep.id} className={`transition-all duration-500 ${isVisible ? 'opacity-100 max-h-20' : 'opacity-0 max-h-0 overflow-hidden'}`}>
+                                                    <SubStep title={substep.title} status={status} progressText={progressText} />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+                <div className="mt-6 text-center flex-shrink-0">
+                    <button 
+                        onClick={onStop}
+                        className="px-6 py-3 bg-red-500/80 text-white font-bold rounded-full shadow-lg hover:bg-red-600 transition-colors flex items-center gap-2 mx-auto"
+                    >
+                        <XCircle className="w-5 h-5" />
+                        Stop
+                    </button>
                 </div>
             </div>
-        )}
+
+            {/* Right Side: Images */}
+            {showImagePanel && (
+                <div className="flex-grow overflow-y-auto p-2">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {storyData.pages.map((page, index) => (
+                            <PageThumbnail key={index} page={page} pageNumber={index + 1} />
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
     </div>
   );
 };

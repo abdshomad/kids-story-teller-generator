@@ -48,6 +48,7 @@ export const jv = {
   'style.button': 'Gawe Crita Kanthi Gaya Iki',
 
   // Loading Screen
+  'loading.main.title': 'Keajaiban lagi kelakon...',
   'loading.main.drafting': 'Ngrancang Ide Crita',
   'loading.sub.draftingIdeas': 'Mikir judhul lan alur crita...',
   'loading.sub.sketchingCovers': 'Nggambar sawetara pilihan sampul...',

@@ -48,6 +48,7 @@ export const tr = {
   'style.button': 'Bu Stille Hikaye Yarat',
 
   // Loading Screen
+  'loading.main.title': 'Sihir gerçekleşiyor...',
   'loading.main.drafting': 'Hikaye Fikirlerini Taslak Haline Getirme',
   'loading.sub.draftingIdeas': 'Bir başlık ve konu üzerinde beyin fırtınası...',
   'loading.sub.sketchingCovers': 'Bazı kapak seçeneklerini çizme...',

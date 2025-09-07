@@ -48,6 +48,7 @@ export const fr = {
   'style.button': 'Créer une histoire avec ce style',
 
   // Loading Screen
+  'loading.main.title': 'La magie opère...',
   'loading.main.drafting': 'Rédaction des idées d\'histoire',
   'loading.sub.draftingIdeas': 'Recherche d\'un titre et d\'une intrigue...',
   'loading.sub.sketchingCovers': 'Esquisse de quelques options de couverture...',

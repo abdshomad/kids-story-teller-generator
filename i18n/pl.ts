@@ -48,6 +48,7 @@ export const pl = {
   'style.button': 'Stwórz historię w tym stylu',
 
   // Loading Screen
+  'loading.main.title': 'Magia się dzieje...',
   'loading.main.drafting': 'Szkicowanie pomysłów na historię',
   'loading.sub.draftingIdeas': 'Burza mózgów nad tytułem i fabułą...',
   'loading.sub.sketchingCovers': 'Szkicowanie kilku opcji okładek...',

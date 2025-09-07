@@ -5,7 +5,7 @@ import { StoryOptions } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, LANGUAGES } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
-import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, PenSquare, Loader2, Globe, Search, ChevronDown } from 'lucide-react';
+import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, PenSquare, Loader2, ChevronDown } from 'lucide-react';
 import FullscreenCanvas from './FullscreenCanvas';
 import { extractCharacterDetails, generateSamplePrompts } from '../services/geminiService';
 
@@ -55,10 +55,6 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   const [activeSampleIndex, setActiveSampleIndex] = useState(0);
   const [placeholder, setPlaceholder] = useState('');
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
   
   const [characterFieldsEditedByUser, setCharacterFieldsEditedByUser] = useState(false);
@@ -76,26 +72,6 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
         return newSet;
     });
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-        setSearchQuery('');
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const primaryLanguages = LANGUAGES.filter(l => l.primary);
-  const secondaryLanguages = LANGUAGES.filter(l => !l.primary)
-    .filter(lang => lang.label.toLowerCase().includes(searchQuery.toLowerCase()));
-  const currentLanguageDetails = LANGUAGES.find(l => l.code === language);
-  const isSecondaryLanguageSelected = currentLanguageDetails && !currentLanguageDetails.primary;
-
 
   const { isListening, isTranscribing, transcript, startListening, stopListening, setTranscript, browserSupportsSpeechRecognition, error, clearError } = useSpeechToText(language);
 
@@ -252,66 +228,22 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
         }
       `}</style>
       <main className="bg-white/70 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl max-w-6xl w-full p-8 sm:p-12">
-        <header className="flex flex-col sm:flex-row justify-between items-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-800 flex items-center gap-3 mb-4 sm:mb-0">
-            <Sparkles className="w-8 h-8 text-fuchsia-500" />
-            {t('input.title')}
-          </h1>
+        <header className="flex flex-col items-center gap-6 mb-8">
           <div className="flex items-center gap-1 bg-gray-200/50 rounded-full p-1 shadow-inner">
-            {primaryLanguages.map(lang => (
+            {LANGUAGES.map(lang => (
               <button
                 key={lang.code}
-                onClick={() => { setLanguage(lang.code); setIsDropdownOpen(false); setSearchQuery(''); }}
+                onClick={() => setLanguage(lang.code)}
                 className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${language === lang.code ? 'bg-white shadow-md text-slate-800' : 'text-slate-500 hover:bg-white/60'}`}
               >
                 {lang.label}
               </button>
             ))}
-             <div className="relative" ref={dropdownRef}>
-                <button
-                    onClick={() => setIsDropdownOpen(prev => {
-                        if (prev) setSearchQuery('');
-                        return !prev;
-                    })}
-                    className={`w-10 h-8 flex items-center justify-center rounded-full transition-colors ${isSecondaryLanguageSelected ? 'bg-white shadow-md' : 'text-slate-500 hover:bg-white/60'}`}
-                    aria-haspopup="true"
-                    aria-expanded={isDropdownOpen}
-                >
-                    {isSecondaryLanguageSelected && currentLanguageDetails ? (
-                      <span className="text-lg">{currentLanguageDetails.flag}</span>
-                    ) : (
-                      <Globe className="w-5 h-5" />
-                    )}
-                </button>
-                {isDropdownOpen && (
-                    <div className="absolute top-full mt-2 end-0 bg-white rounded-xl shadow-lg border border-slate-200/80 z-20 w-52">
-                        <div className="p-2 relative">
-                            <Search className="w-4 h-4 text-slate-400 absolute top-1/2 left-5 -translate-y-1/2" />
-                            <input
-                                type="text"
-                                placeholder={t('common.search')}
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full ps-9 p-2 text-sm border border-slate-300 rounded-md focus:ring-2 focus:ring-fuchsia-300 focus:border-fuchsia-300"
-                                autoFocus
-                            />
-                        </div>
-                        <div className="max-h-48 overflow-y-auto p-2 pt-0">
-                            {secondaryLanguages.map(lang => (
-                                <button
-                                    key={lang.code}
-                                    onClick={() => { setLanguage(lang.code); setIsDropdownOpen(false); setSearchQuery(''); }}
-                                    className={`w-full flex items-center gap-3 text-start p-2 rounded-lg text-sm transition-colors ${language === lang.code ? 'bg-slate-100 font-bold text-slate-800' : 'text-slate-600 hover:bg-slate-50'}`}
-                                >
-                                    <span className="text-lg">{lang.flag}</span>
-                                    <span>{lang.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
           </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-800 flex items-center gap-3">
+            <Sparkles className="w-8 h-8 text-fuchsia-500" />
+            {t('input.title')}
+          </h1>
         </header>
 
         <form onSubmit={handleSubmit} className="space-y-8">

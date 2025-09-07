@@ -48,6 +48,7 @@ export const ar = {
   'style.button': 'أنشئ القصة بهذا الأسلوب',
 
   // Loading Screen
+  'loading.main.title': 'السحر يحدث...',
   'loading.main.drafting': 'صياغة أفكار القصة',
   'loading.sub.draftingIdeas': 'التفكير في عنوان ومؤامرة...',
   'loading.sub.sketchingCovers': 'رسم بعض خيارات الغلاف...',

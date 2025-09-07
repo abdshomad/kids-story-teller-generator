@@ -48,6 +48,7 @@ export const es = {
   'style.button': 'Crear historia con este estilo',
 
   // Loading Screen
+  'loading.main.title': 'La magia está sucediendo...',
   'loading.main.drafting': 'Borrador de ideas para la historia',
   'loading.sub.draftingIdeas': 'Buscando un título y una trama...',
   'loading.sub.sketchingCovers': 'Bocetando algunas opciones de portada...',

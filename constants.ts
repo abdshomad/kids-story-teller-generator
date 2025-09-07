@@ -2,25 +2,13 @@
 import { Heart, Shield, HandHeart, Compass, Paintbrush, Pencil, Grid, Castle, Box, Drama, PenLine } from 'lucide-react';
 import { Language } from './types';
 
-export const LANGUAGES: { code: Language; label: string; flag: string; primary: boolean; }[] = [
-  { code: 'en', label: 'EN', flag: '🇺🇸', primary: true },
-  { code: 'id', label: 'ID', flag: '🇮🇩', primary: true },
-  { code: 'jv', label: 'Javanese', flag: '🇮🇩', primary: false },
-  { code: 'su', label: 'Sundanese', flag: '🇮🇩', primary: false },
-  { code: 'ar', label: 'Arabic', flag: '🇸🇦', primary: false },
-  { code: 'hi', label: 'Hindi', flag: '🇮🇳', primary: false },
-  { code: 'es', label: 'Español', flag: '🇪🇸', primary: false },
-  { code: 'fr', label: 'Français', flag: '🇫🇷', primary: false },
-  { code: 'de', label: 'Deutsch', flag: '🇩🇪', primary: false },
-  { code: 'zh', label: '中文', flag: '🇨🇳', primary: false },
-  { code: 'ja', label: '日本語', flag: '🇯🇵', primary: false },
-  { code: 'pt', label: 'Português', flag: '🇧🇷', primary: false },
-  { code: 'ru', label: 'Русский', flag: '🇷🇺', primary: false },
-  { code: 'it', label: 'Italiano', flag: '🇮🇹', primary: false },
-  { code: 'ko', label: '한국어', flag: '🇰🇷', primary: false },
-  { code: 'tr', label: 'Türkçe', flag: '🇹🇷', primary: false },
-  { code: 'nl', label: 'Nederlands', flag: '🇳🇱', primary: false },
-  { code: 'pl', label: 'Polski', flag: '🇵🇱', primary: false },
+// FIX: Added all supported languages to the LANGUAGES constant to make them selectable in the UI.
+export const LANGUAGES: { code: Language; label: string; flag: string; }[] = [
+  { code: 'ar', label: 'AR', flag: '🇸🇦' },
+  { code: 'en', label: 'EN', flag: '🇺🇸' },
+  { code: 'hi', label: 'HI', flag: '🇮🇳' },
+  { code: 'id', label: 'ID', flag: '🇮🇩' },
+  { code: 'zh', label: 'ZH', flag: '🇨🇳' },
 ];
 
 export const AGE_GROUPS = [

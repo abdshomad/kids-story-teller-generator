@@ -48,6 +48,7 @@ export const ko = {
   'style.button': '이 스타일로 이야기 만들기',
 
   // Loading Screen
+  'loading.main.title': '마법이 일어나고 있어요...',
   'loading.main.drafting': '이야기 아이디어 구상 중',
   'loading.sub.draftingIdeas': '제목과 줄거리 구상 중...',
   'loading.sub.sketchingCovers': '표지 옵션 스케치 중...',

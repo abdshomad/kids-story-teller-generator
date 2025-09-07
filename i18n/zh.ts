@@ -48,6 +48,7 @@ export const zh = {
   'style.button': '用这种风格创作故事',
 
   // Loading Screen
+  'loading.main.title': '魔法正在发生...',
   'loading.main.drafting': '构思故事创意',
   'loading.sub.draftingIdeas': '构思标题和情节...',
   'loading.sub.sketchingCovers': '草拟一些封面选项...',

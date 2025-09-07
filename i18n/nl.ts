@@ -48,6 +48,7 @@ export const nl = {
   'style.button': 'Verhaal maken met deze stijl',
 
   // Loading Screen
+  'loading.main.title': 'De magie gebeurt...',
   'loading.main.drafting': 'Verhaalideeën opstellen',
   'loading.sub.draftingIdeas': 'Brainstormen over een titel en plot...',
   'loading.sub.sketchingCovers': 'Schetsen van enkele omslagopties...',

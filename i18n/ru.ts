@@ -48,6 +48,7 @@ export const ru = {
   'style.button': 'Создать историю в этом стиле',
 
   // Loading Screen
+  'loading.main.title': 'Волшебство происходит...',
   'loading.main.drafting': 'Разработка идей для истории',
   'loading.sub.draftingIdeas': 'Мозговой штурм над названием и сюжетом...',
   'loading.sub.sketchingCovers': 'Наброски нескольких вариантов обложек...',

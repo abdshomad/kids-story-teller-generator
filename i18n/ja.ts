@@ -48,6 +48,7 @@ export const ja = {
   'style.button': 'このスタイルで物語を作成',
 
   // Loading Screen
+  'loading.main.title': '魔法が起きています...',
   'loading.main.drafting': '物語のアイデアを下書き中',
   'loading.sub.draftingIdeas': 'タイトルとプロットをブレインストーミング中...',
   'loading.sub.sketchingCovers': 'いくつかの表紙オプションをスケッチ中...',

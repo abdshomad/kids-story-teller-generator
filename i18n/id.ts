@@ -47,6 +47,7 @@ export const id = {
   'style.button': 'Buat Cerita Dengan Gaya Ini',
 
   // Loading Screen
+  'loading.main.title': 'Keajaiban sedang terjadi...',
   'loading.main.drafting': 'Menyusun Ide Cerita',
   'loading.sub.draftingIdeas': 'Mencari judul dan alur cerita...',
   'loading.sub.sketchingCovers': 'Membuat sketsa beberapa pilihan sampul...',

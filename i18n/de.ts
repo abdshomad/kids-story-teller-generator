@@ -48,6 +48,7 @@ export const de = {
   'style.button': 'Geschichte mit diesem Stil erstellen',
 
   // Loading Screen
+  'loading.main.title': 'Die Magie geschieht...',
   'loading.main.drafting': 'Geschichtenideen entwerfen',
   'loading.sub.draftingIdeas': 'Brainstorming eines Titels und einer Handlung...',
   'loading.sub.sketchingCovers': 'Skizzieren einiger Cover-Optionen...',

@@ -120,20 +120,7 @@ const getLanguageName = (lang: Language): string => {
         case 'id': return 'Indonesian';
         case 'ar': return 'Arabic';
         case 'hi': return 'Hindi';
-        case 'es': return 'Spanish';
-        case 'fr': return 'French';
-        case 'de': return 'German';
-        case 'ja': return 'Japanese';
         case 'zh': return 'Chinese';
-        case 'jv': return 'Javanese';
-        case 'su': return 'Sundanese';
-        case 'pt': return 'Portuguese';
-        case 'ru': return 'Russian';
-        case 'it': return 'Italian';
-        case 'ko': return 'Korean';
-        case 'tr': return 'Turkish';
-        case 'nl': return 'Dutch';
-        case 'pl': return 'Polish';
         default: return 'English';
     }
 };
@@ -301,12 +288,17 @@ const generateAudio = async (text: string): Promise<string | undefined> => {
         return undefined;
     }
     try {
+        const textToSpeak = text;
+        if (!textToSpeak || !textToSpeak.trim()) {
+            return undefined;
+        }
+
         const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM`; // Rachel
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_API_KEY },
             body: JSON.stringify({
-                text,
+                text: textToSpeak,
                 model_id: 'eleven_multilingual_v2',
                 voice_settings: { stability: 0.5, similarity_boost: 0.75 },
             }),

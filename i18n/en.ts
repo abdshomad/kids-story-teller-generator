@@ -47,6 +47,7 @@ export const en = {
   'style.button': 'Create Story With This Style',
 
   // Loading Screen
+  'loading.main.title': 'The magic is happening...',
   'loading.main.drafting': 'Drafting Story Ideas',
   'loading.sub.draftingIdeas': 'Brainstorming a title and plot...',
   'loading.sub.sketchingCovers': 'Sketching some cover options...',

@@ -48,6 +48,7 @@ export const su = {
   'style.button': 'Jieun Carita Kalayan Gaya Ieu',
 
   // Loading Screen
+  'loading.main.title': 'Kaajaiban nuju kajantenan...',
   'loading.main.drafting': 'Ngararancang Ide Carita',
   'loading.sub.draftingIdeas': 'Mikiran judul sareng alur carita...',
   'loading.sub.sketchingCovers': 'Ngagambar sababaraha pilihan sampul...',

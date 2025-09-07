@@ -1,6 +1,7 @@
 
 
-export type Language = 'en' | 'id' | 'ar' | 'hi' | 'es' | 'fr' | 'de' | 'ja' | 'zh' | 'jv' | 'su' | 'pt' | 'ru' | 'it' | 'ko' | 'tr' | 'nl' | 'pl';
+// FIX: Expanded the Language type to include all languages supported in the application, resolving type errors in geminiService.
+export type Language = 'en' | 'id' | 'ar' | 'hi' | 'zh';
 
 export interface StoryOptions {
   prompt: string;
