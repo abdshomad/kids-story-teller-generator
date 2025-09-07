@@ -1,4 +1,5 @@
 
+
 export const en = {
   // Welcome
   'welcome.title': 'A Magical Welcome to Story Time!',
@@ -35,11 +36,21 @@ export const en = {
   'input.draw.done': 'Done',
   'input.draw.clear': 'Clear',
   'input.draw.close': 'Close',
+  'input.draw.brush': 'Brush',
+  'input.draw.eraser': 'Eraser',
+  'input.draw.color': 'Brush color',
+  'input.draw.size': 'Brush size',
 
   // Loading Screen
-  'loading.steps.writing': 'Writing the Narrative',
-  'loading.steps.illustrating': 'Creating Illustrations',
-  'loading.steps.finishing': 'Finalizing the Storybook',
+  'loading.main.writing': 'Writing the Narrative',
+  'loading.sub.analyzing': 'Analyzing your magical idea...',
+  'loading.sub.writingPages': 'Writing the story pages...',
+  'loading.main.illustrating': 'Creating Illustrations',
+  'loading.sub.designingCharacters': 'Designing the characters...',
+  'loading.sub.paintingScenes': 'Painting the scenes...',
+  'loading.main.finalizing': 'Finalizing the Storybook',
+  'loading.sub.assembling': 'Assembling the book...',
+  'loading.sub.sparkles': 'Adding the final magic sparkles!',
   'loading.illustratingPage': 'Painting page {current} of {total}...',
 
   // Story Viewer
@@ -51,6 +62,8 @@ export const en = {
   // Error
   'error.title': 'Oh no, a hiccup in the magic!',
   'error.generic': 'Something went wrong while creating the story. Please try again.',
+  'error.micDenied': 'Microphone permission was denied. Please allow it in your browser settings to use voice input.',
+  'error.micGeneric': 'Could not access the microphone. Please check your hardware and permissions.',
 
   // Common
   'common.tryAgain': 'Try Again',
@@ -71,8 +84,8 @@ export const en = {
   'style.fantasy': 'Fantasy',
 
   // Sample Prompts
-  'prompt.sample1': 'A curious cat who finds a magic hat',
-  'prompt.sample2': 'A friendly robot who wants to plant a garden',
-  'prompt.sample3': 'A little ghost who is afraid of the dark',
-  'prompt.sample4': 'Two best friend dinosaurs who find a treasure map',
+  'prompt.sample1': 'A curious but shy cat who finds a magic hat',
+  'prompt.sample2': 'A happy robot who loves to plant flowers for friends',
+  'prompt.sample3': 'A brave little ghost who is secretly afraid of the dark',
+  'prompt.sample4': 'Two excited dinosaurs who discover a mysterious treasure map',
 };

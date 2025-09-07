@@ -1,8 +1,8 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import DrawingCanvas, { DrawingCanvasRef } from './DrawingCanvas';
 import { useAppContext } from '../App';
-import { Check, Trash2, X } from 'lucide-react';
+import { Check, Trash2, X, Pen, Eraser } from 'lucide-react';
 
 interface FullscreenCanvasProps {
   onDone: (dataUrl: string) => void;
@@ -12,6 +12,9 @@ interface FullscreenCanvasProps {
 const FullscreenCanvas: React.FC<FullscreenCanvasProps> = ({ onDone, onClose }) => {
   const canvasRef = useRef<DrawingCanvasRef>(null);
   const { t } = useAppContext();
+  const [tool, setTool] = useState<'brush' | 'eraser'>('brush');
+  const [strokeWidth, setStrokeWidth] = useState(5);
+  const [strokeColor, setStrokeColor] = useState('#334155'); // slate-800
 
   const handleDone = () => {
     const dataUrl = canvasRef.current?.toDataURL();
@@ -27,7 +30,7 @@ const FullscreenCanvas: React.FC<FullscreenCanvasProps> = ({ onDone, onClose }) 
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-4">
+    <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-2 sm:p-4">
         <div className="absolute top-4 right-4">
             <button
                 onClick={onClose}
@@ -38,11 +41,61 @@ const FullscreenCanvas: React.FC<FullscreenCanvasProps> = ({ onDone, onClose }) 
             </button>
         </div>
         
-        <div className="w-full h-full max-w-4xl max-h-[80vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col p-4">
-            <DrawingCanvas ref={canvasRef} strokeWidth={5} />
+        <div className="w-full h-full max-w-4xl max-h-[75vh] sm:max-h-[80vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col p-2 sm:p-4">
+            <DrawingCanvas
+                ref={canvasRef}
+                tool={tool}
+                strokeWidth={strokeWidth}
+                strokeColor={strokeColor}
+            />
+        </div>
+        
+        {/* Toolbar */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 my-3">
+          <div className="flex items-center gap-2 p-1 bg-white/20 rounded-full">
+            <button
+              onClick={() => setTool('brush')}
+              aria-label={t('input.draw.brush')}
+              className={`p-3 rounded-full transition-colors ${tool === 'brush' ? 'bg-white text-slate-800 shadow-md' : 'text-white hover:bg-white/30'}`}
+            >
+              <Pen className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setTool('eraser')}
+              aria-label={t('input.draw.eraser')}
+              className={`p-3 rounded-full transition-colors ${tool === 'eraser' ? 'bg-white text-slate-800 shadow-md' : 'text-white hover:bg-white/30'}`}
+            >
+              <Eraser className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className={`p-2 bg-white/20 rounded-full transition-opacity ${tool === 'eraser' ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <input
+              type="color"
+              value={strokeColor}
+              onChange={(e) => setStrokeColor(e.target.value)}
+              disabled={tool === 'eraser'}
+              className="w-10 h-10 p-0 bg-transparent border-none rounded-full cursor-pointer disabled:cursor-not-allowed"
+              style={{'WebkitAppearance': 'none', 'MozAppearance': 'none', appearance: 'none'}}
+              aria-label={t('input.draw.color')}
+            />
+          </div>
+          
+          <div className="flex items-center gap-3 p-2 px-4 bg-white/20 rounded-full w-48">
+             <div className="w-5 h-5 bg-slate-800 rounded-full transition-transform" style={{ backgroundColor: strokeColor, transform: `scale(${strokeWidth / 20})` }}></div>
+             <input
+               type="range"
+               min="1"
+               max="50"
+               value={strokeWidth}
+               onChange={(e) => setStrokeWidth(Number(e.target.value))}
+               className="w-full h-2 bg-white/30 rounded-lg appearance-none cursor-pointer"
+               aria-label={t('input.draw.size')}
+             />
+           </div>
         </div>
 
-        <div className="flex items-center gap-4 mt-6">
+        <div className="flex items-center gap-4">
             <button
                 onClick={handleClear}
                 className="flex items-center gap-2 px-6 py-3 bg-white text-slate-800 font-bold rounded-full shadow-lg hover:bg-slate-100 transition-colors"

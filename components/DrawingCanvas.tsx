@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useImperativeHandle, forwardRef, useState, useCallback } from 'react';
 
 interface DrawingCanvasProps {
+  tool?: 'brush' | 'eraser';
   strokeColor?: string;
   strokeWidth?: number;
   onDrawStart?: () => void;
@@ -14,11 +15,24 @@ export interface DrawingCanvasRef {
 }
 
 const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
-  ({ strokeColor = '#334155', strokeWidth = 3, onDrawStart }, ref) => {
+  ({ tool = 'brush', strokeColor = '#334155', strokeWidth = 3, onDrawStart }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [isEmpty, setIsEmpty] = useState(true);
+
+    const setContextProps = useCallback(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = strokeWidth;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
+    }, [strokeColor, strokeWidth, tool]);
 
     const getCoords = useCallback((event: MouseEvent | TouchEvent): { x: number, y: number } | null => {
       if (!canvasRef.current) return null;
@@ -82,16 +96,8 @@ const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
     }, [isDrawing]);
 
     useEffect(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      ctx.strokeStyle = strokeColor;
-      ctx.lineWidth = strokeWidth;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-    }, [strokeColor, strokeWidth]);
+      setContextProps();
+    }, [setContextProps]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -126,19 +132,13 @@ const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
                 const { width, height } = entry.contentRect;
                 canvas.width = width;
                 canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                if (ctx) {
-                    ctx.strokeStyle = strokeColor;
-                    ctx.lineWidth = strokeWidth;
-                    ctx.lineCap = 'round';
-                    ctx.lineJoin = 'round';
-                }
+                setContextProps();
             }
         });
 
         resizeObserver.observe(container);
         return () => resizeObserver.disconnect();
-    }, [strokeColor, strokeWidth]);
+    }, [setContextProps]);
 
 
     useImperativeHandle(ref, () => ({

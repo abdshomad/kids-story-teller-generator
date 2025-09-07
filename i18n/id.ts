@@ -1,4 +1,5 @@
 
+
 export const id = {
   // Welcome
   'welcome.title': 'Selamat Datang di Waktu Cerita Ajaib!',
@@ -35,11 +36,21 @@ export const id = {
   'input.draw.done': 'Selesai',
   'input.draw.clear': 'Bersihkan',
   'input.draw.close': 'Tutup',
+  'input.draw.brush': 'Kuas',
+  'input.draw.eraser': 'Penghapus',
+  'input.draw.color': 'Warna kuas',
+  'input.draw.size': 'Ukuran kuas',
 
   // Loading Screen
-  'loading.steps.writing': 'Menulis Narasi',
-  'loading.steps.illustrating': 'Membuat Ilustrasi',
-  'loading.steps.finishing': 'Menyelesaikan Buku Cerita',
+  'loading.main.writing': 'Menulis Narasi',
+  'loading.sub.analyzing': 'Menganalisis ide ajaibmu...',
+  'loading.sub.writingPages': 'Menulis halaman cerita...',
+  'loading.main.illustrating': 'Membuat Ilustrasi',
+  'loading.sub.designingCharacters': 'Merancang karakter...',
+  'loading.sub.paintingScenes': 'Melukis adegan...',
+  'loading.main.finalizing': 'Menyelesaikan Buku Cerita',
+  'loading.sub.assembling': 'Menyusun buku...',
+  'loading.sub.sparkles': 'Menambahkan kilau sihir terakhir!',
   'loading.illustratingPage': 'Melukis halaman {current} dari {total}...',
 
   // Story Viewer
@@ -51,6 +62,8 @@ export const id = {
   // Error
   'error.title': 'Oh tidak, ada gangguan dalam sihir!',
   'error.generic': 'Terjadi kesalahan saat membuat cerita. Silakan coba lagi.',
+  'error.micDenied': 'Izin mikrofon ditolak. Harap izinkan di pengaturan browser Anda untuk menggunakan input suara.',
+  'error.micGeneric': 'Tidak dapat mengakses mikrofon. Silakan periksa perangkat keras dan izin Anda.',
 
   // Common
   'common.tryAgain': 'Coba Lagi',
@@ -71,8 +84,8 @@ export const id = {
   'style.fantasy': 'Fantasi',
 
   // Sample Prompts
-  'prompt.sample1': 'Kucing penasaran yang menemukan topi ajaib',
-  'prompt.sample2': 'Robot ramah yang ingin menanam kebun',
-  'prompt.sample3': 'Hantu kecil yang takut gelap',
-  'prompt.sample4': 'Dua sahabat dinosaurus yang menemukan peta harta karun',
+  'prompt.sample1': 'Kucing penasaran tapi pemalu yang menemukan topi ajaib',
+  'prompt.sample2': 'Robot ceria yang suka menanam bunga untuk teman-temannya',
+  'prompt.sample3': 'Hantu kecil pemberani yang diam-diam takut gelap',
+  'prompt.sample4': 'Dua dinosaurus bersemangat yang menemukan peta harta karun misterius',
 };

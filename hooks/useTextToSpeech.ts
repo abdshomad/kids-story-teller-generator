@@ -1,5 +1,7 @@
 
+
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { ELEVENLABS_API_KEY } from '../env';
 
 const VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel - good for storytelling
 const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`;
@@ -46,8 +48,8 @@ export const useTextToSpeech = (language: string) => {
   }, []);
 
   const speak = useCallback(async (text: string, onEnd: () => void) => {
-    if (!process.env.ELEVENLABS_API_KEY) {
-      console.error("ELEVENLABS_API_KEY environment variable not set. Text-to-speech will fail.");
+    if (!ELEVENLABS_API_KEY) {
+      console.error("ELEVENLABS_API_KEY not found. Text-to-speech will fail.");
       onEnd();
       return;
     }
@@ -66,7 +68,7 @@ export const useTextToSpeech = (language: string) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'xi-api-key': process.env.ELEVENLABS_API_KEY,
+          'xi-api-key': ELEVENLABS_API_KEY,
         },
         body: JSON.stringify({
           text: text,

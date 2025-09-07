@@ -1,6 +1,8 @@
 
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { StoryOptions, StoryData, StoryPage, Language, LoadingStage } from '../types';
+import { FAL_API_KEY } from '../env';
 
 if (!process.env.API_KEY) {
   throw new Error("API_KEY environment variable not set");
@@ -108,7 +110,10 @@ export const generateStoryAndImages = async (
 ): Promise<void> => {
     
   // 1. Generate story text
-  onProgressUpdate(LoadingStage.WRITING);
+  onProgressUpdate(LoadingStage.ANALYZING_PROMPT);
+  await delay(1500);
+  onProgressUpdate(LoadingStage.WRITING_PAGES);
+
   const storyPromptParts = buildStoryPrompt(options);
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
@@ -132,22 +137,28 @@ export const generateStoryAndImages = async (
   };
 
   onTextComplete(initialStoryData);
+  
+  onProgressUpdate(LoadingStage.DESIGNING_CHARACTERS);
+  await delay(1500);
 
   // 2. Generate images for each page.
-  if (!process.env.FAL_API_KEY) {
-    console.warn("FAL_API_KEY environment variable not set. Skipping image generation.");
-    onProgressUpdate(LoadingStage.ILLUSTRATING, { current: 1, total: initialStoryData.pages.length });
+  if (!FAL_API_KEY) {
+    console.warn("FAL_API_KEY not found. Skipping image generation.");
+    onProgressUpdate(LoadingStage.PAINTING_SCENES, { current: 1, total: initialStoryData.pages.length });
     for (let i = 0; i < initialStoryData.pages.length; i++) {
         onPageIllustrated({ ...initialStoryData.pages[i], imageUrl: 'GENERATION_FAILED' }, i);
-        onProgressUpdate(LoadingStage.ILLUSTRATING, { current: i + 1, total: initialStoryData.pages.length });
+        onProgressUpdate(LoadingStage.PAINTING_SCENES, { current: i + 1, total: initialStoryData.pages.length });
     }
-    onProgressUpdate(LoadingStage.FINISHING);
+    onProgressUpdate(LoadingStage.ASSEMBLING_BOOK);
+    await delay(1000);
+    onProgressUpdate(LoadingStage.ADDING_SPARKLES);
+    await delay(1000);
     return;
   }
   
-  onProgressUpdate(LoadingStage.ILLUSTRATING, { current: 1, total: initialStoryData.pages.length });
+  onProgressUpdate(LoadingStage.PAINTING_SCENES, { current: 1, total: initialStoryData.pages.length });
   for (let i = 0; i < initialStoryData.pages.length; i++) {
-    onProgressUpdate(LoadingStage.ILLUSTRATING, { current: i + 1, total: initialStoryData.pages.length });
+    onProgressUpdate(LoadingStage.PAINTING_SCENES, { current: i + 1, total: initialStoryData.pages.length });
     const page = initialStoryData.pages[i];
     
     let success = false;
@@ -159,7 +170,7 @@ export const generateStoryAndImages = async (
             const falResponse = await fetch(FAL_API_URL, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Key ${process.env.FAL_API_KEY}`,
+                    'Authorization': `Key ${FAL_API_KEY}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -215,7 +226,10 @@ export const generateStoryAndImages = async (
       await delay(1000); // 1-second delay between each page's image generation request
     }
   }
-  onProgressUpdate(LoadingStage.FINISHING);
+  onProgressUpdate(LoadingStage.ASSEMBLING_BOOK);
+  await delay(1000);
+  onProgressUpdate(LoadingStage.ADDING_SPARKLES);
+  await delay(1000);
 };
 
 export const transcribeAudio = async (audio: { mimeType: string, data: string }, language: Language): Promise<string> => {

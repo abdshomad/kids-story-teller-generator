@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useMemo, createContext, useContext } from 'react';
 import WelcomeModal from './components/WelcomeModal';
 import InputScreen from './components/InputScreen';
@@ -43,7 +44,7 @@ const App: React.FC = () => {
   }), [language, t]);
 
   const handleStoryCreate = async (options: StoryOptions) => {
-    setAppState({ status: AppStatus.LOADING, stage: LoadingStage.WRITING });
+    setAppState({ status: AppStatus.LOADING, stage: LoadingStage.ANALYZING_PROMPT });
     try {
       await generateStoryAndImages(
         options,

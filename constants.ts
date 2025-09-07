@@ -1,3 +1,4 @@
+import { Heart, Shield, HandHeart, Compass, Paintbrush, Pencil, Grid, Castle } from 'lucide-react';
 
 export const AGE_GROUPS = [
   { value: '3-5 years', labelKey: 'age.3-5' },
@@ -5,10 +6,10 @@ export const AGE_GROUPS = [
 ];
 
 export const THEMES = [
-  { value: 'Friendship', labelKey: 'theme.friendship' },
-  { value: 'Courage', labelKey: 'theme.courage' },
-  { value: 'Being Kind', labelKey: 'theme.kindness' },
-  { value: 'Adventure', labelKey: 'theme.adventure' },
+  { value: 'Friendship', labelKey: 'theme.friendship', icon: Heart },
+  { value: 'Courage', labelKey: 'theme.courage', icon: Shield },
+  { value: 'Being Kind', labelKey: 'theme.kindness', icon: HandHeart },
+  { value: 'Adventure', labelKey: 'theme.adventure', icon: Compass },
 ];
 
 export const STORY_LENGTHS = [
@@ -18,10 +19,10 @@ export const STORY_LENGTHS = [
 ];
 
 export const ILLUSTRATION_STYLES = [
-  { value: 'Watercolor', labelKey: 'style.watercolor' },
-  { value: 'Cartoon', labelKey: 'style.cartoon' },
-  { value: 'Pixel Art', labelKey: 'style.pixel' },
-  { value: 'Fantasy', labelKey: 'style.fantasy' },
+  { value: 'Watercolor', labelKey: 'style.watercolor', icon: Paintbrush },
+  { value: 'Cartoon', labelKey: 'style.cartoon', icon: Pencil },
+  { value: 'Pixel Art', labelKey: 'style.pixel', icon: Grid },
+  { value: 'Fantasy', labelKey: 'style.fantasy', icon: Castle },
 ];
 
 export const SAMPLE_PROMPTS = [

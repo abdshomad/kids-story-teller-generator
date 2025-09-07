@@ -1,5 +1,6 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React, { useState, useEffect, useCallback, useRef, FC } from 'react';
 import { StoryOptions } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, SAMPLE_PROMPTS } from '../constants';
 import { useAppContext } from '../App';
@@ -25,13 +26,20 @@ const fileToBase64 = (file: File): Promise<{mimeType: string, data: string}> => 
   });
 };
 
+const sampleButtonColors = [
+    'bg-rose-400 hover:bg-rose-500',
+    'bg-violet-400 hover:bg-violet-500',
+    'bg-cyan-400 hover:bg-cyan-500',
+    'bg-emerald-400 hover:bg-emerald-500',
+];
+
 const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   const { language, setLanguage, t } = useAppContext();
   const [options, setOptions] = useState<StoryOptions>({
     prompt: '',
     ageGroup: AGE_GROUPS[0].value,
     theme: THEMES[0].value,
-    length: 'medium',
+    length: 'short',
     illustrationStyle: ILLUSTRATION_STYLES[0].value,
     characterName: '',
     characterType: '',
@@ -39,10 +47,12 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   });
   const [visualInspirationPreview, setVisualInspirationPreview] = useState<string | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [placeholder, setPlaceholder] = useState(t(SAMPLE_PROMPTS[0]));
+  
+  const [activeSampleIndex, setActiveSampleIndex] = useState(0);
+  const [placeholder, setPlaceholder] = useState('');
 
 
-  const { isListening, isTranscribing, transcript, startListening, stopListening, setTranscript, browserSupportsSpeechRecognition } = useSpeechToText(language);
+  const { isListening, isTranscribing, transcript, startListening, stopListening, setTranscript, browserSupportsSpeechRecognition, error, clearError } = useSpeechToText(language);
 
   useEffect(() => {
     if (transcript) {
@@ -52,23 +62,26 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   }, [transcript, setTranscript]);
 
   useEffect(() => {
+    // Update placeholder whenever active index or language changes
+    setPlaceholder(t(SAMPLE_PROMPTS[activeSampleIndex]));
+  }, [activeSampleIndex, t]);
+
+  useEffect(() => {
     if (options.prompt) {
         return; 
     }
-
-    let promptIndex = 0;
     const intervalId = setInterval(() => {
-        const promptKey = SAMPLE_PROMPTS[promptIndex];
-        setPlaceholder(t(promptKey));
-        promptIndex = (promptIndex + 1) % SAMPLE_PROMPTS.length;
+        setActiveSampleIndex(prevIndex => (prevIndex + 1) % SAMPLE_PROMPTS.length);
     }, 4000);
-
     return () => clearInterval(intervalId);
-  }, [t, options.prompt]);
+  }, [options.prompt]);
   
   const handleInputChange = useCallback(<K extends keyof StoryOptions>(field: K, value: StoryOptions[K]) => {
+    if (field === 'prompt' && error) {
+      clearError();
+    }
     setOptions(prev => ({ ...prev, [field]: value }));
-  }, []);
+  }, [error, clearError]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -152,71 +165,155 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                 </button>
               )}
             </div>
+             {error && <p className="text-red-600 text-sm mt-2 text-center" role="alert">{t(error)}</p>}
+             <div className="flex flex-wrap justify-center gap-5 my-5">
+              {SAMPLE_PROMPTS.map((promptKey, i) => {
+                const isActive = i === activeSampleIndex && !options.prompt;
+                return (
+                    <button
+                        type="button"
+                        key={promptKey}
+                        onClick={() => handleInputChange('prompt', t(promptKey))}
+                        className={`px-5 py-3 text-white font-semibold rounded-full text-sm shadow-md transition-all duration-300 hover:scale-105 ${sampleButtonColors[i % sampleButtonColors.length]} ${isActive ? 'ring-4 ring-offset-2 ring-violet-400 scale-110' : ''}`}
+                    >
+                        {t(promptKey)}
+                    </button>
+                );
+              })}
+            </div>
           </section>
           
-          <div className="grid lg:grid-cols-2 gap-8">
-            <section>
-              <h2 className="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2"><UserRound className="w-6 h-6 text-purple-500" />{t('input.character.title')}</h2>
-              <div className="space-y-3">
-                <input type="text" value={options.characterName} onChange={(e) => handleInputChange('characterName', e.target.value)} placeholder={t('input.character.name')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
-                <input type="text" value={options.characterType} onChange={(e) => handleInputChange('characterType', e.target.value)} placeholder={t('input.character.type')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
-                <input type="text" value={options.characterPersonality} onChange={(e) => handleInputChange('characterPersonality', e.target.value)} placeholder={t('input.character.personality')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
-              </div>
-            </section>
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div className="space-y-8">
+                <section>
+                  <h2 className="text-xl font-bold text-slate-700 mb-3 flex items-center gap-2"><UserRound className="w-6 h-6 text-purple-500" />{t('input.character.title')}</h2>
+                  <div className="space-y-1">
+                    <input type="text" value={options.characterName} onChange={(e) => handleInputChange('characterName', e.target.value)} placeholder={t('input.character.name')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
+                    <input type="text" value={options.characterType} onChange={(e) => handleInputChange('characterType', e.target.value)} placeholder={t('input.character.type')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
+                    <input type="text" value={options.characterPersonality} onChange={(e) => handleInputChange('characterPersonality', e.target.value)} placeholder={t('input.character.personality')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
+                  </div>
+                </section>
+                <section>
+                    <h2 className="text-xl font-bold text-slate-700 mb-3 flex items-center gap-2"><Image className="w-6 h-6 text-sky-500" />{t('input.visualInspiration.label')}</h2>
+                    <div className="bg-slate-100/40 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+                        <label className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 p-4 border-2 border-dashed border-slate-300/80 rounded-lg text-slate-600 hover:bg-white/80 hover:border-sky-500 hover:text-sky-600 transition-colors">
+                           <Upload className="w-5 h-5" />
+                           <span className="font-semibold">{t('input.visualInspiration.uploadDescription')}</span>
+                           <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                        </label>
+                        
+                        <span className="font-semibold text-slate-500">or</span>
+
+                        <button type="button" onClick={() => setIsDrawing(true)} className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 p-4 border-2 border-dashed border-slate-300/80 rounded-lg text-slate-600 hover:bg-white/80 hover:border-purple-500 hover:text-purple-600 transition-colors">
+                           <PenSquare className="w-5 h-5" />
+                           <span className="font-semibold">{t('input.visualInspiration.drawDescription')}</span>
+                        </button>
+                        
+                        {visualInspirationPreview && (
+                          <div className="w-full sm:w-auto sm:ml-4 pt-4 sm:pt-0">
+                            <img src={visualInspirationPreview} alt="Preview" className="rounded-lg object-cover h-24 w-24 mx-auto shadow-md"/>
+                          </div>
+                        )}
+                    </div>
+                </section>
+            </div>
 
             <section>
               <h2 className="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2"><SlidersHorizontal className="w-6 h-6 text-emerald-500" />{t('input.options.title')}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Select id="ageGroup" label={t('input.options.age')} value={options.ageGroup} onChange={(e) => handleInputChange('ageGroup', e.target.value)} options={AGE_GROUPS.map(o => ({...o, label: t(o.labelKey)}))} />
-                <Select id="theme" label={t('input.options.theme')} value={options.theme} onChange={(e) => handleInputChange('theme', e.target.value)} options={THEMES.map(o => ({...o, label: t(o.labelKey)}))} />
+              <div className="space-y-6">
+                
                 <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-1">{t('input.options.length')}</label>
-                    <div className="flex gap-2">
-                        {STORY_LENGTHS.map(lengthOption => (
-                            <button
-                                type="button"
-                                key={lengthOption.value}
-                                onClick={() => handleInputChange('length', lengthOption.value as StoryOptions['length'])}
-                                className={`flex-1 p-3 rounded-lg text-xs font-bold transition-all text-center border ${
-                                    options.length === lengthOption.value
-                                        ? 'bg-purple-500 text-white shadow-md border-purple-500'
-                                        : 'bg-white/60 text-slate-700 hover:bg-white/90 border-slate-300/80'
-                                }`}
-                            >
-                                {t(lengthOption.labelKey)}
-                            </button>
-                        ))}
-                    </div>
+                  <label className="block text-sm font-bold text-slate-600 mb-2">{t('input.options.age')}</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {AGE_GROUPS.map(opt => (
+                      <button
+                        type="button"
+                        key={opt.value}
+                        onClick={() => handleInputChange('ageGroup', opt.value)}
+                        className={`w-full p-3 rounded-lg text-sm font-bold transition-all text-center border ${
+                          options.ageGroup === opt.value
+                            ? 'bg-purple-500 text-white shadow-md border-purple-500'
+                            : 'bg-white/60 text-slate-700 hover:bg-white/90 border-slate-300/80'
+                        }`}
+                      >
+                        {t(opt.labelKey)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <Select id="illustrationStyle" label={t('input.options.style')} value={options.illustrationStyle} onChange={(e) => handleInputChange('illustrationStyle', e.target.value)} options={ILLUSTRATION_STYLES.map(o => ({...o, label: t(o.labelKey)}))} />
+
+                <div>
+                  <label className="block text-sm font-bold text-slate-600 mb-2">{t('input.options.theme')}</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {THEMES.map(opt => {
+                      const Icon = opt.icon;
+                      return (
+                        <button
+                          type="button"
+                          key={opt.value}
+                          onClick={() => handleInputChange('theme', opt.value)}
+                          className={`w-full p-3 rounded-lg text-sm font-bold transition-all border flex flex-col items-center gap-2 ${
+                            options.theme === opt.value
+                              ? 'bg-purple-500 text-white shadow-md border-purple-500'
+                              : 'bg-white/60 text-slate-700 hover:bg-white/90 border-slate-300/80'
+                          }`}
+                        >
+                          <Icon className="w-6 h-6" />
+                          <span>{t(opt.labelKey)}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-bold text-slate-600 mb-2">{t('input.options.length')}</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {STORY_LENGTHS.map(opt => (
+                      <button
+                        type="button"
+                        key={opt.value}
+                        onClick={() => handleInputChange('length', opt.value as StoryOptions['length'])}
+                        className={`w-full p-3 rounded-lg text-sm font-bold transition-all text-center border ${
+                          options.length === opt.value
+                            ? 'bg-purple-500 text-white shadow-md border-purple-500'
+                            : 'bg-white/60 text-slate-700 hover:bg-white/90 border-slate-300/80'
+                        }`}
+                      >
+                        {t(opt.labelKey)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-slate-600 mb-2">{t('input.options.style')}</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {ILLUSTRATION_STYLES.map(opt => {
+                      const Icon = opt.icon;
+                      return (
+                        <button
+                          type="button"
+                          key={opt.value}
+                          onClick={() => handleInputChange('illustrationStyle', opt.value)}
+                          className={`w-full p-3 rounded-lg text-sm font-bold transition-all border flex flex-col items-center gap-2 ${
+                            options.illustrationStyle === opt.value
+                              ? 'bg-purple-500 text-white shadow-md border-purple-500'
+                              : 'bg-white/60 text-slate-700 hover:bg-white/90 border-slate-300/80'
+                          }`}
+                        >
+                          <Icon className="w-6 h-6" />
+                          <span>{t(opt.labelKey)}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
               </div>
             </section>
           </div>
           
-          <section>
-            <h2 className="text-xl font-bold text-slate-700 mb-3 flex items-center gap-2"><Image className="w-6 h-6 text-sky-500" />{t('input.visualInspiration.label')}</h2>
-            <div className="bg-slate-100/40 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
-                <label className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 p-4 border-2 border-dashed border-slate-300/80 rounded-lg text-slate-600 hover:bg-white/80 hover:border-sky-500 hover:text-sky-600 transition-colors">
-                   <Upload className="w-5 h-5" />
-                   <span className="font-semibold">{t('input.visualInspiration.uploadDescription')}</span>
-                   <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-                </label>
-                
-                <span className="font-semibold text-slate-500">or</span>
-
-                <button type="button" onClick={() => setIsDrawing(true)} className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 p-4 border-2 border-dashed border-slate-300/80 rounded-lg text-slate-600 hover:bg-white/80 hover:border-purple-500 hover:text-purple-600 transition-colors">
-                   <PenSquare className="w-5 h-5" />
-                   <span className="font-semibold">{t('input.visualInspiration.drawDescription')}</span>
-                </button>
-                
-                {visualInspirationPreview && (
-                  <div className="w-full sm:w-auto sm:ml-4 pt-4 sm:pt-0">
-                    <img src={visualInspirationPreview} alt="Preview" className="rounded-lg object-cover h-24 w-24 mx-auto shadow-md"/>
-                  </div>
-                )}
-            </div>
-          </section>
-
           <div className="text-center pt-2">
             <button type="submit" className="w-full sm:w-auto bg-fuchsia-600 text-white font-bold tracking-wider py-4 px-10 rounded-full hover:bg-fuchsia-700 focus:outline-none focus:ring-4 focus:ring-fuchsia-300 transition-all duration-300 shadow-lg text-lg">
               {t('input.button.create')}
@@ -227,31 +324,5 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     </div>
   );
 };
-
-interface SelectProps {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  options: { value: string; label: string }[];
-}
-
-const Select: React.FC<SelectProps> = ({ id, label, value, onChange, options }) => (
-    <div className="relative">
-        <label htmlFor={id} className="block text-sm font-bold text-slate-600 mb-1">{label}</label>
-        <select 
-            id={id} 
-            value={value} 
-            onChange={onChange} 
-            className="w-full p-3 bg-white/60 border border-slate-300/80 appearance-none rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all"
-        >
-            {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-        </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 pt-6 text-slate-700">
-            <ChevronDown className="h-5 w-5" />
-        </div>
-    </div>
-);
-
 
 export default InputScreen;

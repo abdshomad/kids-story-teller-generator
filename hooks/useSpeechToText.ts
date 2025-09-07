@@ -24,6 +24,7 @@ export const useSpeechToText = (language: Language) => {
   const [isListening, setIsListening] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
@@ -39,6 +40,7 @@ export const useSpeechToText = (language: Language) => {
     if (isListening || isTranscribing || !browserSupportsSpeechRecognition) return;
 
     setTranscript('');
+    setError(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const options = { mimeType: 'audio/webm' };
@@ -68,6 +70,7 @@ export const useSpeechToText = (language: Language) => {
           setTranscript(result);
         } catch (error) {
           console.error('Error transcribing audio:', error);
+          setError('error.generic');
         } finally {
           setIsTranscribing(false);
         }
@@ -75,8 +78,13 @@ export const useSpeechToText = (language: Language) => {
 
       mediaRecorder.start();
       setIsListening(true);
-    } catch (error) {
-      console.error("Error accessing microphone:", error);
+    } catch (err) {
+      console.error("Error accessing microphone:", err);
+      if (err instanceof Error && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+          setError('error.micDenied');
+      } else {
+          setError('error.micGeneric');
+      }
     }
   }, [isListening, isTranscribing, browserSupportsSpeechRecognition, language]);
 
@@ -88,5 +96,7 @@ export const useSpeechToText = (language: Language) => {
     stopListening,
     setTranscript,
     browserSupportsSpeechRecognition,
+    error,
+    clearError: useCallback(() => setError(null), []),
   };
 };

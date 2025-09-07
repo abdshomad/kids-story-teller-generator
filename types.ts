@@ -1,4 +1,5 @@
 
+
 export type Language = 'en' | 'id';
 
 export interface StoryOptions {
@@ -36,9 +37,17 @@ export enum AppStatus {
 }
 
 export enum LoadingStage {
-  WRITING = 'writing',
-  ILLUSTRATING = 'illustrating',
-  FINISHING = 'finishing'
+  // Writing
+  ANALYZING_PROMPT = 'analyzing_prompt',
+  WRITING_PAGES = 'writing_pages',
+  
+  // Illustrating
+  DESIGNING_CHARACTERS = 'designing_characters',
+  PAINTING_SCENES = 'painting_scenes',
+
+  // Finalizing
+  ASSEMBLING_BOOK = 'assembling_book',
+  ADDING_SPARKLES = 'adding_sparkles',
 }
 
 export type AppState =
