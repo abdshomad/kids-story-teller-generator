@@ -120,6 +120,7 @@ const getLanguageName = (lang: Language): string => {
         case 'id': return 'Indonesian';
         case 'ar': return 'Arabic';
         case 'hi': return 'Hindi';
+        case 'ja': return 'Japanese';
         case 'zh': return 'Chinese';
         default: return 'English';
     }

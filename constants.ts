@@ -8,6 +8,7 @@ export const LANGUAGES: { code: Language; label: string; flag: string; }[] = [
   { code: 'en', label: 'EN', flag: '🇺🇸' },
   { code: 'hi', label: 'HI', flag: '🇮🇳' },
   { code: 'id', label: 'ID', flag: '🇮🇩' },
+  { code: 'ja', label: 'JA', flag: '🇯🇵' },
   { code: 'zh', label: 'ZH', flag: '🇨🇳' },
 ];
 
