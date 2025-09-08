@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { transcribeAudio } from '../services/geminiService';
+import { transcribeAudio } from '../services/analysisService';
 import { Language } from '../types';
 
 const blobToBase64 = (blob: Blob): Promise<{ mimeType: string; data: string }> => {

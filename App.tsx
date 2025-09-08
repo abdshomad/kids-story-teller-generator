@@ -6,7 +6,8 @@ import LoadingScreen from './components/LoadingScreen';
 import StoryViewer from './components/StoryViewer';
 import StyleSelectionScreen from './components/StyleSelectionScreen';
 import { StoryData, StoryOptions, Language, AppState, AppStatus, LoadingStage, StoryOutline } from './types';
-import { generateStoryOutline, generateFullStoryFromSelection, regenerateImage, generateSamplePrompts } from './services/geminiService';
+import { generateStoryOutline, generateFullStoryFromSelection, regenerateImage } from './services/storyService';
+import { generateSamplePrompts } from './services/analysisService';
 import { locales } from './i18n/locales';
 
 interface AppContextType {
