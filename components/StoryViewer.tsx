@@ -2,7 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { StoryData, SoundEffect, StoryPage } from '../types';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
 import { useAppContext } from '../App';
-import { Volume2, VolumeX, ArrowLeft, ArrowRight, ImageOff, RefreshCw, Loader2, Info } from 'lucide-react';
+import StoryHeader from './story/StoryHeader';
+import StoryControls from './story/StoryControls';
+import PageView from './story/PageView';
 
 interface StoryViewerProps {
   story: StoryData;
@@ -13,7 +15,6 @@ interface StoryViewerProps {
 
 const stripNarrationTags = (text: string): string => {
   if (!text) return '';
-  // Removes tags like [laughs] or [sighs] used for narration AI
   return text.replace(/\[.*?\]/g, '').replace(/\s\s+/g, ' ').trim();
 };
 
@@ -26,12 +27,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryIma
 
   const totalPages = story.pages.length;
   const isTitlePage = currentPage === -1;
-  const currentContent = isTitlePage
-    ? { text: story.title, imageUrl: story.pages[0]?.imageUrl, audioUrl: story.pages[0]?.audioUrl }
-    : story.pages[currentPage];
-    
-  const hasSoundEffectsOnPage = !isTitlePage && story.pages[currentPage]?.soundEffects?.some(sfx => sfx.audioUrl);
-
+  
   const playSfx = useCallback((audioUrl: string) => {
     if (playingSfx) {
       playingSfx.pause();
@@ -42,7 +38,8 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryIma
     setPlayingSfx(audio);
   }, [playingSfx]);
 
-  const renderPageTextWithSfx = useCallback((text: string, soundEffects: SoundEffect[] | undefined) => {
+  const renderPageTextWithSfx = useCallback((page: StoryPage) => {
+    const { text, soundEffects } = page;
     if (!soundEffects || soundEffects.length === 0) {
       return stripNarrationTags(text);
     }
@@ -93,7 +90,6 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryIma
       </>
     );
   }, [playSfx, t]);
-
 
   const goToNextPage = useCallback(() => {
     setCurrentPage(prev => (prev < totalPages - 1 ? prev + 1 : prev));
@@ -151,77 +147,30 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryIma
 
   return (
     <div className="h-screen w-screen bg-slate-800 flex flex-col p-4 sm:p-6 lg:p-8">
-      <div className="flex justify-between items-center mb-4 text-white flex-shrink-0">
-        <h1 className="text-xl font-bold truncate">{story.title}</h1>
-        <div className="flex items-center gap-4">
-          {isSupported && story.pages.some(p => p.audioUrl) && (
-            <button onClick={handleReadAloud} title={t('story.readAloud')} className="p-2 rounded-full hover:bg-slate-700 transition-colors">
-              {isSpeaking ? <Volume2 className="w-6 h-6 text-yellow-400" /> : <VolumeX className="w-6 h-6" />}
-            </button>
-          )}
-          <button onClick={onNewStory} className="px-4 py-2 bg-blue-500 font-bold rounded-full hover:bg-blue-600 transition-colors">
-            {t('story.newStory')}
-          </button>
-        </div>
-      </div>
+      <StoryHeader 
+        title={story.title}
+        isSpeaking={isSpeaking}
+        isSupported={isSupported && story.pages.some(p => p.audioUrl)}
+        onNewStory={onNewStory}
+        onReadAloud={handleReadAloud}
+      />
 
       <div className="flex-grow flex items-center justify-center relative">
-        <div className="w-full max-w-5xl aspect-[4/3] bg-white rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
-            <div className="w-full md:w-1/2 h-1/2 md:h-full bg-slate-100 flex items-center justify-center p-4">
-                {(() => {
-                    if (currentContent.imageUrl && currentContent.imageUrl !== 'GENERATION_FAILED') {
-                        return <img src={currentContent.imageUrl} alt={isTitlePage ? 'Story cover' : `Illustration for page ${currentPage + 1}`} className="w-full h-full object-cover rounded-lg"/>;
-                    }
-                    if (currentContent.imageUrl === 'GENERATION_FAILED') {
-                        const isRetrying = !isTitlePage && retryingPages.has(currentPage);
-                        return (
-                            <div className="flex flex-col items-center justify-center text-red-500 gap-4 p-4 text-center">
-                                <ImageOff className="w-16 h-16" />
-                                <span className="font-bold text-lg">{t('story.imageError')}</span>
-                                {!isTitlePage && (
-                                    <button 
-                                        onClick={() => onRetryImage(currentPage)} 
-                                        disabled={isRetrying}
-                                        className="mt-2 px-4 py-2 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-600 transition-colors disabled:bg-slate-400 flex items-center gap-2"
-                                    >
-                                        {isRetrying ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCw className="w-5 h-5" />}
-                                        {isRetrying ? t('common.loading') : t('common.tryAgain')}
-                                    </button>
-                                )}
-                            </div>
-                        );
-                    }
-                    return (
-                        <div className="flex flex-col items-center justify-center text-slate-500 gap-4">
-                            <div className="w-16 h-16 border-4 border-slate-300 border-t-purple-400 rounded-full animate-spin"></div>
-                            <span className="font-bold text-lg">{t('story.illustrating')}</span>
-                        </div>
-                    );
-                })()}
-            </div>
-            <div className="w-full md:w-1/2 h-1/2 md:h-full p-6 sm:p-8 flex flex-col justify-center">
-                 <div className="overflow-y-auto flex-grow">
-                    <p className={`text-slate-800 ${isTitlePage ? 'text-3xl md:text-4xl lg:text-5xl font-extrabold text-center' : 'text-lg md:text-xl lg:text-2xl leading-relaxed'}`}>
-                        {isTitlePage 
-                            ? currentContent.text 
-                            : renderPageTextWithSfx(currentContent.text, (currentContent as StoryPage).soundEffects)}
-                    </p>
-                 </div>
-                 {hasSoundEffectsOnPage && (
-                    <div className="flex-shrink-0 text-center text-slate-500 text-sm mt-4 flex items-center justify-center gap-2 animate-pulse">
-                        <Info className="w-4 h-4" />
-                        <span>{t('story.sfx_tooltip')}</span>
-                    </div>
-                 )}
-            </div>
-        </div>
-        
-        <button onClick={goToPrevPage} disabled={isTitlePage} className="absolute start-0 sm:start-4 lg:start-8 top-1/2 -translate-y-1/2 p-3 bg-white/50 rounded-full text-slate-800 hover:bg-white disabled:opacity-0 disabled:cursor-not-allowed transition-all">
-          <ArrowLeft className="w-8 h-8"/>
-        </button>
-        <button onClick={goToNextPage} disabled={currentPage === totalPages - 1} className="absolute end-0 sm:end-4 lg:end-8 top-1/2 -translate-y-1/2 p-3 bg-white/50 rounded-full text-slate-800 hover:bg-white disabled:opacity-0 disabled:cursor-not-allowed transition-all">
-          <ArrowRight className="w-8 h-8"/>
-        </button>
+        <PageView
+            story={story}
+            currentPage={currentPage}
+            isTitlePage={isTitlePage}
+            retryingPages={retryingPages}
+            onRetryImage={onRetryImage}
+            renderPageTextWithSfx={renderPageTextWithSfx}
+        />
+        <StoryControls 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onNext={goToNextPage}
+            onPrev={goToPrevPage}
+            isTitlePage={isTitlePage}
+        />
       </div>
 
       <div className="flex-shrink-0 flex justify-center items-center gap-2 pt-4">

@@ -1,8 +1,4 @@
 
-
-
-
-
 import React, { useState, useCallback, useMemo, createContext, useContext, useEffect } from 'react';
 import WelcomeModal from './components/WelcomeModal';
 import InputScreen from './components/InputScreen';
@@ -10,7 +6,7 @@ import LoadingScreen from './components/LoadingScreen';
 import StoryViewer from './components/StoryViewer';
 import StyleSelectionScreen from './components/StyleSelectionScreen';
 import { StoryData, StoryOptions, Language, AppState, AppStatus, LoadingStage, StoryOutline } from './types';
-import { generateStoryOutline, generateFullStoryFromSelection, regenerateImage } from './services/geminiService';
+import { generateStoryOutline, generateFullStoryFromSelection, regenerateImage, generateSamplePrompts } from './services/geminiService';
 import { locales } from './i18n/locales';
 
 interface AppContextType {
@@ -33,6 +29,9 @@ const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>({ status: AppStatus.WELCOME });
   const [language, setLanguage] = useState<Language>('en');
   const [retryingPages, setRetryingPages] = useState<Set<number>>(new Set());
+  
+  const [samplePrompts, setSamplePrompts] = useState<{ title: string; prompt: string; }[]>([]);
+  const [isLoadingSamples, setIsLoadingSamples] = useState(true);
 
 
   useEffect(() => {
@@ -47,6 +46,36 @@ const App: React.FC = () => {
     });
     return translation;
   }, [language]);
+  
+  const fetchInitialPrompts = useCallback(async () => {
+    setIsLoadingSamples(true);
+    setSamplePrompts([]);
+    try {
+        const prompts = await generateSamplePrompts(language);
+        setSamplePrompts(prompts);
+    } catch (e) {
+        console.error("Failed to fetch initial prompts", e);
+    } finally {
+        setIsLoadingSamples(false);
+    }
+  }, [language]);
+
+  const addMorePrompts = useCallback(async () => {
+    setIsLoadingSamples(true);
+    try {
+        const newPrompts = await generateSamplePrompts(language, samplePrompts);
+        setSamplePrompts(prev => [...prev, ...newPrompts]);
+    } catch (e) {
+        console.error("Failed to add more prompts", e);
+    } finally {
+        setIsLoadingSamples(false);
+    }
+  }, [language, samplePrompts]);
+  
+  useEffect(() => {
+    fetchInitialPrompts();
+  }, [fetchInitialPrompts]);
+
 
   const contextValue = useMemo(() => ({
     language,
@@ -157,11 +186,18 @@ const App: React.FC = () => {
   };
 
   const renderContent = () => {
+    const inputScreenProps = {
+        onCreateStory: handleStoryCreate,
+        samplePrompts: samplePrompts,
+        isLoadingSamples: isLoadingSamples,
+        addMorePrompts: addMorePrompts,
+    };
+      
     switch (appState.status) {
       case AppStatus.WELCOME:
         return <WelcomeModal onAcknowledge={handleWelcomeAcknowledge} />;
       case AppStatus.INPUT:
-        return <InputScreen onCreateStory={handleStoryCreate} />;
+        return <InputScreen {...inputScreenProps} />;
       case AppStatus.LOADING:
         return <LoadingScreen onStop={handleStopGeneration} phase={appState.phase} stage={appState.stage} progress={appState.progress} storyData={appState.storyData} />;
       case AppStatus.STYLE_SELECTION:
@@ -182,7 +218,7 @@ const App: React.FC = () => {
           </div>
         );
       default:
-        return <InputScreen onCreateStory={handleStoryCreate} />;
+        return <InputScreen {...inputScreenProps} />;
     }
   };
 

@@ -1,29 +1,22 @@
-import React, { useState, useEffect, useCallback, useRef, FC } from 'react';
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StoryOptions, Character } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, LANGUAGES } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
-import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, PenSquare, Loader2, ChevronDown, Plus, Trash2 } from 'lucide-react';
+import { Mic, Sparkles, UserRound, SlidersHorizontal, Loader2, Plus } from 'lucide-react';
 import FullscreenCanvas from './FullscreenCanvas';
-import { extractAndGenerateCharacters, generateSamplePrompts } from '../services/geminiService';
+import { extractAndGenerateCharacters } from '../services/geminiService';
+import Section from './input/Section';
+import CharacterCard from './input/CharacterCard';
+import OptionSelector from './input/OptionSelector';
 
 interface InputScreenProps {
   onCreateStory: (options: StoryOptions) => void;
+  samplePrompts: { title: string; prompt: string; }[];
+  isLoadingSamples: boolean;
+  addMorePrompts: () => void;
 }
-
-const fileToBase64 = (file: File): Promise<{mimeType: string, data: string}> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-        const result = reader.result as string;
-        const [mimePart, base64Part] = result.split(',');
-        const mimeType = mimePart.split(':')[1].split(';')[0];
-        resolve({ mimeType, data: base64Part });
-    };
-    reader.onerror = (error) => reject(error);
-  });
-};
 
 const sampleButtonColors = [
     'bg-rose-400 hover:bg-rose-500',
@@ -40,7 +33,7 @@ const createNewCharacter = (): Character => ({
   visualInspiration: undefined,
 });
 
-const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
+const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory, samplePrompts, isLoadingSamples, addMorePrompts }) => {
   const { language, setLanguage, t } = useAppContext();
   const [options, setOptions] = useState<StoryOptions>({
     prompt: '',
@@ -55,8 +48,6 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   const [characterPreviews, setCharacterPreviews] = useState<Record<string, string>>({});
   const [drawingCharacterId, setDrawingCharacterId] = useState<string | null>(null);
   
-  const [samplePrompts, setSamplePrompts] = useState<{ title: string; prompt: string; }[]>([]);
-  const [isLoadingSamples, setIsLoadingSamples] = useState(true);
   const [activeSampleIndex, setActiveSampleIndex] = useState(0);
   const [placeholder, setPlaceholder] = useState('');
 
@@ -139,36 +130,6 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     }
   }, [transcript, setTranscript]);
 
-  const fetchInitialPrompts = useCallback(async () => {
-    setIsLoadingSamples(true);
-    setSamplePrompts([]);
-    try {
-        const prompts = await generateSamplePrompts(language);
-        setSamplePrompts(prompts);
-    } catch (e) {
-        console.error("Failed to fetch initial prompts", e);
-    } finally {
-        setIsLoadingSamples(false);
-    }
-  }, [language]);
-
-  const addMorePrompts = useCallback(async () => {
-    setIsLoadingSamples(true);
-    try {
-        const newPrompts = await generateSamplePrompts(language, samplePrompts);
-        setSamplePrompts(prev => [...prev, ...newPrompts]);
-    } catch (e) {
-        console.error("Failed to add more prompts", e);
-    } finally {
-        setIsLoadingSamples(false);
-    }
-  }, [language, samplePrompts]);
-  
-  useEffect(() => {
-    fetchInitialPrompts();
-  }, [fetchInitialPrompts]);
-
-
   useEffect(() => {
     const examplePlaceholder = "Lily's favorite teddy bear, Barnaby, seems to be a regular toy. But at night, Barnaby whispers exciting secrets about the day's adventures. What amazing things does he tell Lily?";
     if (samplePrompts.length > 0) {
@@ -195,11 +156,8 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   
   
   useEffect(() => {
-    // Only trigger if prompt is not empty, user hasn't started manually editing characters,
-    // and the prompt has changed since the last extraction.
     if (options.prompt && !characterFieldsEditedByUser && options.prompt !== lastExtractedPrompt.current) {
         const handler = setTimeout(async () => {
-            // Re-check condition inside timeout in case state changed
             if (characterFieldsEditedByUser) return;
             
             const currentPrompt = options.prompt;
@@ -207,11 +165,8 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
             setIsExtractingCharacter(true);
 
             try {
-                // This service now returns characters with generated image data
                 const extractedChars: (Partial<Character> & { previewUrl?: string })[] = await extractAndGenerateCharacters(currentPrompt, language);
                 
-                // Final check: Only update state if the prompt is still the same one we started with
-                // and the user still hasn't touched the character fields.
                 if (lastExtractedPrompt.current === currentPrompt && !characterFieldsEditedByUser) {
                     if (extractedChars.length > 0) {
                         const newCharacters = extractedChars.map(char => ({
@@ -232,7 +187,6 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
                         setOptions(prev => ({ ...prev, characters: newCharacters }));
                         setCharacterPreviews(newPreviews);
                     } else {
-                        // If AI returns no characters, reset to a single, default empty character card.
                         setOptions(prev => ({...prev, characters: [createNewCharacter()]}));
                         setCharacterPreviews({});
                     }
@@ -240,12 +194,10 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
             } catch (error) {
                 console.error("Failed to extract and generate characters:", error);
                  if (lastExtractedPrompt.current === currentPrompt) {
-                    // On error, also reset to a single default character
                     setOptions(prev => ({...prev, characters: [createNewCharacter()]}));
                     setCharacterPreviews({});
                  }
             } finally {
-                // Ensure loader stops only for the prompt it started for
                 if (lastExtractedPrompt.current === currentPrompt) {
                    setIsExtractingCharacter(false);
                 }
@@ -257,20 +209,6 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
         };
     }
 }, [options.prompt, language, characterFieldsEditedByUser]);
-
-
-
-  const handleFileChange = async (id: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      try {
-        const { mimeType, data } = await fileToBase64(file);
-        handleCharacterInspiration(id, { mimeType, data }, URL.createObjectURL(file));
-      } catch (error) {
-        console.error("Error converting file to base64", error);
-      }
-    }
-  };
   
   const handleDrawingDone = (dataUrl: string) => {
     if (drawingCharacterId) {
@@ -395,7 +333,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
             <Section title={t('input.character.title')} icon={<UserRound />} id="character" isOpen={openSections.has('character')} onToggle={toggleSection} isLoading={isExtractingCharacter}>
               <p className="text-sm text-slate-600 mb-4">{t('input.character.subtitle')}</p>
               <div className="space-y-6">
-                {options.characters.map((char, index) => (
+                {options.characters.map((char) => (
                   <CharacterCard
                     key={char.id}
                     character={char}
@@ -438,124 +376,5 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     </div>
   );
 };
-
-// FIX: The type for the 'icon' prop was too generic (React.ReactElement), which caused a TypeScript error when cloning the element to add a 'className'. By specifying that the element accepts a 'className' prop, we resolve the type error.
-const Section: FC<{ title: string; icon: React.ReactElement<{ className?: string }>; id: string; isOpen: boolean; onToggle: (id: string) => void; children: React.ReactNode; isLoading?: boolean }> = ({ title, icon, id, isOpen, onToggle, children, isLoading = false }) => (
-    <div className="bg-white/50 rounded-2xl p-6 shadow-sm">
-        <button type="button" onClick={() => onToggle(id)} className="w-full flex justify-between items-center text-xl font-bold text-slate-700">
-            <div className="flex items-center gap-3">
-                {/* FIX: Removed unnecessary type assertion after fixing prop type. */}
-                {isLoading ? <Loader2 className="w-6 h-6 animate-spin text-fuchsia-500" /> : React.cloneElement(icon, { className: 'w-6 h-6 text-fuchsia-500' })}
-                <span>{title}</span>
-            </div>
-            <ChevronDown className={`w-6 h-6 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-        </button>
-        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'mt-4 max-h-[1000px]' : 'max-h-0'}`}>
-            {children}
-        </div>
-    </div>
-);
-
-const CharacterCard: FC<{
-    character: Character;
-    previewUrl?: string;
-    onChange: (id: string, field: keyof Omit<Character, 'id' | 'visualInspiration'>, value: string) => void;
-    onInspirationChange: (id: string, inspiration: Character['visualInspiration'], previewUrl: string) => void;
-    onDrawClick: (id: string) => void;
-    onRemove?: (id: string) => void;
-    isOnlyCharacter: boolean;
-// FIX: Added 'isOnlyCharacter' to the destructured props to resolve a 'Cannot find name' error.
-}> = ({ character, previewUrl, onChange, onInspirationChange, onDrawClick, onRemove, isOnlyCharacter }) => {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const { t } = useAppContext();
-
-    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            try {
-                const { mimeType, data } = await fileToBase64(file);
-                onInspirationChange(character.id, { mimeType, data }, URL.createObjectURL(file));
-            } catch (error) {
-                console.error("Error converting file to base64", error);
-            }
-        }
-    };
-
-    return (
-        <div className="bg-slate-100/60 p-4 rounded-xl relative">
-            {!isOnlyCharacter && onRemove && (
-                <button
-                    type="button"
-                    onClick={() => onRemove(character.id)}
-                    className="absolute top-2 right-2 p-1.5 text-slate-400 hover:bg-red-100 hover:text-red-500 rounded-full transition-colors"
-                    aria-label="Remove character"
-                >
-                    <Trash2 className="w-4 h-4" />
-                </button>
-            )}
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="w-full sm:w-28 flex-shrink-0">
-                    <div className="aspect-square w-full bg-slate-200 rounded-lg flex items-center justify-center overflow-hidden">
-                        {previewUrl ? (
-                            <img src={previewUrl} alt="Character inspiration" className="w-full h-full object-cover" />
-                        ) : (
-                            <Image className="w-8 h-8 text-slate-400" />
-                        )}
-                    </div>
-                    <div className="flex justify-around mt-2">
-                        <button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            title={t('input.visualInspiration.uploadDescription')}
-                            className="p-1.5 text-slate-500 hover:text-fuchsia-600 transition-colors"
-                        >
-                            <Upload className="w-5 h-5" />
-                        </button>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            accept="image/*"
-                            className="hidden"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => onDrawClick(character.id)}
-                            title={t('input.visualInspiration.drawDescription')}
-                            className="p-1.5 text-slate-500 hover:text-fuchsia-600 transition-colors"
-                        >
-                            <PenSquare className="w-5 h-5" />
-                        </button>
-                    </div>
-                </div>
-                <div className="flex-grow space-y-2">
-                    <input type="text" placeholder={t('input.character.name')} value={character.name} onChange={(e) => onChange(character.id, 'name', e.target.value)} className="w-full p-2 bg-white/80 border border-slate-300/80 rounded-md focus:ring-2 focus:ring-fuchsia-300" />
-                    <input type="text" placeholder={t('input.character.type')} value={character.type} onChange={(e) => onChange(character.id, 'type', e.target.value)} className="w-full p-2 bg-white/80 border border-slate-300/80 rounded-md focus:ring-2 focus:ring-fuchsia-300" />
-                    <input type="text" placeholder={t('input.character.personality')} value={character.personality} onChange={(e) => onChange(character.id, 'personality', e.target.value)} className="w-full p-2 bg-white/80 border border-slate-300/80 rounded-md focus:ring-2 focus:ring-fuchsia-300" />
-                </div>
-            </div>
-        </div>
-    );
-};
-
-
-const OptionSelector: FC<{ label: string; value: string; onChange: (value: string) => void; options: { value: string; label: string; }[] }> = ({ label, value, onChange, options }) => (
-    <div>
-        <label className="block text-sm font-bold text-slate-600 mb-2">{label}</label>
-        <div className="flex flex-wrap gap-2">
-            {options.map(opt => (
-                <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => onChange(opt.value)}
-                    className={`px-3 py-1.5 text-sm font-bold rounded-full transition-colors ${value === opt.value ? 'bg-fuchsia-500 text-white shadow' : 'bg-slate-200/80 text-slate-700 hover:bg-slate-300/80'}`}
-                >
-                    {opt.label}
-                </button>
-            ))}
-        </div>
-    </div>
-);
-
 
 export default InputScreen;
