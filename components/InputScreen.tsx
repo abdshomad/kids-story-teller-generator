@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryOptions } from '../types';
 import { LANGUAGES, AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES } from '../constants';
@@ -90,7 +91,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory, samplePrompts,
             <div className="flex flex-wrap justify-center items-center gap-4 my-6">
               {(isLoadingSamples && samplePrompts.length === 0) ? Array.from({ length: 4 }).map((_, i) => (<div key={i} className={`h-12 w-48 rounded-full animate-pulse ${sampleButtonColors[i % 4]}`} />)) : (
                 <>
-                  {samplePrompts.map((s, i) => <button key={i} type="button" onClick={() => handleInputChange('prompt', s.prompt)} className={`text-sm font-bold text-white px-4 py-2 rounded-full shadow-lg ${sampleButtonColors[i % 4]}`}>{s.title}</button>)}
+                  {samplePrompts.map((s, i) => <button key={i} type="button" onClick={() => handleInputChange('prompt', s.prompt)} className={`text-sm font-bold text-white px-4 py-2 rounded-full shadow-lg transition-all duration-200 ${sampleButtonColors[i % 4]} ${options.prompt === s.prompt ? 'scale-105' : 'hover:scale-105'}`}>{s.title}</button>)}
                   <button type="button" onClick={addMorePrompts} disabled={isLoadingSamples} className="text-sm font-bold text-slate-600 hover:text-fuchsia-600 disabled:text-slate-400 transition-colors flex items-center gap-1"> {isLoadingSamples ? <Loader2 className="w-4 h-4 animate-spin"/> : <Sparkles className="w-4 h-4"/>} {t('input.samples.addMore')} </button>
                 </>
               )}

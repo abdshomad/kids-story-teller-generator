@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useTextToSpeech } from './useTextToSpeech';
 import { StoryData } from '../types';
 
@@ -10,14 +10,23 @@ export const useStoryPlayer = (
     const [isAutoPlay, setIsAutoPlay] = useState(false);
     const { isSpeaking, speak, cancel, isSupported } = useTextToSpeech();
     const [currentAudioIndex, setCurrentAudioIndex] = useState(0);
+    const nextPageTimeoutRef = useRef<number | null>(null);
 
     const pageAudioUrls = useMemo(() => 
         (currentPage >= 0 && story.pages[currentPage]?.audioUrls) || [],
     [currentPage, story.pages]);
 
+    const clearNextPageTimeout = () => {
+        if (nextPageTimeoutRef.current) {
+            clearTimeout(nextPageTimeoutRef.current);
+            nextPageTimeoutRef.current = null;
+        }
+    };
+
     // Reset audio index when page changes manually
     useEffect(() => {
         setCurrentAudioIndex(0);
+        clearNextPageTimeout();
         // Also cancel any ongoing speech from the previous page
         if (isSpeaking) {
             cancel();
@@ -34,7 +43,9 @@ export const useStoryPlayer = (
                     setCurrentAudioIndex(prev => prev + 1);
                 } else {
                     if (currentPage < story.pages.length - 1) {
-                        goToNextPage();
+                        nextPageTimeoutRef.current = window.setTimeout(() => {
+                            goToNextPage();
+                        }, 1500); // Add a 1.5-second delay
                     } else {
                         setIsAutoPlay(false); // End of story
                     }
@@ -46,6 +57,7 @@ export const useStoryPlayer = (
     const canPlay = isSupported && story.pages.some(p => p.audioUrls && p.audioUrls.length > 0);
 
     const handleReadAloud = () => {
+        clearNextPageTimeout();
         if (isSpeaking) {
             cancel();
             setIsAutoPlay(false);
@@ -59,13 +71,19 @@ export const useStoryPlayer = (
         }
     };
     
+    const cancelSpeech = () => {
+        clearNextPageTimeout();
+        cancel();
+    };
+
     // Stop autoplay if the user navigates away or component unmounts
     useEffect(() => {
         return () => {
+            clearNextPageTimeout();
             cancel();
             setIsAutoPlay(false);
         };
     }, [cancel]);
 
-    return { isSpeaking, handleReadAloud, canPlayAudio: canPlay, cancelSpeech: cancel };
+    return { isSpeaking, handleReadAloud, canPlayAudio: canPlay, cancelSpeech };
 };
