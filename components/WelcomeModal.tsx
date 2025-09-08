@@ -20,11 +20,11 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onAcknowledge }) => {
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity duration-300">
-      <div className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl max-w-4xl w-full p-6 sm:p-8 text-center transform transition-all duration-300 scale-100 opacity-100">
+      <div className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl max-w-4xl w-full p-4 sm:p-8 text-center transform transition-all duration-300 scale-100 opacity-100 max-h-full overflow-y-auto">
         
         <header className="flex flex-col items-center gap-6 mb-6">
             <div className="w-full flex justify-center">
-                <div className="flex items-center gap-1 bg-gray-200/50 rounded-full p-1 shadow-inner">
+                <div className="flex flex-wrap justify-center items-center gap-1 bg-gray-200/50 rounded-full p-1 shadow-inner">
                     {LANGUAGES.map(lang => (
                         <button
                             key={lang.code}
@@ -72,7 +72,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onAcknowledge }) => {
 
         <button
           onClick={onAcknowledge}
-          className="w-full sm:w-auto bg-fuchsia-600 text-white font-bold tracking-wider py-4 px-10 rounded-full hover:bg-fuchsia-700 focus:outline-none focus:ring-4 focus:ring-fuchsia-300 transition-all duration-300 shadow-lg text-lg"
+          className="w-full sm:w-auto bg-fuchsia-600 text-white font-bold tracking-wider py-3 sm:py-4 px-6 sm:px-10 rounded-full hover:bg-fuchsia-700 focus:outline-none focus:ring-4 focus:ring-fuchsia-300 transition-all duration-300 shadow-lg text-base sm:text-lg"
         >
           {t('welcome.button')}
         </button>
