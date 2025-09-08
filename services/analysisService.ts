@@ -1,7 +1,9 @@
+
 import { GoogleGenAI } from "@google/genai";
 import { Language, Character } from '../types';
 import { generateImageWithFal } from './apiService';
-import { samplePromptsSchema, charactersSchema, getLanguageName } from './promptService';
+import { samplePromptsSchema, charactersSchema } from './schemas';
+import { getLanguageName } from './promptService';
 
 if (!process.env.API_KEY) {
   throw new Error("API_KEY environment variable not set");
