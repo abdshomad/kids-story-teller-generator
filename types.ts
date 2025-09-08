@@ -6,11 +6,16 @@ export interface Character {
   name: string;
   type: string;
   personality: string;
+  voiceId: string;
   visualInspiration?: {
     mimeType: string;
     data: string; // base64
   };
 }
+
+export type PageTextPart = 
+  | { type: 'narration'; content: string; }
+  | { type: 'dialogue'; characterName: string; content: string; };
 
 export interface StoryOptions {
   prompt: string;
@@ -29,10 +34,10 @@ export interface SoundEffect {
 }
 
 export interface StoryPage {
-  text: string;
+  text: PageTextPart[];
   imagePrompt: string;
   imageUrl?: string | 'GENERATION_FAILED';
-  audioUrl?: string;
+  audioUrls?: string[];
   soundEffects?: SoundEffect[];
 }
 

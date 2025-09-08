@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { extractAndGenerateCharacters } from '../services/analysisService';
 import { Character, Language } from '../types';
+import { CHARACTER_VOICES } from '../constants';
 
 type SetterFn = (characters: Character[], previews: Record<string, string>) => void;
-const createNewCharacter = (): Character => ({ id: `char-${Date.now()}`, name: '', type: '', personality: '' });
+// FIX: Added missing 'voiceId' property to conform to the Character type.
+const createNewCharacter = (): Character => ({ id: `char-${Date.now()}`, name: '', type: '', personality: '', voiceId: CHARACTER_VOICES[0].id });
 
 export const useCharacterExtraction = (prompt: string, language: Language, setCharacters: SetterFn, characterFieldsEdited: boolean) => {
   const [isExtractingCharacter, setIsExtractingCharacter] = useState(false);
@@ -21,7 +23,8 @@ export const useCharacterExtraction = (prompt: string, language: Language, setCh
           const extracted = await extractAndGenerateCharacters(currentPrompt, language);
           if (lastExtractedPrompt.current === currentPrompt && !characterFieldsEdited) {
             if (extracted.length > 0) {
-              const newChars = extracted.map(c => ({ id: `char-${Date.now()}-${Math.random()}`, name: c.name || '', type: c.type || '', personality: c.personality || '', visualInspiration: c.visualInspiration }));
+              // FIX: Added missing 'voiceId' property to conform to the Character type.
+              const newChars = extracted.map(c => ({ id: `char-${Date.now()}-${Math.random()}`, name: c.name || '', type: c.type || '', personality: c.personality || '', visualInspiration: c.visualInspiration, voiceId: CHARACTER_VOICES[0].id }));
               const newPreviews = extracted.reduce((acc, char, i) => {
                 if (char.previewUrl) acc[newChars[i].id] = char.previewUrl;
                 return acc;

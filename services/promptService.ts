@@ -1,4 +1,3 @@
-
 import { Language, StoryOptions, Character } from '../types';
 
 export const getLanguageName = (lang: Language): string => {
@@ -44,9 +43,15 @@ Guidelines:
 - Age: ${options.ageGroup}, Theme: ${options.theme}
 - Tone: Positive, uplifting, kind. NO violence, scary elements, or mature themes.
 - Length: Exactly ${getPageCount(options.length)} pages (paragraphs).
-- Narration Tags: Embed emotional context tags like [laughs], [sighs], [excited] for the voice actor. Example: "He shouted, [excited]."
+- Text Structure: For each page, structure the text as an array of objects. Each object must have a 'type' ('narration' or 'dialogue') and 'content'. Dialogue objects MUST also include a 'characterName' field, matching one of the character names provided below.
+  Example:
+  [
+    { "type": "narration", "content": "The sun was setting over the hills." },
+    { "type": "dialogue", "characterName": "Barnaby", "content": "Oh, what a wonderful day!" }
+  ]
+- Narration Tags: Embed emotional context tags like [laughs], [sighs], [excited] inside the 'content' field for the voice actor. Example: "He shouted, [excited]."
 - Image Prompts: For each page, create a child-friendly, G-rated image prompt.
-- Sound Effects: For each page, identify 1-2 key moments. Provide the exact text trigger and a simple sfx_prompt (e.g., "leaves rustling").
+- Sound Effects: For each page, identify 1-2 key moments. Provide the exact text trigger (which must be a phrase from the 'content' of one of the text parts) and a simple sfx_prompt (e.g., "leaves rustling").
 
 CRUCIAL: For all image prompts, you MUST use the exact visual descriptions provided below for each character to ensure visual consistency.
 Main Characters' Visual Descriptions:

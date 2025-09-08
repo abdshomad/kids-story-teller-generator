@@ -28,6 +28,7 @@ export const zh = {
   'input.character.name': '名字',
   'input.character.type': '类型（例如，一只勇敢的狮子）',
   'input.character.personality': '性格（例如，好奇又善良）',
+  'input.character.voice': '声音',
   'input.options.title': '自定义您的故事',
   'input.options.age': '年龄组',
   'input.options.theme': '主题',

@@ -1,4 +1,5 @@
 import { FAL_API_KEY, ELEVENLABS_API_KEY } from '../env';
+import { NARRATOR_VOICE_ID } from '../constants';
 
 const FAL_IMG_API_URL = 'https://fal.run/fal-ai/nano-banana';
 
@@ -71,25 +72,25 @@ export const generateSoundEffect = async (prompt: string): Promise<string | unde
     }
 };
 
-export const generateAudio = async (text: string): Promise<string | undefined> => {
+export const generateAudio = async (text: string, voiceId: string = NARRATOR_VOICE_ID): Promise<string | undefined> => {
     if (!ELEVENLABS_API_KEY) {
         console.warn("ELEVENLABS_API_KEY not found. Skipping audio generation.");
         return undefined;
     }
     try {
-        const textToSpeak = text;
-        if (!textToSpeak || !textToSpeak.trim()) {
+        const textToSpeak = text.replace(/\[.*?\]/g, '').replace(/\s\s+/g, ' ').trim();
+        if (!textToSpeak) {
             return undefined;
         }
 
-        const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/piTKgcLEGmPE4e6mEKli`; // Nicole
+        const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_API_KEY },
             body: JSON.stringify({
                 text: textToSpeak,
-                model_id: 'eleven_v3',
-                voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0.2, use_speaker_boost: true },
+                model_id: 'eleven_multilingual_v2',
+                voice_settings: { stability: 0.6, similarity_boost: 0.75, style: 0.05, use_speaker_boost: true },
             }),
         });
         if (!response.ok) throw new Error(`ElevenLabs API error: ${response.status}`);

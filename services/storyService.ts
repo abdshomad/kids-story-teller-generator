@@ -1,9 +1,9 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { StoryOptions, StoryData, StoryPage, LoadingStage, StoryOutline, Character } from '../types';
 import { generateImageWithFal, generateAudio, generateSoundEffect } from './apiService';
 import { storyOutlineSchema, storySchema } from './schemas';
 import { buildOutlinePrompt, buildFullStoryPrompt } from './promptService';
+import { NARRATOR_VOICE_ID } from "../constants";
 
 if (!process.env.API_KEY) {
   throw new Error("API_KEY environment variable not set");
@@ -88,7 +88,7 @@ export const generateFullStoryFromSelection = async (options: StoryOptions, sele
   const parsedStory = await generateStoryTextAndPrompts(options, synopsis, detailedCharacterDescriptions, finalIllustrationStyle, (key) => t(key) as string);
   
   const finalOptions = { ...options, illustrationStyle: finalIllustrationStyle };
-  const storyData: StoryData = { title: '', pages: parsedStory.pages?.map(p => ({ ...p, imageUrl: undefined, audioUrl: undefined })) || [], options: finalOptions };
+  const storyData: StoryData = { title: '', pages: parsedStory.pages?.map(p => ({ ...p, imageUrl: undefined, audioUrls: undefined })) || [], options: finalOptions };
 
   onUpdate({ stage: LoadingStage.PAINTING_SCENES, storyData, progress: { current: 0, total: storyData.pages.length } });
   const imagePromises = storyData.pages.map((page, index) =>
@@ -102,9 +102,21 @@ export const generateFullStoryFromSelection = async (options: StoryOptions, sele
   onUpdate({ stage: LoadingStage.FINAL_TOUCHES, storyData, progress: { current: 0, total: storyData.pages.length } });
   for (let i = 0; i < storyData.pages.length; i++) {
     const page = storyData.pages[i];
-    const narrationPromise = generateAudio(page.text).then(url => { page.audioUrl = url; });
+    
+    const audioPartPromises = page.text.map(part => {
+        if (part.type === 'dialogue') {
+            const character = options.characters.find(c => c.name === part.characterName);
+            const voiceId = character?.voiceId || NARRATOR_VOICE_ID;
+            return generateAudio(part.content, voiceId);
+        }
+        return generateAudio(part.content, NARRATOR_VOICE_ID);
+    });
+
+    const urls = await Promise.all(audioPartPromises);
+    page.audioUrls = urls.filter((url): url is string => !!url);
+
     const sfxPromises = page.soundEffects?.map(sfx => generateSoundEffect(sfx.sfx_prompt).then(url => { sfx.audioUrl = url; })) || [];
-    await Promise.all([narrationPromise, ...sfxPromises]);
+    await Promise.all(sfxPromises);
     onUpdate({ stage: LoadingStage.FINAL_TOUCHES, storyData: { ...storyData }, progress: { current: i + 1, total: storyData.pages.length } });
   }
 

@@ -28,6 +28,7 @@ export const ar = {
   'input.character.name': 'الاسم',
   'input.character.type': 'النوع (على سبيل المثال، أسد شجاع)',
   'input.character.personality': 'الشخصية (على سبيل المثال، فضولي ولطيف)',
+  'input.character.voice': 'الصوت',
   'input.options.title': 'خصص قصتك',
   'input.options.age': 'الفئة العمرية',
   'input.options.theme': 'الموضوع',

@@ -1,4 +1,3 @@
-
 import { Type } from "@google/genai";
 
 export const storyOutlineSchema = {
@@ -33,8 +32,26 @@ export const storySchema = {
         type: Type.OBJECT,
         properties: {
           text: {
-            type: Type.STRING,
-            description: 'One paragraph of the story. It should be engaging and appropriate for the specified age group.',
+            type: Type.ARRAY,
+            description: "An array of objects representing parts of the text, separating narration from dialogue. Example: [{type: 'narration', content: '...'}, {type: 'dialogue', characterName: 'Character', content: '...'}]",
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                type: {
+                  type: Type.STRING,
+                  description: "The type of text, either 'narration' or 'dialogue'."
+                },
+                characterName: {
+                  type: Type.STRING,
+                  description: "If type is 'dialogue', the name of the character speaking. Must match a provided character name."
+                },
+                content: {
+                  type: Type.STRING,
+                  description: 'The text content for this part. Should include emotional context tags like [laughs].'
+                }
+              },
+              required: ["type", "content"]
+            }
           },
           imagePrompt: {
             type: Type.STRING,
@@ -42,13 +59,13 @@ export const storySchema = {
           },
           soundEffects: {
             type: Type.ARRAY,
-            description: 'An optional array of sound effects for this page. Identify 1-2 key moments.',
+            description: "An optional array of sound effects for this page. Identify 1-2 key moments. The text_trigger must be a phrase from the 'content' of one of the text parts.",
             items: {
                 type: Type.OBJECT,
                 properties: {
                     text_trigger: {
                         type: Type.STRING,
-                        description: 'The exact text phrase from the page\'s main text that should trigger this sound effect.'
+                        description: "The exact text phrase from the 'content' of one of the text parts on this page that should trigger this sound effect."
                     },
                     sfx_prompt: {
                         type: Type.STRING,

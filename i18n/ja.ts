@@ -28,6 +28,7 @@ export const ja = {
   'input.character.name': '名前',
   'input.character.type': 'タイプ（例：勇敢なライオン）',
   'input.character.personality': '性格（例：好奇心旺盛で親切）',
+  'input.character.voice': '声',
   'input.options.title': '物語をカスタマイズ',
   'input.options.age': '年齢層',
   'input.options.theme': 'テーマ',

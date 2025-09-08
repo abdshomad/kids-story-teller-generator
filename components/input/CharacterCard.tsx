@@ -1,7 +1,8 @@
 import React, { FC, useRef } from 'react';
 import { Character } from '../../types';
 import { useAppContext } from '../../App';
-import { Image, Upload, PenSquare, Trash2 } from 'lucide-react';
+import { Image, Upload, PenSquare, Trash2, Loader2 } from 'lucide-react';
+import { CHARACTER_VOICES } from '../../constants';
 
 const fileToBase64 = (file: File): Promise<{mimeType: string, data: string}> => {
   return new Promise((resolve, reject) => {
@@ -20,12 +21,13 @@ const fileToBase64 = (file: File): Promise<{mimeType: string, data: string}> => 
 const CharacterCard: FC<{
     character: Character;
     previewUrl?: string;
-    onChange: (id: string, field: keyof Omit<Character, 'id' | 'visualInspiration'>, value: string) => void;
+    onChange: (id: string, field: keyof Omit<Character, 'id' | 'visualInspiration'> | 'voiceId', value: string) => void;
     onInspirationChange: (id: string, inspiration: Character['visualInspiration'], previewUrl: string) => void;
     onDrawClick: (id: string) => void;
     onRemove?: (id: string) => void;
     isOnlyCharacter: boolean;
-}> = ({ character, previewUrl, onChange, onInspirationChange, onDrawClick, onRemove, isOnlyCharacter }) => {
+    isGeneratingImage?: boolean;
+}> = ({ character, previewUrl, onChange, onInspirationChange, onDrawClick, onRemove, isOnlyCharacter, isGeneratingImage }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { t } = useAppContext();
 
@@ -55,9 +57,14 @@ const CharacterCard: FC<{
             )}
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="w-full sm:w-28 flex-shrink-0">
-                    <div className="aspect-square w-full bg-slate-200 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="aspect-square w-full bg-slate-200 rounded-lg flex items-center justify-center overflow-hidden relative">
                         {previewUrl ? (
                             <img src={previewUrl} alt="Character inspiration" className="w-full h-full object-cover" />
+                        ) : isGeneratingImage ? (
+                            <div className="flex flex-col items-center justify-center text-slate-500">
+                                <Loader2 className="w-8 h-8 animate-spin" />
+                                <span className="text-xs mt-2 font-semibold">Generating...</span>
+                            </div>
                         ) : (
                             <Image className="w-8 h-8 text-slate-400" />
                         )}
@@ -92,6 +99,19 @@ const CharacterCard: FC<{
                     <input type="text" placeholder={t('input.character.name')} value={character.name} onChange={(e) => onChange(character.id, 'name', e.target.value)} className="w-full p-2 bg-white/80 border border-slate-300/80 rounded-md focus:ring-2 focus:ring-fuchsia-300" />
                     <input type="text" placeholder={t('input.character.type')} value={character.type} onChange={(e) => onChange(character.id, 'type', e.target.value)} className="w-full p-2 bg-white/80 border border-slate-300/80 rounded-md focus:ring-2 focus:ring-fuchsia-300" />
                     <input type="text" placeholder={t('input.character.personality')} value={character.personality} onChange={(e) => onChange(character.id, 'personality', e.target.value)} className="w-full p-2 bg-white/80 border border-slate-300/80 rounded-md focus:ring-2 focus:ring-fuchsia-300" />
+                     <div>
+                        <label className="sr-only" htmlFor={`voice-${character.id}`}>{t('input.character.voice')}</label>
+                        <select
+                            id={`voice-${character.id}`}
+                            value={character.voiceId}
+                            onChange={(e) => onChange(character.id, 'voiceId', e.target.value)}
+                            className="w-full p-2 bg-white/80 border border-slate-300/80 rounded-md focus:ring-2 focus:ring-fuchsia-300"
+                        >
+                            {CHARACTER_VOICES.map(voice => (
+                                <option key={voice.id} value={voice.id}>{voice.name}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>

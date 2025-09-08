@@ -28,6 +28,7 @@ export const hi = {
   'input.character.name': 'नाम',
   'input.character.type': 'प्रकार (जैसे, एक बहादुर शेर)',
   'input.character.personality': 'व्यक्तित्व (जैसे, जिज्ञासु और दयालु)',
+  'input.character.voice': 'आवाज़',
   'input.options.title': 'अपनी कहानी को अनुकूलित करें',
   'input.options.age': 'आयु समूह',
   'input.options.theme': 'विषय',

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { StoryPage } from '../../types';
 import { Loader2, ImageOff } from 'lucide-react';
@@ -20,7 +19,8 @@ const PageThumbnail: React.FC<PageThumbnailProps> = ({ page, pageNumber }) => (
             )}
         </div>
         <h3 className="font-bold text-sm text-slate-700">Page {pageNumber}</h3>
-        <p className="text-xs text-slate-600 h-12 overflow-hidden">{page.text}</p>
+        {/* FIX: Mapped over page.text parts and joined them to render as a string, resolving the ReactNode type error. */}
+        <p className="text-xs text-slate-600 h-12 overflow-hidden">{page.text.map(p => p.content).join(' ')}</p>
         <p className="text-xs text-slate-400 italic mt-1 truncate group-hover:whitespace-normal group-hover:text-slate-500 transition">
             &ldquo;{page.imagePrompt}&rdquo;
         </p>

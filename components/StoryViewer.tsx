@@ -22,7 +22,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryIma
   const totalPages = story.pages.length;
 
   const { currentPage, setCurrentPage, goToNextPage, goToPrevPage } = useStoryNavigation(totalPages);
-  const { isSpeaking, handleReadAloud, canPlayAudio, cancelSpeech } = useStoryPlayer(story, currentPage, goToNextPage, language);
+  const { isSpeaking, handleReadAloud, canPlayAudio, cancelSpeech } = useStoryPlayer(story, currentPage, goToNextPage);
   const { playSfx, stopSfx } = useSoundEffects();
   
   useEffect(() => { stopSfx(); }, [currentPage, stopSfx]);
@@ -35,27 +35,38 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onNewStory, onRetryIma
 
   const renderPageTextWithSfx = useCallback((page: StoryPage) => {
     const { text, soundEffects } = page;
-    if (!soundEffects || soundEffects.length === 0) return stripNarrationTags(text);
-
+    
     const triggerMap = new Map<string, string>();
-    soundEffects.forEach(sfx => { if (sfx.text_trigger && sfx.audioUrl) triggerMap.set(stripNarrationTags(sfx.text_trigger.trim()), sfx.audioUrl); });
-    
-    const strippedText = stripNarrationTags(text);
-    if (triggerMap.size === 0) return strippedText;
+    if(soundEffects){
+      soundEffects.forEach(sfx => { if (sfx.text_trigger && sfx.audioUrl) triggerMap.set(stripNarrationTags(sfx.text_trigger.trim()), sfx.audioUrl); });
+    }
 
-    const regex = new RegExp(`(${[...triggerMap.keys()].sort((a, b) => b.length - a.length).map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'g');
+    const renderContentWithSfx = (content: string) => {
+      if (triggerMap.size === 0) return <>{content}</>;
+      
+      const regex = new RegExp(`(${[...triggerMap.keys()].sort((a, b) => b.length - a.length).map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'g');
+      
+      return (
+        <>
+          {content.split(regex).filter(Boolean).map((part, index) => {
+            const audioUrl = triggerMap.get(part.trim());
+            if (audioUrl) {
+              return ( <span key={index} className="text-fuchsia-600 font-bold cursor-pointer hover:underline" onClick={() => playSfx(audioUrl)} role="button" tabIndex={0} onKeyPress={(e) => e.key === 'Enter' && playSfx(audioUrl)} title={t('story.sfx_tooltip')}> {part} </span> );
+            }
+            return <React.Fragment key={index}>{part}</React.Fragment>;
+          })}
+        </>
+      );
+    };
     
-    return (
-      <>
-        {strippedText.split(regex).filter(Boolean).map((part, index) => {
-          const audioUrl = triggerMap.get(part.trim());
-          if (audioUrl) {
-            return ( <span key={index} className="text-purple-600 font-bold cursor-pointer hover:underline" onClick={() => playSfx(audioUrl)} role="button" tabIndex={0} onKeyPress={(e) => e.key === 'Enter' && playSfx(audioUrl)} title={t('story.sfx_tooltip')}> {part} </span> );
-          }
-          return <React.Fragment key={index}>{part}</React.Fragment>;
-        })}
-      </>
-    );
+    return text.map((part, index) => {
+      const renderedContent = renderContentWithSfx(stripNarrationTags(part.content));
+      if (part.type === 'dialogue') {
+        return <p key={index} className="mb-2"><strong className="text-purple-700">{part.characterName}:</strong> <em className="text-slate-800">"{renderedContent}"</em></p>;
+      }
+      return <p key={index} className="mb-2 inline">{renderedContent} </p>;
+    });
+
   }, [playSfx, t]);
 
   return (

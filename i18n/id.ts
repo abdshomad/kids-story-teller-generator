@@ -27,6 +27,7 @@ export const id = {
   'input.character.name': 'Nama',
   'input.character.type': 'Jenis (misalnya, singa pemberani)',
   'input.character.personality': 'Kepribadian (misalnya, ingin tahu dan baik hati)',
+  'input.character.voice': 'Suara',
   'input.options.title': 'Sesuaikan Cerita Anda',
   'input.options.age': 'Kelompok Usia',
   'input.options.theme': 'Tema',

@@ -27,6 +27,7 @@ export const en = {
   'input.character.name': 'Name',
   'input.character.type': 'Type (e.g., a brave lion)',
   'input.character.personality': 'Personality (e.g., curious and kind)',
+  'input.character.voice': 'Voice',
   'input.options.title': 'Customize Your Story',
   'input.options.age': 'Age Group',
   'input.options.theme': 'Theme',

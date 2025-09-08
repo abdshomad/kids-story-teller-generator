@@ -12,6 +12,15 @@ export const LANGUAGES: { code: Language; label: string; flag: string; }[] = [
   { code: 'zh', label: 'ZH', flag: '🇨🇳' },
 ];
 
+export const CHARACTER_VOICES = [
+  { id: 'jBpfuIE2acCO8z3wKNLl', name: 'Gigi (Young Girl)' },
+  { id: 'D38z5RcWu1voky8WS1ja', name: 'Fin (Young Boy)' },
+  { id: 'ThT5KcBeYPX3keUQqHPh', name: 'Dorothy (Grandmother)' },
+  { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam (Deep Voice)' },
+  { id: 'pFZP5JQG7iQjIQUymGRi', name: 'Lily (Soft Voice)' },
+];
+export const NARRATOR_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel
+
 export const AGE_GROUPS = [
   { value: '3-5 years', labelKey: 'age.3-5' },
   { value: '6-8 years', labelKey: 'age.6-8' }

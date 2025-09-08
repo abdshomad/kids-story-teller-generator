@@ -1,14 +1,20 @@
 import { useState, useCallback } from 'react';
 import { StoryOptions, Character, Language } from '../types';
-import { AGE_GROUPS, THEMES, ILLUSTRATION_STYLES } from '../constants';
+import { AGE_GROUPS, THEMES, ILLUSTRATION_STYLES, CHARACTER_VOICES } from '../constants';
 
 const createNewCharacter = (): Character => ({
   id: `char-${Date.now()}-${Math.random()}`,
   name: '',
   type: '',
   personality: '',
+  voiceId: CHARACTER_VOICES[0].id,
   visualInspiration: undefined,
 });
+
+const getRandomIllustrationStyle = () => {
+    const randomIndex = Math.floor(Math.random() * ILLUSTRATION_STYLES.length);
+    return ILLUSTRATION_STYLES[randomIndex].value;
+};
 
 export const useStoryOptions = (initialLanguage: Language) => {
   const [options, setOptions] = useState<StoryOptions>({
@@ -16,7 +22,7 @@ export const useStoryOptions = (initialLanguage: Language) => {
     ageGroup: AGE_GROUPS[0].value,
     theme: THEMES[0].value,
     length: 'short',
-    illustrationStyle: ILLUSTRATION_STYLES[0].value,
+    illustrationStyle: getRandomIllustrationStyle(),
     characters: [createNewCharacter()],
     language: initialLanguage,
   });
@@ -27,7 +33,7 @@ export const useStoryOptions = (initialLanguage: Language) => {
     setOptions(prev => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleCharacterChange = useCallback((id: string, field: keyof Omit<Character, 'id' | 'visualInspiration'>, value: string) => {
+  const handleCharacterChange = useCallback((id: string, field: keyof Omit<Character, 'id' | 'visualInspiration'> | 'voiceId', value: string) => {
     setOptions(prev => ({
       ...prev,
       characters: prev.characters.map(char =>

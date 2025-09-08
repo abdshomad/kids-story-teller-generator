@@ -101,7 +101,7 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory, samplePrompts,
             <Section title={t('input.character.title')} icon={<UserRound />} id="character" isOpen={openSections.has('character')} onToggle={(id) => setOpenSections(p => p.has(id) ? new Set([...p].filter(s => s !== id)) : new Set([...p, id]))} isLoading={isExtractingCharacter}>
               <p className="text-sm text-slate-600 mb-4">{t('input.character.subtitle')}</p>
               <div className="space-y-6">
-                {options.characters.map((char) => <CharacterCard key={char.id} character={char} previewUrl={characterPreviews[char.id]} onChange={handleAnyCharacterChange} onInspirationChange={handleCharacterInspiration} onDrawClick={setDrawingCharacterId} onRemove={options.characters.length > 1 ? removeCharacter : undefined} isOnlyCharacter={options.characters.length === 1} />)}
+                {options.characters.map((char) => <CharacterCard key={char.id} character={char} previewUrl={characterPreviews[char.id]} onChange={handleAnyCharacterChange} onInspirationChange={handleCharacterInspiration} onDrawClick={setDrawingCharacterId} onRemove={options.characters.length > 1 ? removeCharacter : undefined} isOnlyCharacter={options.characters.length === 1} isGeneratingImage={isExtractingCharacter} />)}
               </div>
               <button type="button" onClick={addCharacter} className="mt-4 flex items-center gap-2 text-sm font-bold text-fuchsia-600 hover:text-fuchsia-700 transition-colors"><Plus className="w-4 h-4" /> Add Another Character </button>
             </Section>
