@@ -1,20 +1,25 @@
 // FIX: Expanded the Language type to include all languages supported in the application, resolving type errors in geminiService.
 export type Language = 'en' | 'id' | 'ar' | 'hi' | 'zh' | 'ja';
 
+export interface Character {
+  id: string;
+  name: string;
+  type: string;
+  personality: string;
+  visualInspiration?: {
+    mimeType: string;
+    data: string; // base64
+  };
+}
+
 export interface StoryOptions {
   prompt: string;
   ageGroup: string;
   theme: string;
   length: 'very_short' | 'short' | 'medium' | 'long';
   illustrationStyle: string;
-  characterName: string;
-  characterType: string;
-  characterPersonality: string;
+  characters: Character[];
   language: Language;
-  visualInspiration?: {
-    mimeType: string;
-    data: string; // base64
-  };
 }
 
 export interface SoundEffect {

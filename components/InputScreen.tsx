@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef, FC } from 'react';
-import { StoryOptions } from '../types';
+import { StoryOptions, Character } from '../types';
 import { AGE_GROUPS, THEMES, STORY_LENGTHS, ILLUSTRATION_STYLES, LANGUAGES } from '../constants';
 import { useAppContext } from '../App';
 import { useSpeechToText } from '../hooks/useSpeechToText';
-import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, PenSquare, Loader2, ChevronDown } from 'lucide-react';
+import { Mic, Sparkles, Upload, UserRound, Image, SlidersHorizontal, PenSquare, Loader2, ChevronDown, Plus, Trash2 } from 'lucide-react';
 import FullscreenCanvas from './FullscreenCanvas';
-import { extractCharacterDetails, generateSamplePrompts } from '../services/geminiService';
+import { extractAndGenerateCharacters, generateSamplePrompts } from '../services/geminiService';
 
 interface InputScreenProps {
   onCreateStory: (options: StoryOptions) => void;
@@ -32,6 +32,14 @@ const sampleButtonColors = [
     'bg-emerald-400 hover:bg-emerald-500',
 ];
 
+const createNewCharacter = (): Character => ({
+  id: `char-${Date.now()}-${Math.random()}`,
+  name: '',
+  type: '',
+  personality: '',
+  visualInspiration: undefined,
+});
+
 const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   const { language, setLanguage, t } = useAppContext();
   const [options, setOptions] = useState<StoryOptions>({
@@ -40,20 +48,19 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     theme: THEMES[0].value,
     length: 'short',
     illustrationStyle: ILLUSTRATION_STYLES[0].value,
-    characterName: '',
-    characterType: '',
-    characterPersonality: '',
+    characters: [createNewCharacter()],
     language: language,
   });
-  const [visualInspirationPreview, setVisualInspirationPreview] = useState<string | null>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
+  
+  const [characterPreviews, setCharacterPreviews] = useState<Record<string, string>>({});
+  const [drawingCharacterId, setDrawingCharacterId] = useState<string | null>(null);
   
   const [samplePrompts, setSamplePrompts] = useState<{ title: string; prompt: string; }[]>([]);
   const [isLoadingSamples, setIsLoadingSamples] = useState(true);
   const [activeSampleIndex, setActiveSampleIndex] = useState(0);
   const [placeholder, setPlaceholder] = useState('');
 
-  const [openSections, setOpenSections] = useState<Set<string>>(new Set());
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set(['character']));
   
   const [characterFieldsEditedByUser, setCharacterFieldsEditedByUser] = useState(false);
   const [isExtractingCharacter, setIsExtractingCharacter] = useState(false);
@@ -80,12 +87,46 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     setOptions(prev => ({ ...prev, [field]: value }));
   }, [error, clearError]);
   
-  const handleCharacterInputChange = useCallback((field: 'characterName' | 'characterType' | 'characterPersonality', value: string) => {
+  const handleCharacterChange = useCallback((id: string, field: keyof Omit<Character, 'id' | 'visualInspiration'>, value: string) => {
     if (!characterFieldsEditedByUser) {
-      setCharacterFieldsEditedByUser(true);
+        setCharacterFieldsEditedByUser(true);
     }
-    handleInputChange(field, value);
-  }, [characterFieldsEditedByUser, handleInputChange]);
+    setOptions(prev => ({
+        ...prev,
+        characters: prev.characters.map(char =>
+            char.id === id ? { ...char, [field]: value } : char
+        ),
+    }));
+  }, [characterFieldsEditedByUser]);
+
+  const handleCharacterInspiration = useCallback((id: string, inspiration: Character['visualInspiration'], previewUrl: string) => {
+    setOptions(prev => ({
+        ...prev,
+        characters: prev.characters.map(char =>
+            char.id === id ? { ...char, visualInspiration: inspiration } : char
+        ),
+    }));
+    setCharacterPreviews(prev => ({ ...prev, [id]: previewUrl }));
+  }, []);
+
+  const addCharacter = () => {
+    setOptions(prev => ({
+        ...prev,
+        characters: [...prev.characters, createNewCharacter()],
+    }));
+  };
+  
+  const removeCharacter = (id: string) => {
+    setOptions(prev => ({
+        ...prev,
+        characters: prev.characters.filter(char => char.id !== id),
+    }));
+    setCharacterPreviews(prev => {
+        const newPreviews = { ...prev };
+        delete newPreviews[id];
+        return newPreviews;
+    });
+  };
 
   useEffect(() => {
     handleInputChange('language', language);
@@ -129,29 +170,36 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
 
 
   useEffect(() => {
+    const examplePlaceholder = "Lily's favorite teddy bear, Barnaby, seems to be a regular toy. But at night, Barnaby whispers exciting secrets about the day's adventures. What amazing things does he tell Lily?";
     if (samplePrompts.length > 0) {
-      setPlaceholder(samplePrompts[activeSampleIndex % samplePrompts.length].prompt);
+      const allPlaceholders = [examplePlaceholder, ...samplePrompts.map(p => p.prompt)];
+      setPlaceholder(allPlaceholders[activeSampleIndex % allPlaceholders.length]);
     } else {
-      setPlaceholder(t('input.prompt.placeholder'));
+      setPlaceholder(examplePlaceholder);
     }
   }, [activeSampleIndex, samplePrompts, t]);
+
 
   useEffect(() => {
     if (options.prompt || samplePrompts.length === 0) {
         return; 
     }
     const intervalId = setInterval(() => {
-        setActiveSampleIndex(prevIndex => (prevIndex + 1) % samplePrompts.length);
+        setActiveSampleIndex(prevIndex => {
+            const totalPlaceholders = samplePrompts.length + 1; // +1 for the static example
+            return (prevIndex + 1) % totalPlaceholders;
+        });
     }, 4000);
     return () => clearInterval(intervalId);
   }, [options.prompt, samplePrompts]);
   
+  
   useEffect(() => {
-    // This effect handles auto-filling character details from the prompt.
-    // It only runs if the prompt is not empty and the user has not manually edited the character fields.
+    // Only trigger if prompt is not empty, user hasn't started manually editing characters,
+    // and the prompt has changed since the last extraction.
     if (options.prompt && !characterFieldsEditedByUser && options.prompt !== lastExtractedPrompt.current) {
         const handler = setTimeout(async () => {
-            // Re-check in case the user started editing during the debounce timeout
+            // Re-check condition inside timeout in case state changed
             if (characterFieldsEditedByUser) return;
             
             const currentPrompt = options.prompt;
@@ -159,44 +207,65 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
             setIsExtractingCharacter(true);
 
             try {
-                const details = await extractCharacterDetails(currentPrompt, language);
+                // This service now returns characters with generated image data
+                const extractedChars: (Partial<Character> & { previewUrl?: string })[] = await extractAndGenerateCharacters(currentPrompt, language);
                 
-                // Final check before setting state to prevent race conditions
-                setOptions(prev => {
-                    if (prev.prompt === currentPrompt && !characterFieldsEditedByUser) {
-                        return {
-                            ...prev,
-                            characterName: details.characterName || '',
-                            characterType: details.characterType || '',
-                            characterPersonality: details.characterPersonality || '',
-                        };
+                // Final check: Only update state if the prompt is still the same one we started with
+                // and the user still hasn't touched the character fields.
+                if (lastExtractedPrompt.current === currentPrompt && !characterFieldsEditedByUser) {
+                    if (extractedChars.length > 0) {
+                        const newCharacters = extractedChars.map(char => ({
+                            id: `char-${Date.now()}-${Math.random()}`,
+                            name: char.name || '',
+                            type: char.type || '',
+                            personality: char.personality || '',
+                            visualInspiration: char.visualInspiration,
+                        }));
+                        
+                        const newPreviews = extractedChars.reduce((acc, char, index) => {
+                            if (char.previewUrl) {
+                                acc[newCharacters[index].id] = char.previewUrl;
+                            }
+                            return acc;
+                        }, {} as Record<string, string>);
+
+                        setOptions(prev => ({ ...prev, characters: newCharacters }));
+                        setCharacterPreviews(newPreviews);
+                    } else {
+                        // If AI returns no characters, reset to a single, default empty character card.
+                        setOptions(prev => ({...prev, characters: [createNewCharacter()]}));
+                        setCharacterPreviews({});
                     }
-                    return prev;
-                });
+                }
             } catch (error) {
-                console.error("Failed to extract character details:", error);
+                console.error("Failed to extract and generate characters:", error);
+                 if (lastExtractedPrompt.current === currentPrompt) {
+                    // On error, also reset to a single default character
+                    setOptions(prev => ({...prev, characters: [createNewCharacter()]}));
+                    setCharacterPreviews({});
+                 }
             } finally {
-                // Only stop the spinner if this was the last request sent
+                // Ensure loader stops only for the prompt it started for
                 if (lastExtractedPrompt.current === currentPrompt) {
                    setIsExtractingCharacter(false);
                 }
             }
-        }, 1500); // 1.5 second debounce after user stops typing
+        }, 1500); // 1.5 second debounce
 
         return () => {
             clearTimeout(handler);
         };
     }
-  }, [options.prompt, language, characterFieldsEditedByUser]);
+}, [options.prompt, language, characterFieldsEditedByUser]);
 
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleFileChange = async (id: string, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       try {
         const { mimeType, data } = await fileToBase64(file);
-        handleInputChange('visualInspiration', { mimeType, data });
-        setVisualInspirationPreview(URL.createObjectURL(file));
+        handleCharacterInspiration(id, { mimeType, data }, URL.createObjectURL(file));
       } catch (error) {
         console.error("Error converting file to base64", error);
       }
@@ -204,13 +273,14 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
   };
   
   const handleDrawingDone = (dataUrl: string) => {
-    const [mimePart, base64Part] = dataUrl.split(',');
-    if (mimePart && base64Part) {
-      const mimeType = mimePart.split(':')[1].split(';')[0];
-      handleInputChange('visualInspiration', { mimeType, data: base64Part });
-      setVisualInspirationPreview(dataUrl);
+    if (drawingCharacterId) {
+        const [mimePart, base64Part] = dataUrl.split(',');
+        if (mimePart && base64Part) {
+            const mimeType = mimePart.split(':')[1].split(';')[0];
+            handleCharacterInspiration(drawingCharacterId, { mimeType, data: base64Part }, dataUrl);
+        }
     }
-    setIsDrawing(false);
+    setDrawingCharacterId(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -228,8 +298,8 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     }
   }, [isListening, isTranscribing, startListening, stopListening]);
 
-  if (isDrawing) {
-      return <FullscreenCanvas onDone={handleDrawingDone} onClose={() => setIsDrawing(false)} />;
+  if (drawingCharacterId) {
+      return <FullscreenCanvas onDone={handleDrawingDone} onClose={() => setDrawingCharacterId(null)} />;
   }
 
   return (
@@ -298,197 +368,68 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
               ) : (
                 <>
                   {samplePrompts.map((sample, i) => {
-                      const isActive = i === activeSampleIndex && !options.prompt;
+                      const isActive = (i + 1) === (activeSampleIndex % (samplePrompts.length + 1)) && !options.prompt;
                       return (
+                        <div key={i} className="flex flex-col items-center">
                           <button
-                              type="button"
-                              key={i}
-                              onClick={() => handleInputChange('prompt', sample.prompt)}
-                              className={`px-5 py-3 text-white font-semibold rounded-full text-sm shadow-md transition-all duration-300 hover:scale-105 whitespace-nowrap ${sampleButtonColors[i % sampleButtonColors.length]} ${isActive ? 'ring-4 ring-offset-2 ring-violet-400 scale-110' : ''}`}
+                            type="button"
+                            onClick={() => handleInputChange('prompt', sample.prompt)}
+                            className={`text-sm font-bold text-white px-4 py-2 rounded-full shadow-lg transition-all duration-300 ${sampleButtonColors[i % sampleButtonColors.length]}`}
                           >
-                              {sample.title}
+                            {sample.title}
                           </button>
+                          {isActive && <div className="mt-1 w-2 h-2 bg-slate-500 rounded-full animate-fade-in-down"></div>}
+                        </div>
                       );
                   })}
+                  <button type="button" onClick={addMorePrompts} disabled={isLoadingSamples} className="text-sm font-bold text-slate-600 hover:text-fuchsia-600 disabled:text-slate-400 transition-colors flex items-center gap-1">
+                    {isLoadingSamples ? <Loader2 className="w-4 h-4 animate-spin"/> : <Sparkles className="w-4 h-4"/>}
+                    {t('input.samples.addMore')}
+                  </button>
                 </>
               )}
-               <button
-                  type="button"
-                  onClick={addMorePrompts}
-                  disabled={isLoadingSamples}
-                  className="px-5 py-3 text-slate-700 bg-white/80 font-semibold rounded-full text-sm shadow-md transition-all duration-300 hover:scale-105 hover:bg-white disabled:opacity-50 disabled:cursor-wait flex items-center gap-2"
-                >
-                  {isLoadingSamples ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5 text-fuchsia-500" />}
-                  {t('input.samples.addMore')}
-                </button>
             </div>
           </section>
-          
-          <div className="grid lg:grid-cols-2 gap-x-12 gap-y-4">
-            <div className="space-y-4">
-                <section>
-                    <button type="button" onClick={() => toggleSection('character')} className="w-full flex justify-between items-center text-xl font-bold text-slate-700 py-2">
-                        <span className="flex items-center gap-2">
-                            <UserRound className="w-6 h-6 text-purple-500" />
-                            {t('input.character.title')}
-                            {isExtractingCharacter && <Loader2 className="w-5 h-5 text-purple-500 animate-spin" />}
-                        </span>
-                        <ChevronDown className={`w-6 h-6 text-slate-500 transition-transform ${openSections.has('character') ? 'rotate-180' : ''}`} />
-                    </button>
-                    {openSections.has('character') && (
-                        <div className="ps-8 animate-fade-in-down">
-                            <p className="text-sm text-slate-500 mb-3">{t('input.character.subtitle')}</p>
-                            <div className="space-y-1">
-                                <input type="text" value={options.characterName} onChange={(e) => handleCharacterInputChange('characterName', e.target.value)} placeholder={t('input.character.name')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
-                                <input type="text" value={options.characterType} onChange={(e) => handleCharacterInputChange('characterType', e.target.value)} placeholder={t('input.character.type')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
-                                <input type="text" value={options.characterPersonality} onChange={(e) => handleCharacterInputChange('characterPersonality', e.target.value)} placeholder={t('input.character.personality')} className="w-full p-3 bg-white/60 border border-slate-300/80 rounded-lg focus:ring-2 focus:ring-purple-300/50 focus:border-purple-300 transition-all placeholder:text-slate-500"/>
-                            </div>
-                        </div>
-                    )}
-                </section>
-                <div className="border-t border-slate-300/70"></div>
-                <section>
-                    <button type="button" onClick={() => toggleSection('visual')} className="w-full flex justify-between items-center text-xl font-bold text-slate-700 py-2">
-                        <span className="flex items-center gap-2">
-                            <Image className="w-6 h-6 text-sky-500" />
-                            {t('input.visualInspiration.label')}
-                        </span>
-                        <ChevronDown className={`w-6 h-6 text-slate-500 transition-transform ${openSections.has('visual') ? 'rotate-180' : ''}`} />
-                    </button>
-                    {openSections.has('visual') && (
-                        <div className="ps-8 animate-fade-in-down">
-                            <div className="bg-slate-100/40 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
-                                <label className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 p-4 border-2 border-dashed border-slate-300/80 rounded-lg text-slate-600 hover:bg-white/80 hover:border-sky-500 hover:text-sky-600 transition-colors">
-                                <Upload className="w-5 h-5" />
-                                <span className="font-semibold">{t('input.visualInspiration.uploadDescription')}</span>
-                                <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-                                </label>
-                                
-                                <span className="font-semibold text-slate-500">or</span>
 
-                                <button type="button" onClick={() => setIsDrawing(true)} className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 p-4 border-2 border-dashed border-slate-300/80 rounded-lg text-slate-600 hover:bg-white/80 hover:border-purple-500 hover:text-purple-600 transition-colors">
-                                <PenSquare className="w-5 h-5" />
-                                <span className="font-semibold">{t('input.visualInspiration.drawDescription')}</span>
-                                </button>
-                                
-                                {visualInspirationPreview && (
-                                <div className="w-full sm:w-auto sm:ms-4 pt-4 sm:pt-0">
-                                    <img src={visualInspirationPreview} alt="Preview" className="rounded-lg object-cover h-24 w-24 mx-auto shadow-md"/>
-                                </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </section>
-                <div className="border-t border-slate-300/70"></div>
-            </div>
-
-            <section>
-              <button type="button" onClick={() => toggleSection('options')} className="w-full flex justify-between items-center text-xl font-bold text-slate-700 py-2">
-                  <span className="flex items-center gap-2">
-                      <SlidersHorizontal className="w-6 h-6 text-emerald-500" />
-                      {t('input.options.title')}
-                  </span>
-                  <ChevronDown className={`w-6 h-6 text-slate-500 transition-transform ${openSections.has('options') ? 'rotate-180' : ''}`} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <Section title={t('input.character.title')} icon={<UserRound />} id="character" isOpen={openSections.has('character')} onToggle={toggleSection} isLoading={isExtractingCharacter}>
+              <p className="text-sm text-slate-600 mb-4">{t('input.character.subtitle')}</p>
+              <div className="space-y-6">
+                {options.characters.map((char, index) => (
+                  <CharacterCard
+                    key={char.id}
+                    character={char}
+                    previewUrl={characterPreviews[char.id]}
+                    onChange={handleCharacterChange}
+                    onInspirationChange={handleCharacterInspiration}
+                    onDrawClick={setDrawingCharacterId}
+                    onRemove={options.characters.length > 1 ? removeCharacter : undefined}
+                    isOnlyCharacter={options.characters.length === 1}
+                  />
+                ))}
+              </div>
+              <button type="button" onClick={addCharacter} className="mt-4 flex items-center gap-2 text-sm font-bold text-fuchsia-600 hover:text-fuchsia-700 transition-colors">
+                <Plus className="w-4 h-4" />
+                Add Another Character
               </button>
-              {openSections.has('options') && (
-                  <div className="space-y-6 pt-2 ps-8 animate-fade-in-down">
-                    
-                    <div>
-                      <label className="block text-sm font-bold text-slate-600 mb-2">{t('input.options.age')}</label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {AGE_GROUPS.map(opt => (
-                          <button
-                            type="button"
-                            key={opt.value}
-                            onClick={() => handleInputChange('ageGroup', opt.value)}
-                            className={`w-full p-3 rounded-lg text-sm font-bold transition-all text-center border ${
-                              options.ageGroup === opt.value
-                                ? 'bg-purple-500 text-white shadow-md border-purple-500'
-                                : 'bg-white/60 text-slate-700 hover:bg-white/90 border-slate-300/80'
-                            }`}
-                          >
-                            {t(opt.labelKey)}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+            </Section>
 
-                    <div>
-                      <label className="block text-sm font-bold text-slate-600 mb-2">{t('input.options.theme')}</label>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        {THEMES.map(opt => {
-                          const Icon = opt.icon;
-                          return (
-                            <button
-                              type="button"
-                              key={opt.value}
-                              onClick={() => handleInputChange('theme', opt.value)}
-                              className={`w-full p-3 rounded-lg text-sm font-bold transition-all border flex flex-col items-center gap-2 ${
-                                options.theme === opt.value
-                                  ? 'bg-purple-500 text-white shadow-md border-purple-500'
-                                  : 'bg-white/60 text-slate-700 hover:bg-white/90 border-slate-300/80'
-                              }`}
-                            >
-                              <Icon className="w-6 h-6" />
-                              <span>{t(opt.labelKey)}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-bold text-slate-600 mb-2">{t('input.options.length')}</label>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        {STORY_LENGTHS.map(opt => (
-                          <button
-                            type="button"
-                            key={opt.value}
-                            onClick={() => handleInputChange('length', opt.value as StoryOptions['length'])}
-                            className={`w-full p-3 rounded-lg text-sm font-bold transition-all text-center border ${
-                              options.length === opt.value
-                                ? 'bg-purple-500 text-white shadow-md border-purple-500'
-                                : 'bg-white/60 text-slate-700 hover:bg-white/90 border-slate-300/80'
-                            }`}
-                          >
-                            {t(opt.labelKey)}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-bold text-slate-600 mb-2">{t('input.options.style')}</label>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        {ILLUSTRATION_STYLES.map(opt => {
-                          const Icon = opt.icon;
-                          return (
-                            <button
-                              type="button"
-                              key={opt.value}
-                              onClick={() => handleInputChange('illustrationStyle', opt.value)}
-                              className={`w-full p-3 rounded-lg text-sm font-bold transition-all border flex flex-col items-center gap-2 ${
-                                options.illustrationStyle === opt.value
-                                  ? 'bg-purple-500 text-white shadow-md border-purple-500'
-                                  : 'bg-white/60 text-slate-700 hover:bg-white/90 border-slate-300/80'
-                              }`}
-                            >
-                              <Icon className="w-6 h-6" />
-                              <span>{t(opt.labelKey)}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                  </div>
-              )}
-            </section>
+            <Section title={t('input.options.title')} icon={<SlidersHorizontal />} id="options" isOpen={openSections.has('options')} onToggle={toggleSection}>
+              <div className="space-y-4">
+                <OptionSelector label={t('input.options.age')} value={options.ageGroup} onChange={(v) => handleInputChange('ageGroup', v)} options={AGE_GROUPS.map(o => ({ ...o, label: t(o.labelKey)}))} />
+                <OptionSelector label={t('input.options.theme')} value={options.theme} onChange={(v) => handleInputChange('theme', v)} options={THEMES.map(o => ({ ...o, label: t(o.labelKey)}))} />
+                <OptionSelector label={t('input.options.length')} value={options.length} onChange={(v) => handleInputChange('length', v as any)} options={STORY_LENGTHS.map(o => ({ ...o, label: t(o.labelKey)}))} />
+                <OptionSelector label={t('input.options.style')} value={options.illustrationStyle} onChange={(v) => handleInputChange('illustrationStyle', v)} options={ILLUSTRATION_STYLES.map(o => ({ ...o, label: t(o.labelKey)}))} />
+              </div>
+            </Section>
           </div>
-          
-          <div className="text-center pt-2">
-            <button type="submit" className="w-full sm:w-auto bg-fuchsia-600 text-white font-bold tracking-wider py-4 px-10 rounded-full hover:bg-fuchsia-700 focus:outline-none focus:ring-4 focus:ring-fuchsia-300 transition-all duration-300 shadow-lg text-lg">
+
+          <div className="text-center pt-4">
+            <button
+              type="submit"
+              disabled={!options.prompt.trim() || isTranscribing}
+              className="px-10 py-4 bg-fuchsia-600 text-white font-extrabold text-lg rounded-full shadow-lg hover:bg-fuchsia-700 transition-all duration-300 disabled:bg-slate-400 disabled:cursor-not-allowed"
+            >
               {t('input.button.create')}
             </button>
           </div>
@@ -497,5 +438,124 @@ const InputScreen: React.FC<InputScreenProps> = ({ onCreateStory }) => {
     </div>
   );
 };
+
+// FIX: The type for the 'icon' prop was too generic (React.ReactElement), which caused a TypeScript error when cloning the element to add a 'className'. By specifying that the element accepts a 'className' prop, we resolve the type error.
+const Section: FC<{ title: string; icon: React.ReactElement<{ className?: string }>; id: string; isOpen: boolean; onToggle: (id: string) => void; children: React.ReactNode; isLoading?: boolean }> = ({ title, icon, id, isOpen, onToggle, children, isLoading = false }) => (
+    <div className="bg-white/50 rounded-2xl p-6 shadow-sm">
+        <button type="button" onClick={() => onToggle(id)} className="w-full flex justify-between items-center text-xl font-bold text-slate-700">
+            <div className="flex items-center gap-3">
+                {/* FIX: Removed unnecessary type assertion after fixing prop type. */}
+                {isLoading ? <Loader2 className="w-6 h-6 animate-spin text-fuchsia-500" /> : React.cloneElement(icon, { className: 'w-6 h-6 text-fuchsia-500' })}
+                <span>{title}</span>
+            </div>
+            <ChevronDown className={`w-6 h-6 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'mt-4 max-h-[1000px]' : 'max-h-0'}`}>
+            {children}
+        </div>
+    </div>
+);
+
+const CharacterCard: FC<{
+    character: Character;
+    previewUrl?: string;
+    onChange: (id: string, field: keyof Omit<Character, 'id' | 'visualInspiration'>, value: string) => void;
+    onInspirationChange: (id: string, inspiration: Character['visualInspiration'], previewUrl: string) => void;
+    onDrawClick: (id: string) => void;
+    onRemove?: (id: string) => void;
+    isOnlyCharacter: boolean;
+// FIX: Added 'isOnlyCharacter' to the destructured props to resolve a 'Cannot find name' error.
+}> = ({ character, previewUrl, onChange, onInspirationChange, onDrawClick, onRemove, isOnlyCharacter }) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { t } = useAppContext();
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            try {
+                const { mimeType, data } = await fileToBase64(file);
+                onInspirationChange(character.id, { mimeType, data }, URL.createObjectURL(file));
+            } catch (error) {
+                console.error("Error converting file to base64", error);
+            }
+        }
+    };
+
+    return (
+        <div className="bg-slate-100/60 p-4 rounded-xl relative">
+            {!isOnlyCharacter && onRemove && (
+                <button
+                    type="button"
+                    onClick={() => onRemove(character.id)}
+                    className="absolute top-2 right-2 p-1.5 text-slate-400 hover:bg-red-100 hover:text-red-500 rounded-full transition-colors"
+                    aria-label="Remove character"
+                >
+                    <Trash2 className="w-4 h-4" />
+                </button>
+            )}
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="w-full sm:w-28 flex-shrink-0">
+                    <div className="aspect-square w-full bg-slate-200 rounded-lg flex items-center justify-center overflow-hidden">
+                        {previewUrl ? (
+                            <img src={previewUrl} alt="Character inspiration" className="w-full h-full object-cover" />
+                        ) : (
+                            <Image className="w-8 h-8 text-slate-400" />
+                        )}
+                    </div>
+                    <div className="flex justify-around mt-2">
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            title={t('input.visualInspiration.uploadDescription')}
+                            className="p-1.5 text-slate-500 hover:text-fuchsia-600 transition-colors"
+                        >
+                            <Upload className="w-5 h-5" />
+                        </button>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="image/*"
+                            className="hidden"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => onDrawClick(character.id)}
+                            title={t('input.visualInspiration.drawDescription')}
+                            className="p-1.5 text-slate-500 hover:text-fuchsia-600 transition-colors"
+                        >
+                            <PenSquare className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+                <div className="flex-grow space-y-2">
+                    <input type="text" placeholder={t('input.character.name')} value={character.name} onChange={(e) => onChange(character.id, 'name', e.target.value)} className="w-full p-2 bg-white/80 border border-slate-300/80 rounded-md focus:ring-2 focus:ring-fuchsia-300" />
+                    <input type="text" placeholder={t('input.character.type')} value={character.type} onChange={(e) => onChange(character.id, 'type', e.target.value)} className="w-full p-2 bg-white/80 border border-slate-300/80 rounded-md focus:ring-2 focus:ring-fuchsia-300" />
+                    <input type="text" placeholder={t('input.character.personality')} value={character.personality} onChange={(e) => onChange(character.id, 'personality', e.target.value)} className="w-full p-2 bg-white/80 border border-slate-300/80 rounded-md focus:ring-2 focus:ring-fuchsia-300" />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
+const OptionSelector: FC<{ label: string; value: string; onChange: (value: string) => void; options: { value: string; label: string; }[] }> = ({ label, value, onChange, options }) => (
+    <div>
+        <label className="block text-sm font-bold text-slate-600 mb-2">{label}</label>
+        <div className="flex flex-wrap gap-2">
+            {options.map(opt => (
+                <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => onChange(opt.value)}
+                    className={`px-3 py-1.5 text-sm font-bold rounded-full transition-colors ${value === opt.value ? 'bg-fuchsia-500 text-white shadow' : 'bg-slate-200/80 text-slate-700 hover:bg-slate-300/80'}`}
+                >
+                    {opt.label}
+                </button>
+            ))}
+        </div>
+    </div>
+);
+
 
 export default InputScreen;

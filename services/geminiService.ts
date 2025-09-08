@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { StoryOptions, StoryData, StoryPage, Language, LoadingStage, StoryOutline, SoundEffect } from '../types';
+import { StoryOptions, StoryData, StoryPage, Language, LoadingStage, StoryOutline, SoundEffect, Character } from '../types';
 import { FAL_API_KEY, ELEVENLABS_API_KEY } from '../env';
 
 if (!process.env.API_KEY) {
@@ -22,8 +22,15 @@ const storyOutlineSchema = {
       type: Type.STRING,
       description: 'A short, one-paragraph synopsis of the story. It should be exciting and give a taste of the adventure to come.'
     },
+    coverPrompts: {
+        type: Type.ARRAY,
+        description: "An array of exactly 3 diverse and visually rich image prompts for the book cover. Each prompt must end with a ' Style: [Style Name]' suffix, e.g., ' Style: Vibrant Cartoon'.",
+        items: {
+            type: Type.STRING
+        }
+    }
   },
-  required: ["title", "synopsis"],
+  required: ["title", "synopsis", "coverPrompts"],
 };
 
 const storySchema = {
@@ -69,24 +76,39 @@ const storySchema = {
   required: ["pages"],
 };
 
-const characterDetailsSchema = {
+const charactersSchema = {
   type: Type.OBJECT,
   properties: {
-    characterName: {
-      type: Type.STRING,
-      description: 'The name of the main character, if mentioned or implied. If not, suggest a creative name appropriate for a child\'s story.',
-    },
-    characterType: {
-      type: Type.STRING,
-      description: 'A short description of the main character\'s type (e.g., "a brave lion", "a curious girl", "a happy little robot"). Infer this from the prompt.',
-    },
-    characterPersonality: {
-      type: Type.STRING,
-      description: 'A short description of the main character\'s personality (e.g., "adventurous and kind", "shy but clever"). Infer this from the prompt.',
+    characters: {
+      type: Type.ARRAY,
+      description: 'An array of main characters found in the story prompt.',
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          name: {
+            type: Type.STRING,
+            description: 'The name of the character.',
+          },
+          type: {
+            type: Type.STRING,
+            description: 'A short description of the character\'s type (e.g., "a young girl", "a brave lion", "a friendly teddy bear").',
+          },
+          personality: {
+            type: Type.STRING,
+            description: 'A short description of the character\'s personality (e.g., "adventurous and kind", "shy but clever").',
+          },
+          imagePrompt: {
+              type: Type.STRING,
+              description: 'A simple but visually descriptive prompt for an image generation model to create a 150x150 pixel character icon. Example: "A cute, friendly teddy bear named Barnaby, simple cartoon style for kids."'
+          }
+        },
+        required: ["name", "type", "personality", "imagePrompt"],
+      },
     },
   },
-  required: ["characterName", "characterType", "characterPersonality"],
+  required: ["characters"],
 };
+
 
 const samplePromptsSchema = {
   type: Type.OBJECT,
@@ -167,9 +189,10 @@ The prompts must be written in ${getLanguageName(language)}.
     }
 };
 
-// FIX: Added extractCharacterDetails function to analyze the user's prompt and suggest character details.
-export const extractCharacterDetails = async (prompt: string, language: Language): Promise<{ characterName: string; characterType: string; characterPersonality: string; }> => {
-    const systemInstruction = `You are an expert at analyzing story ideas and identifying key character traits. Based on the user's prompt, extract or infer the main character's name, type, and personality. Respond in ${getLanguageName(language)}. If no details are available, provide creative, age-appropriate suggestions based on the prompt.`;
+export const extractAndGenerateCharacters = async (prompt: string, language: Language): Promise<(Partial<Character> & { previewUrl?: string })[]> => {
+    const systemInstruction = `You are an expert at analyzing children's story ideas. Your task is to identify all main characters from the user's prompt.
+For each character, provide their name, type, a brief personality description, and a simple, visually descriptive prompt for an image generation model to create a 150x150 pixel character icon.
+If no characters are explicitly mentioned, do not invent any. Respond in ${getLanguageName(language)}.`;
     
     try {
         const response = await ai.models.generateContent({
@@ -178,18 +201,53 @@ export const extractCharacterDetails = async (prompt: string, language: Language
             config: {
                 systemInstruction,
                 responseMimeType: "application/json",
-                responseSchema: characterDetailsSchema,
+                responseSchema: charactersSchema,
             },
         });
-        return JSON.parse(response.text);
+        
+        const result = JSON.parse(response.text);
+        const charactersToGenerate: { name: string; type: string; personality: string; imagePrompt: string; }[] = result.characters || [];
+
+        if (charactersToGenerate.length === 0) {
+            return [];
+        }
+
+        // Generate images for each character in parallel
+        const characterPromises = charactersToGenerate.map(async (char) => {
+            const imageUrl = await generateImageWithFal(char.imagePrompt);
+            let visualInspiration: Character['visualInspiration'] | undefined = undefined;
+
+            if (imageUrl !== 'GENERATION_FAILED') {
+                try {
+                    // Convert data URL back to the required format
+                    const [mimePart, base64Part] = imageUrl.split(',');
+                    const mimeType = mimePart.split(':')[1].split(';')[0];
+                    if (mimeType && base64Part) {
+                        visualInspiration = { mimeType, data: base64Part };
+                    }
+                } catch(e) {
+                    console.error("Could not parse generated image data URL", e);
+                }
+            }
+            
+            return {
+                name: char.name,
+                type: char.type,
+                personality: char.personality,
+                visualInspiration: visualInspiration,
+                previewUrl: imageUrl !== 'GENERATION_FAILED' ? imageUrl : undefined
+            };
+        });
+
+        return await Promise.all(characterPromises);
+
     } catch (error) {
-        console.error("Failed to extract character details:", error);
-        // Return empty strings on failure to avoid breaking the UI
-        return { characterName: '', characterType: '', characterPersonality: '' };
+        console.error("Failed to extract or generate characters:", error);
+        return [];
     }
 };
 
-// FIX: Added transcribeAudio function for speech-to-text functionality.
+
 export const transcribeAudio = async (audio: { mimeType: string; data: string }, language: Language): Promise<string> => {
     const audioPart = {
         inlineData: {
@@ -260,7 +318,6 @@ const generateImageWithFal = async (prompt: string): Promise<string | 'GENERATIO
     return 'GENERATION_FAILED';
 };
 
-// FIX: Added regenerateImage function to allow users to retry failed image generations.
 export const regenerateImage = async (prompt: string, style: string): Promise<string | 'GENERATION_FAILED'> => {
     // The style is often already in the prompt from the full story generation, but adding it again ensures consistency.
     const fullPrompt = `${prompt}, in the style of ${style}`;
@@ -322,44 +379,64 @@ const generateAudio = async (text: string): Promise<string | undefined> => {
     }
 };
 
+const buildCharacterDescription = (characters: Character[]): string => {
+    if (!characters || characters.length === 0) return '';
+    const descriptions = characters.map((char, index) => {
+        const details = [char.name, char.type, char.personality].filter(Boolean).join(', ');
+        if (!details) return null;
+        return `Character ${index + 1}: ${details}. ${char.visualInspiration ? `(See provided image for appearance)` : ''}`;
+    }).filter(Boolean).join('\n');
+    return descriptions;
+};
+
 interface OutlineUpdate { stage: LoadingStage.DRAFTING_IDEAS | LoadingStage.SKETCHING_COVERS; }
 export const generateStoryOutline = async (options: StoryOptions, onUpdate: (update: OutlineUpdate) => void): Promise<StoryOutline> => {
     onUpdate({ stage: LoadingStage.DRAFTING_IDEAS });
     
-    const characterDescription = [options.characterName, options.characterType, options.characterPersonality].filter(Boolean).join(', ');
+    const characterDescription = buildCharacterDescription(options.characters);
     const outlinePrompt = `
-You are a creative author for children. Based on the user's idea, generate a creative title and a short, one-paragraph synopsis for a story.
-The entire response, including the values for title and synopsis, must be written in ${getLanguageName(options.language)}.
-The synopsis should be exciting and give a taste of the adventure to come. Be strictly G-rated, positive, and safe for all ages.
+You are a creative author and art director for children's books. Based on the user's idea and character descriptions, you must generate three things:
+1. A creative and engaging title for the story.
+2. A short, one-paragraph synopsis of the story that is exciting and gives a taste of the adventure to come.
+3. An array of exactly 3 diverse and visually rich image prompts for the book cover.
+
+**Rules for Cover Prompts:**
+- They MUST feature the main characters as described by the user.
+- If character images are provided, the descriptions in the prompts MUST be consistent with those images.
+- Each prompt must represent a different artistic style. For example, one could be whimsical and happy, another soft and dreamy, and a third epic and magical.
+- CRITICALLY, each prompt string MUST end with a " Style: [Style Name]" suffix. For example, "A brave squirrel with a red cape standing on a branch, looking at the moon. Style: Dreamy Watercolor".
+
+The entire response, including titles, synopsis, and prompts, must be written in ${getLanguageName(options.language)}.
+Be strictly G-rated, positive, and safe for all ages.
 
 Story Idea: "${options.prompt}"
-${characterDescription ? `Main Character: ${characterDescription}` : ''}
+${characterDescription ? `Main Characters:\n${characterDescription}` : ''}
 `;
     
+    const promptParts: ( { text: string } | { inlineData: { mimeType: string; data: string; } } )[] = [{ text: outlinePrompt }];
+    options.characters.forEach(char => {
+        if (char.visualInspiration) {
+            promptParts.push({ inlineData: char.visualInspiration });
+        }
+    });
+
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: outlinePrompt,
+        contents: { parts: promptParts },
         config: { responseMimeType: "application/json", responseSchema: storyOutlineSchema }
     });
     
-    const { title, synopsis } = JSON.parse(response.text);
+    const { title, synopsis, coverPrompts } = JSON.parse(response.text);
 
     onUpdate({ stage: LoadingStage.SKETCHING_COVERS });
     
-    const basePrompt = `Cover for a children's book titled "${title}". The story is about: ${synopsis}. Main character: ${characterDescription || options.prompt}.`;
-    const coverPrompts = [
-        { prompt: `${basePrompt} Style: Vibrant and colorful, happy cartoon.` },
-        { prompt: `${basePrompt} Style: Soft and dreamy, beautiful watercolor.` },
-        { prompt: `${basePrompt} Style: Epic and magical, detailed fantasy art.` }
-    ];
-
-    const coverImagePromises = coverPrompts.map(p => generateImageWithFal(p.prompt));
+    const coverImagePromises = coverPrompts.map((p: string) => generateImageWithFal(p));
     const coverImageUrls = await Promise.all(coverImagePromises);
 
     return {
         title,
         synopsis,
-        coverImageOptions: coverImageUrls.map((imageUrl, i) => ({ prompt: coverPrompts[i].prompt, imageUrl })),
+        coverImageOptions: coverImageUrls.map((imageUrl, i) => ({ prompt: coverPrompts[i], imageUrl })),
         originalOptions: options
     };
 };
@@ -384,7 +461,7 @@ export const generateFullStoryFromSelection = async (
   
   onUpdate({ stage: LoadingStage.WRITING_PAGES });
 
-  const characterDescription = [options.characterName, options.characterType, options.characterPersonality].filter(Boolean).join(', ');
+  const characterDescription = buildCharacterDescription(options.characters);
   const fullStoryPrompt = `
 You are a world-class children's storyteller and a voice director. Your task is to write a complete story in ${getLanguageName(options.language)} based on the provided synopsis.
 
@@ -400,21 +477,31 @@ You are a world-class children's storyteller and a voice director. Your task is 
 - **Image Prompts:** For each page, create a child-friendly, G-rated image prompt. These prompts MUST be visually consistent with the selected style.
 - **Sound Effects:** For each page, identify 1-2 key moments that can be enhanced with a sound effect. For each moment, provide the exact text phrase from the story that should trigger the sound, and a simple, descriptive prompt for an AI to generate the sound (e.g., "leaves rustling", "door creaking", "happy bird chirping").
 
+**Crucial Instruction for Image Prompts:** 
+If images of the characters were provided, your descriptions in the image prompts MUST closely match the appearance of the characters in those images. For example, if an image shows a squirrel with a blue hat, the prompts should always describe a squirrel with a blue hat. This is the most important instruction.
+
 **Story Synopsis:**
 ${synopsis}
 
-**Main Character:**
-${characterDescription || options.prompt}
+**Main Characters:**
+${characterDescription || 'As described in the user prompt.'}
 
 **Selected Visual Style (for image prompts):**
 ${selectedCoverPrompt}
 
 Please generate the complete story now.
 `;
-    // FIX: Completed the Gemini API call and added the subsequent logic to process the story, generate images, and generate audio.
+    
+    const promptParts: ( { text: string } | { inlineData: { mimeType: string; data: string; } } )[] = [{ text: fullStoryPrompt }];
+    options.characters.forEach(char => {
+        if (char.visualInspiration) {
+            promptParts.push({ inlineData: char.visualInspiration });
+        }
+    });
+    
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: fullStoryPrompt,
+        contents: { parts: promptParts },
         config: {
             responseMimeType: "application/json",
             responseSchema: storySchema,
