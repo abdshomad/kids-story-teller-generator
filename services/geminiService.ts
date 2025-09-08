@@ -448,6 +448,36 @@ interface FullStoryUpdate {
     progress?: { current: number; total: number };
 }
 
+/**
+ * Generates a detailed, consistent visual description of a character from an image.
+ * This description is then used to ensure visual consistency in all story illustrations.
+ * @param character The character object, which must include visual inspiration.
+ * @returns A promise that resolves to a string containing the detailed description.
+ */
+const generateCharacterAppearanceDescription = async (character: Character): Promise<string> => {
+    if (!character.visualInspiration) {
+        return ''; 
+    }
+    
+    const prompt = `
+Analyze the provided image of a character.
+Generate a single, concise, and visually detailed description of the character's appearance.
+This description will be used in multiple image generation prompts, so it must be consistent and specific.
+Focus on key features like species, clothing, colors, and any unique accessories.
+The description should be a single sentence.
+Example output: "A friendly brown teddy bear with button eyes, wearing a red bow tie."
+Another example: "A young girl with curly brown hair, wearing a yellow raincoat and red boots."
+`;
+    
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: { parts: [{ text: prompt }, { inlineData: character.visualInspiration }] },
+    });
+    
+    return response.text.trim().replace(/"/g, '');
+};
+
+
 export const generateFullStoryFromSelection = async (
   options: StoryOptions, 
   selectedCoverPrompt: string,
@@ -456,14 +486,32 @@ export const generateFullStoryFromSelection = async (
   onUpdate: (update: FullStoryUpdate) => void
 ): Promise<StoryData> => {
     
+  // Extract the definitive style from the selected cover prompt to ensure consistency.
+  const styleMatch = selectedCoverPrompt.match(/Style: (.*)/);
+  const finalIllustrationStyle = styleMatch ? styleMatch[1].trim() : options.illustrationStyle;
+    
   onUpdate({ stage: LoadingStage.ANALYZING_PROMPT });
+  
+  // Generate detailed, consistent visual descriptions for each character with an image.
+  // This is a crucial step for ensuring visual consistency across all illustrations.
+  const characterDescriptionPromises = options.characters.map(async (char) => {
+      if (char.visualInspiration) {
+          const visualDescription = await generateCharacterAppearanceDescription(char);
+          return `For the character named '${char.name}', who is a ${char.type}, ALWAYS use this exact visual description: "${visualDescription}".`;
+      }
+      // Fallback for characters without images, providing a text-based description.
+      const textDescription = [char.name, char.type, char.personality].filter(Boolean).join(', ');
+      return `The character '${char.name}' is a ${textDescription}.`;
+  });
+  
+  const detailedCharacterDescriptions = (await Promise.all(characterDescriptionPromises)).join('\n');
+  
   await delay(1000);
   
   onUpdate({ stage: LoadingStage.WRITING_PAGES });
 
-  const characterDescription = buildCharacterDescription(options.characters);
   const fullStoryPrompt = `
-You are a world-class children's storyteller and a voice director. Your task is to write a complete story in ${getLanguageName(options.language)} based on the provided synopsis.
+You are a world-class children's storyteller and a voice director. Your task is to write a complete story in ${getLanguageName(options.language)} based on the provided synopsis and character descriptions.
 
 **Story Guidelines:**
 - **Target Age:** ${options.ageGroup}
@@ -474,20 +522,20 @@ You are a world-class children's storyteller and a voice director. Your task is 
 - **Expressive Narration:** To make the narration more engaging, embed emotional context tags directly into the story text for the AI voice actor. These tags add reactions, emotional states, and pauses.
     - **Use tags like:** [laughs], [sigh], [excited], [nervous], [whispers], [pauses], [gasps], [sorrowful].
     - **Example of correctly formatted text:** "He looked at the giant cookie. [gasps] 'It's bigger than my head!' he shouted, [excited]."
-- **Image Prompts:** For each page, create a child-friendly, G-rated image prompt. These prompts MUST be visually consistent with the selected style.
+- **Image Prompts:** For each page, create a child-friendly, G-rated image prompt.
 - **Sound Effects:** For each page, identify 1-2 key moments that can be enhanced with a sound effect. For each moment, provide the exact text phrase from the story that should trigger the sound, and a simple, descriptive prompt for an AI to generate the sound (e.g., "leaves rustling", "door creaking", "happy bird chirping").
 
-**Crucial Instruction for Image Prompts:** 
-If images of the characters were provided, your descriptions in the image prompts MUST closely match the appearance of the characters in those images. For example, if an image shows a squirrel with a blue hat, the prompts should always describe a squirrel with a blue hat. This is the most important instruction.
+**CRUCIAL INSTRUCTION FOR CHARACTER VISUALS:**
+You have been provided with detailed visual descriptions for the main characters. For every image prompt you generate that includes a character, you MUST use the exact visual description provided below for that character. Do not improvise or change it. This is the most important rule to ensure visual consistency throughout the story.
+
+**Main Characters' Visual Descriptions:**
+${detailedCharacterDescriptions}
 
 **Story Synopsis:**
 ${synopsis}
 
-**Main Characters:**
-${characterDescription || 'As described in the user prompt.'}
-
-**Selected Visual Style (for image prompts):**
-${selectedCoverPrompt}
+**Selected Visual Style (for all image prompts):**
+${finalIllustrationStyle}
 
 Please generate the complete story now.
 `;
@@ -519,10 +567,13 @@ Please generate the complete story now.
     const pages: StoryPage[] = parsedStory.pages || [];
     const totalPages = pages.length;
 
+    // Use a new options object with the updated style to ensure the final data is consistent.
+    const finalOptions = { ...options, illustrationStyle: finalIllustrationStyle };
+
     const storyData: StoryData = {
         title: '', // Title is added back in App.tsx
         pages: pages.map(p => ({ ...p, imageUrl: undefined, audioUrl: undefined })),
-        options,
+        options: finalOptions,
     };
 
     onUpdate({ stage: LoadingStage.DESIGNING_CHARACTERS, storyData });
@@ -530,9 +581,9 @@ Please generate the complete story now.
 
     onUpdate({ stage: LoadingStage.PAINTING_SCENES, storyData, progress: { current: 0, total: totalPages } });
 
-    // Generate images in parallel
+    // Generate images in parallel, ensuring the final, consistent style is used.
     const imagePromises = pages.map((page, index) =>
-        generateImageWithFal(`${page.imagePrompt}, ${options.illustrationStyle}`).then(imageUrl => {
+        generateImageWithFal(`${page.imagePrompt}, ${finalIllustrationStyle}`).then(imageUrl => {
             storyData.pages[index].imageUrl = imageUrl;
             // Create a new object for the update to ensure React state changes are detected
             onUpdate({
